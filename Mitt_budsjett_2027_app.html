@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f2ec">
+<title>Mitt budsjett · 2027</title>
+<style>
+:root{--bg:#f5f2ec;--paper:#fffefa;--ink:#252923;--muted:#73766d;--line:#e6e1d7;--green:#526b55;--green2:#e6eee5;--red:#a94e42;--redbg:#f8e9e5;--gold:#b08c55;--shadow:0 8px 30px rgba(45,44,34,.06)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:15px;line-height:1.4}
+button,input,select{font:inherit}button{cursor:pointer}.app{max-width:760px;margin:auto;min-height:100dvh;padding-bottom:100px}
+header{padding:22px 20px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);font-weight:800}.year{border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-size:12px;background:var(--paper)}
+h1{font-size:30px;line-height:1.08;letter-spacing:-.04em;margin:8px 0 6px;font-weight:750}.sub{color:var(--muted);margin:0;font-size:14px}
+main{padding:8px 16px 24px}.view{display:none}.view.active{display:block}
+.hero{background:var(--green);color:white;border-radius:24px;padding:22px;margin:10px 0 14px;box-shadow:var(--shadow)}
+.hero .eyebrow{font-size:12px;opacity:.8;letter-spacing:.08em;text-transform:uppercase}.hero .amount{font-size:38px;font-weight:760;letter-spacing:-.045em;margin:4px 0 2px}.hero .hint{font-size:13px;opacity:.85}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}.stat{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:15px;min-width:0}.stat .label{font-size:12px;color:var(--muted);margin-bottom:6px}.stat .value{font-size:20px;font-weight:740;letter-spacing:-.03em;overflow-wrap:anywhere}.green{color:var(--green)}.red{color:var(--red)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:17px;margin:12px 0;box-shadow:var(--shadow)}
+.cardhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.card h2{font-size:17px;margin:0;letter-spacing:-.02em}.muted{color:var(--muted);font-size:13px}
+.bar{height:9px;border-radius:99px;background:#ebe7df;overflow:hidden;display:flex;margin:12px 0 8px}.bar span{height:100%;display:block}.bar .spent{background:#7f927e}.bar .saved{background:#c7aa79}.legend{display:flex;flex-wrap:wrap;gap:12px;color:var(--muted);font-size:12px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:rgba(255,254,250,.94);backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:9px 8px calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center}.navinner{width:min(760px,100%);display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.nav button{border:0;background:transparent;color:var(--muted);padding:8px 3px;border-radius:13px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:4px}.nav button .ico{font-size:20px;line-height:1.1}.nav button.active{background:var(--green2);color:var(--green);font-weight:700}
+.sectiontitle{display:flex;justify-content:space-between;align-items:end;margin:12px 3px 8px}.sectiontitle h2{margin:0;font-size:21px;letter-spacing:-.03em}.pill{border-radius:999px;padding:5px 9px;background:var(--green2);color:var(--green);font-size:11px;font-weight:700;white-space:nowrap}
+.monthselect{display:flex;align-items:center;gap:10px;margin:12px 0}.monthselect select{flex:1;background:var(--paper);border:1px solid var(--line);padding:12px;border-radius:12px;color:var(--ink)}
+.group-title{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800;margin:18px 3px 8px}
+.rowitem{display:grid;grid-template-columns:minmax(0,1fr) 118px;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.rowitem:last-child{border-bottom:0}.itemname{font-weight:600;font-size:14px}.itemmeta{font-size:12px;color:var(--muted);margin-top:3px}.moneyinput{width:100%;border:1px solid var(--line);border-radius:11px;background:#fff;padding:10px;text-align:right;font-weight:650;color:var(--ink);min-width:0}.moneyinput:focus{outline:2px solid #9fb49e;border-color:transparent}
+.totalrow{display:flex;justify-content:space-between;gap:10px;padding:13px 0 0;margin-top:4px;border-top:1px solid var(--line);font-weight:750}
+.goal{padding:13px 0;border-bottom:1px solid var(--line)}.goal:last-child{border:0}.goalhead{display:flex;justify-content:space-between;gap:10px;align-items:center}.goalname{font-weight:650}.goal input{width:110px;text-align:right}.goalbar{height:7px;background:#eee9df;border-radius:20px;margin-top:9px;overflow:hidden}.goalbar span{display:block;height:100%;background:var(--green);border-radius:20px}
+.actionrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.btn{border:1px solid var(--line);border-radius:12px;padding:11px 14px;background:var(--paper);color:var(--ink);font-weight:650}.btn.primary{background:var(--green);border-color:var(--green);color:#fff}.btn.soft{background:var(--green2);border-color:var(--green2);color:var(--green)}.btn.danger{color:var(--red)}
+.note{background:#f5efe2;border-radius:14px;padding:12px 14px;color:#6e604a;font-size:13px;margin:12px 0}
+.monthgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.monthtile{border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:11px 10px;text-align:left}.monthtile strong{display:block;font-size:12px;color:var(--muted);font-weight:600}.monthtile span{display:block;font-weight:750;font-size:15px;margin-top:5px}.monthtile small{font-size:11px;color:var(--muted)}
+input[type=file]{display:none}.footerhint{text-align:center;color:var(--muted);font-size:11px;margin:20px 0}
+.toast{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);background:#252923;color:white;padding:11px 15px;border-radius:999px;font-size:13px;display:none;z-index:20;box-shadow:var(--shadow);max-width:90vw}
+@media(min-width:600px){main{padding:10px 22px 30px}header{padding-left:26px;padding-right:26px}.hero{padding:28px}.hero .amount{font-size:44px}.statgrid{grid-template-columns:repeat(4,1fr)}.monthgrid{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div><div class="brand">Personlig økonomi</div><h1>Mitt budsjett</h1><p class="sub">En roligere oversikt over pengene dine.</p></div><div class="year">2027 · NOK</div></header>
+<main>
+<section class="view active" id="view-home">
+<div class="hero"><div class="eyebrow">Disponibelt etter budsjett og sparing</div><div class="amount" id="home-left">−1 100 kr</div><div class="hint" id="home-hint">Planen bruker litt mer enn inntekten.</div></div>
+<div class="statgrid">
+<div class="stat"><div class="label">Inntekt / mnd.</div><div class="value" id="home-income">58 300 kr</div></div>
+<div class="stat"><div class="label">Utgifter / mnd.</div><div class="value" id="home-expenses">44 500 kr</div></div>
+<div class="stat"><div class="label">Sparing / mnd.</div><div class="value" id="home-savings">14 900 kr</div></div>
+<div class="stat"><div class="label">Spareandel</div><div class="value" id="home-rate">25,6 %</div></div>
+</div>
+<div class="card"><div class="cardhead"><h2>Fordeling av inntekten</h2><span class="pill">Per måned</span></div><div class="bar"><span class="spent" id="expensebar" style="width:76%"></span><span class="saved" id="savebar" style="width:26%"></span></div><div class="legend"><span><i class="dot" style="background:#7f927e"></i>Utgifter</span><span><i class="dot" style="background:#c7aa79"></i>Sparing</span><span id="bar-caption"></span></div></div>
+<div class="card"><div class="cardhead"><h2>Planen din</h2><span class="muted">2027</span></div><div class="rowitem"><div><div class="itemname">Buffer</div><div class="itemmeta">Fleksibel sparing til uforutsett</div></div><strong id="buffer-summary">4 400 kr/mnd.</strong></div><div class="rowitem"><div><div class="itemname">Langtid / fond</div><div class="itemmeta">Langsiktig sparing</div></div><strong id="fund-summary">6 000 kr/mnd.</strong></div><div class="rowitem"><div><div class="itemname">Barnehage</div><div class="itemmeta">Fast månedlig kostnad</div></div><strong>850 kr/mnd.</strong></div><div class="actionrow"><button class="btn primary" onclick="showView('budget')">Rediger budsjett</button><button class="btn" onclick="shareSummary()">Del oppsummering ↗</button></div></div>
+<div class="note">Tips: Beløpene lagres automatisk i denne nettleseren. Bruk «Del / sikkerhetskopi» for å eksportere eller flytte budsjettet.</div>
+</section>
+
+<section class="view" id="view-budget">
+<div class="sectiontitle"><div><h2>Budsjettet</h2><div class="muted">Trykk på et beløp for å endre det.</div></div><span class="pill">Auto-lagret</span></div>
+<div class="monthselect"><label for="month">Måned</label><select id="month" onchange="renderMonth()"></select><span class="muted">Plan</span></div>
+<div class="card"><div class="cardhead"><h2>Inntekter</h2><span id="income-total" class="pill">58 300 kr</span></div><div id="income-list"></div><div class="totalrow"><span>Sum inntekter</span><span id="income-total-bottom"></span></div></div>
+<div class="card"><div class="cardhead"><h2>Utgifter</h2><span id="expense-total" class="pill"></span></div><div id="expense-list"></div><div class="totalrow"><span>Sum utgifter</span><span id="expense-total-bottom"></span></div></div>
+<div class="card"><div class="cardhead"><h2>Sparing og overføringer</h2><span id="saving-total" class="pill"></span></div><div id="saving-list"></div><div class="totalrow"><span>Sum sparing</span><span id="saving-total-bottom"></span></div></div>
+<div class="card"><div class="totalrow" style="border:0;padding:0;margin:0"><span>Igjen etter alt</span><span id="budget-left"></span></div><div class="actionrow"><button class="btn soft" onclick="resetBudget()">Tilbakestill beløp</button><button class="btn primary" onclick="showView('share')">Del / sikkerhetskopi</button></div></div>
+</section>
+
+<section class="view" id="view-year">
+<div class="sectiontitle"><div><h2>Årsoversikt</h2><div class="muted">Samme budsjett hver måned – endre månedlige beløp under Budsjett.</div></div></div>
+<div class="statgrid"><div class="stat"><div class="label">Årsinntekt</div><div class="value" id="year-income"></div></div><div class="stat"><div class="label">Årsutgifter</div><div class="value" id="year-expenses"></div></div><div class="stat"><div class="label">Årssparing</div><div class="value" id="year-savings"></div></div><div class="stat"><div class="label">Årsresultat</div><div class="value" id="year-left"></div></div></div>
+<div class="card"><div class="cardhead"><h2>Måned for måned</h2><span class="muted">Planlagt resultat</span></div><div class="monthgrid" id="monthgrid"></div></div>
+<div class="note">Dette er en prognose basert på månedlige snitt. Strømmen er lagt inn som 4 000 kr/mnd. selv om den varierer gjennom året. Faktiske sesongvariasjoner kan legges inn ved å endre månedsbeløpet før du planlegger den enkelte måneden.</div>
+</section>
+
+<section class="view" id="view-share">
+<div class="sectiontitle"><div><h2>Del og sikkerhetskopier</h2><div class="muted">Du bestemmer hvem som får se tallene dine.</div></div></div>
+<div class="card"><h2>Del budsjettet</h2><p class="muted">Del en enkel oppsummering via mobilens delingsmeny. Dette deler ikke automatisk en synkronisert kopi.</p><div class="actionrow"><button class="btn primary" onclick="shareSummary()">Del oppsummering ↗</button><button class="btn" onclick="copySummary()">Kopier tekst</button></div></div>
+<div class="card"><h2>Flytt budsjettet mellom enheter</h2><p class="muted">Eksporter en sikkerhetskopi og importer filen på en annen enhet. Filen inneholder budsjettbeløpene du har lagt inn.</p><div class="actionrow"><button class="btn primary" onclick="exportJSON()">Eksporter sikkerhetskopi</button><label class="btn" for="importfile">Importer fil</label><input id="importfile" type="file" accept=".json,application/json" onchange="importJSON(event)"/></div></div>
+<div class="card"><h2>Regneark</h2><p class="muted">Vil du jobbe videre i Excel eller Google Sheets, kan du eksportere alle kategoriene til CSV.</p><div class="actionrow"><button class="btn" onclick="exportCSV()">Last ned CSV</button></div></div>
+<div class="note">Privatliv: Budsjettet lagres lokalt i nettleseren på denne enheten. Det lastes ikke opp til en konto og synkroniseres ikke automatisk. Hvis du deler HTML-filen, mottar den andre personen en egen kopi.</div>
+<div class="card"><h2>Administrer data</h2><div class="actionrow"><button class="btn danger" onclick="clearSaved()">Slett lagrede endringer</button></div></div>
+</section>
+<div class="footerhint">Personlig budsjett · 2027 · Tallene kan endres når livet endrer seg.</div>
+</main>
+</div>
+<nav class="nav"><div class="navinner">
+<button class="active" data-view="home" onclick="showView('home')"><span class="ico">⌂</span>Oversikt</button>
+<button data-view="budget" onclick="showView('budget')"><span class="ico">≡</span>Budsjett</button>
+<button data-view="year" onclick="showView('year')"><span class="ico">▦</span>Året</button>
+<button data-view="share" onclick="showView('share')"><span class="ico">↗</span>Deling</button>
+</div></nav>
+<div class="toast" id="toast"></div>
+<script>
+const months=['Januar','Februar','Mars','April','Mai','Juni','Juli','August','September','Oktober','November','Desember'];
+const defaults={
+income:[['Lønn',55000],['Barnestøtte NAV',3300],['Andre inntekter',0],['Overtid/bonus',0],['Refusjoner',0],['Annet',0]],
+expenses:[['Boliglån',16000],['Strøm · årssnitt',4000],['Klær til barna',1500],['Mat og husholdning',5000],['Forsikringer – hus/innbo',800],['Bil – service/vedlikehold',550],['Studielån',3500],['Vann/kommunale avgifter',2000],['Bilforsikring',2000],['Trening',450],['Strømmetjenester',600],['Parkering/bom/bilvask',2000],['Klær',3000],['Restaurant/kino',2000],['Mobil og internett · dekkes av jobb',0],['Drivstoff/lading · inkludert i bilbudsjettet',0],['Helse/apotek',0],['Barn – aktiviteter/skole',0],['Ferie/reiser',0],['Gaver/høytider',0],['Vedlikehold/uforutsett hjem',0],['Andre/årlige regninger',0],['Diverse',0],['Barnehage',850],['Tannlege',250]],
+savings:[['Elias',1500],['Benjamin',1500],['Langtid / fond',6000],['Buffer',4400],['Mamma',1500],['Ferie / større mål',0],['Annen sparing',0]]
+};
+let data=JSON.parse(JSON.stringify(defaults));
+try{const saved=localStorage.getItem('personalBudget2027v2');if(saved){const parsed=JSON.parse(saved);if(parsed.income&&parsed.expenses&&parsed.savings)data=parsed;}}catch(e){}
+const fmt=n=>new Intl.NumberFormat('nb-NO',{maximumFractionDigits:0}).format(Math.round(Number(n)||0))+' kr';
+const total=arr=>arr.reduce((s,x)=>s+(Number(x[1])||0),0);
+function totals(){let i=total(data.income),e=total(data.expenses),s=total(data.savings);return {i,e,s,left:i-e-s};}
+function save(){try{localStorage.setItem('personalBudget2027v2',JSON.stringify(data));}catch(e){} updateAll();}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.style.display='none',2200);}
+function showView(name){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id==='view-'+name));document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.view===name));window.scrollTo({top:0,behavior:'smooth'});if(name==='budget')renderMonth();}
+function makeList(type,target){const el=document.getElementById(target);el.innerHTML='';data[type].forEach((item,idx)=>{const row=document.createElement('div');row.className='rowitem';row.innerHTML=`<div><div class="itemname"></div><div class="itemmeta">${type==='income'?'Inntekt':type==='expenses'?'Månedlig utgift':'Sparing / overføring'}</div></div><input class="moneyinput" type="number" min="0" step="50" inputmode="decimal" aria-label="Beløp for ${item[0]}">`;row.querySelector('.itemname').textContent=item[0];const inp=row.querySelector('input');inp.value=item[1];inp.addEventListener('change',()=>{data[type][idx][1]=Math.max(0,Number(inp.value)||0);save();});inp.addEventListener('input',()=>{data[type][idx][1]=Math.max(0,Number(inp.value)||0);updateAll(false);});el.appendChild(row);});}
+function renderMonth(){makeList('income','income-list');makeList('expenses','expense-list');makeList('savings','saving-list');}
+function updateAll(rerender=true){const t=totals();const put=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};put('home-left',fmt(t.left));document.getElementById('home-left').className='amount '+(t.left<0?'':'');put('home-hint',t.left<0?'Planen bruker '+fmt(Math.abs(t.left))+' mer enn inntekten.':t.left===0?'Hele inntekten er fordelt.':'Du har '+fmt(t.left)+' igjen som ekstra margin.');put('home-income',fmt(t.i));put('home-expenses',fmt(t.e));put('home-savings',fmt(t.s));put('home-rate',t.i?((t.s/t.i)*100).toLocaleString('nb-NO',{maximumFractionDigits:1})+' %':'0 %');put('buffer-summary',fmt(data.savings.find(x=>x[0]==='Buffer')?.[1]||0)+'/mnd.');put('fund-summary',fmt(data.savings.find(x=>x[0]==='Langtid / fond')?.[1]||0)+'/mnd.');put('income-total',fmt(t.i));put('income-total-bottom',fmt(t.i));put('expense-total',fmt(t.e));put('expense-total-bottom',fmt(t.e));put('saving-total',fmt(t.s));put('saving-total-bottom',fmt(t.s));put('budget-left',fmt(t.left));put('year-income',fmt(t.i*12));put('year-expenses',fmt(t.e*12));put('year-savings',fmt(t.s*12));put('year-left',fmt(t.left*12));document.getElementById('year-left').className='value '+(t.left<0?'red':'green');document.getElementById('expensebar').style.width=Math.min(100,t.i?t.e/t.i*100:0)+'%';document.getElementById('savebar').style.width=Math.min(100,t.i?t.s/t.i*100:0)+'%';put('bar-caption',t.left<0?'Over budsjett':fmt(Math.max(0,t.left))+' margin');document.getElementById('monthgrid').innerHTML=months.map(m=>`<button class="monthtile" onclick="document.getElementById('month').value='${m}';showView('budget')"><strong>${m}</strong><span class="${t.left<0?'red':'green'}">${fmt(t.left)}</span><small>etter sparing</small></button>`).join('');if(rerender&&document.getElementById('view-budget').classList.contains('active'))renderMonth();}
+function summaryText(){const t=totals();return `PERSONLIG BUDSJETT 2027\nInntekt: ${fmt(t.i)}/mnd.\nUtgifter: ${fmt(t.e)}/mnd.\nSparing: ${fmt(t.s)}/mnd.\nDisponibelt etter alt: ${fmt(t.left)}/mnd.\nÅrsresultat: ${fmt(t.left*12)}\n\nLaget i Mitt budsjett.`;}
+async function shareSummary(){const txt=summaryText();try{if(navigator.share)await navigator.share({title:'Mitt budsjett 2027',text:txt});else{await navigator.clipboard.writeText(txt);toast('Oppsummering kopiert');}}catch(e){if(e.name!=='AbortError')copySummary();}}
+async function copySummary(){try{await navigator.clipboard.writeText(summaryText());toast('Oppsummering kopiert');}catch(e){download('budsjett-oppsummering.txt',summaryText(),'text/plain');toast('Tekstfil lastet ned');}}
+function download(name,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function exportJSON(){download('mitt-budsjett-2027.json',JSON.stringify({version:2,year:2027,data},null,2),'application/json');toast('Sikkerhetskopi eksportert');}
+function importJSON(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const x=JSON.parse(reader.result);const d=x.data||x;if(!d.income||!d.expenses||!d.savings)throw Error();data=d;save();renderMonth();toast('Budsjettet er importert');}catch(e){alert('Filen kunne ikke leses som et budsjett.');}};reader.readAsText(file);event.target.value='';}
+function exportCSV(){const rows=[['Type','Kategori','Beløp per måned','Beløp per år']];[['Inntekt',data.income],['Utgift',data.expenses],['Sparing',data.savings]].forEach(([type,arr])=>arr.forEach(([name,n])=>rows.push([type,name,n,Number(n)*12])));const csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n');download('mitt-budsjett-2027.csv',csv,'text/csv;charset=utf-8');}
+function resetBudget(){if(confirm('Tilbakestille alle beløp til startverdiene?')){data=JSON.parse(JSON.stringify(defaults));save();renderMonth();toast('Startverdiene er gjenopprettet');}}
+function clearSaved(){if(confirm('Slette lagrede endringer på denne enheten og gå tilbake til startverdiene?')){try{localStorage.removeItem('personalBudget2027v2')}catch(e){}data=JSON.parse(JSON.stringify(defaults));updateAll();renderMonth();toast('Lokale endringer er slettet');}}
+document.getElementById('month').innerHTML=months.map((m,i)=>`<option value="${m}">${m}</option>`).join('');
+updateAll();renderMonth();
+</script>
+</body></html>
