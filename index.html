@@ -382,6 +382,7 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
     <div class="swatches" id="swatches"></div>
   </div>
   <div class="card">
+    <p class="muted" style="margin:0 0 12px">Versjon <b id="app-version"></b> – sjekk at denne stemmer etter at du har lastet opp en ny fil.</p>
     <h3>Start på nytt</h3>
     <p class="muted" style="margin:0">Sletter alle beløp og endringer på denne enheten.</p>
     <div class="btns"><button class="btn danger" type="button" id="m-reset">Slett alt og start på nytt</button></div>
@@ -713,7 +714,10 @@ function quoteFor(it,st){const n=it.name.toLowerCase();
  return list[(+NOW.slice(5))%list.length];}
 function ringSVG(p){const r=30,c=2*Math.PI*r;return`<svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="${r}" fill="none" stroke="var(--acc2)" stroke-width="8"/><circle cx="36" cy="36" r="${r}" fill="none" stroke="${p>=100?'var(--green)':'var(--acc)'}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(c*Math.min(p,100)/100).toFixed(1)} ${c.toFixed(1)}"/></svg>`;}
 function renderGoals(){const gs=data.savings.filter(x=>!x.only&&x.goal&&x.goal.on&&x.goal.amount>0);
- const card=document.getElementById('goals-card');card.style.display=gs.length?'':'none';if(!gs.length)return;
+ const card=document.getElementById('goals-card');card.style.display='';
+ const wm=workMonth(),noGoal=data.savings.filter(x=>!x.only&&!(x.goal&&x.goal.on&&x.goal.amount>0)&&inMonth(x,wm));
+ const tail=`<div style="margin-top:${gs.length?'12':'4'}px">${gs.length?'':'<p class="muted" style="margin:0 0 4px">Sett et mål for en sparepost – se hvor langt du har kommet, prosent og når du er i mål.</p>'}
+  <div class="suggest">${suggestChips(wm)}${noGoal.map(x=>`<button type="button" data-setgoal="${x.id}">🎯 Mål for ${esc(x.name)}</button>`).join('')}</div></div>`;
  document.getElementById('goals').innerHTML=gs.map(it=>{const st=goalStatus(it),debt=it.goal.type==='debt',done=st.pct>=100;
   const boost=!done&&st.eta?goalStatus(it,500):null,saved=boost&&boost.eta?st.months-boost.months:0;
   return`<div class="goal"><div class="ring">${ringSVG(st.pct)}<span>${Math.floor(st.pct)} %</span></div>
@@ -723,6 +727,7 @@ function renderGoals(){const gs=data.savings.filter(x=>!x.only&&x.goal&&x.goal.o
    ${saved>0?`<div class="boost">Med 500 kr mer i måneden blir du ${debt?'ferdig':'i mål'} ${monthsText(saved)} tidligere.</div>`:''}
    ${it.goal.motivate?`<div class="quote">${esc(quoteFor(it,st))}</div>`:''}
    <div class="togrow" style="grid-column:1/3;margin-top:-4px"><small style="font-size:13px;color:var(--muted)">Motiverende meldinger</small><label class="switch" style="transform:scale(.8);transform-origin:right"><input type="checkbox" data-mot="${it.id}" ${it.goal.motivate?'checked':''} aria-label="Motiverende meldinger for ${esc(it.name)}"><span></span></label></div></div>`;}).join('');
+ document.getElementById('goals').insertAdjacentHTML('beforeend',tail);bindSuggest(document.getElementById('goals'),wm);
  document.querySelectorAll('#goals [data-mot]').forEach(c=>c.onchange=()=>{const it=find(c.dataset.mot);if(it){it.goal.motivate=c.checked;save(c.checked?'Meldinger på':'Meldinger av');}});}
 function renderNewMonth(){const el=document.getElementById('newmonth');const prev=prevPlanned(NOW);
  if(!PERIOD.includes(NOW)||isPlanned(NOW)||!prev){el.style.display='none';return;}
@@ -767,6 +772,20 @@ function bindBalance(root){root.querySelectorAll('[data-rm]').forEach(b=>b.oncli
   if(!confirm(`Fjerne ${fmt(d.amount)} (fra ${mLabel(d.only).toLowerCase()}) fra kontoen fra og med ${mLabel(mode).toLowerCase()}? Bruk dette når pengene er tatt ut eller brukt.`))return;d.removed=mode;d.keep=true;save('Fjernet fra '+mName(mode).toLowerCase());});
  root.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{const d=find(b.dataset.undo);if(d){delete d.removed;save('Ligger på kontoen igjen');}});}
 const SAVE_SUGGEST=[['Ferie','✈️','bank'],['Bil','🚗','bank'],['Buffer','🛟','bank'],['Gjeld','💳','transfer']];
+const findSaving=n=>data.savings.find(x=>!x.only&&x.name.toLowerCase().includes(n.toLowerCase()));
+/* Månedens plan å legge nye poster i: inneværende måned, ellers siste planlagte */
+function workMonth(){if(isPlanned(NOW))return NOW;return effMonth(NOW)||NOW;}
+function suggestChips(m){return SAVE_SUGGEST.map(o=>{const ex=findSaving(o[0]);
+  if(!ex)return`<button type="button" data-sg="${o[0]}">+ ${o[1]} ${o[0]}</button>`;
+  if(!inMonth(ex,m))return`<button type="button" data-back="${ex.id}">↩ ${iconOf(ex,'savings')} ${esc(ex.name)} (hent tilbake)</button>`;
+  return'';}).join('');}
+function bindSuggest(root,m,afterOpen){
+ root.querySelectorAll('[data-sg]').forEach(b=>b.onclick=()=>{const o=SAVE_SUGGEST.find(x=>x[0]===b.dataset.sg);mode=m;tab='savings';
+  openSheet('savings',null,{name:o[0],icon:o[1],kind:o[2],goal:{on:true,type:o[2]==='transfer'?'debt':'save',amount:'',before:'',motivate:true}});});
+ root.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{const it=find(b.dataset.back);if(!it)return;data.plan[m]=data.plan[m]||{};data.plan[m][it.id]=it.amount||0;
+  save(it.name+' er lagt tilbake i '+mLabel(m).toLowerCase());});
+ root.querySelectorAll('[data-setgoal]').forEach(b=>b.onclick=()=>{mode=m;tab='savings';openSheet('savings',b.dataset.setgoal);
+  const on=document.getElementById('g-on');on.checked=true;paintGoal();});}
 function regOneOffs(m){return['income','expenses','savings'].flatMap(t=>data[t].filter(it=>it.only===m).map(it=>({t,it})));}
 function renderBudget(){
  if(!mode||!PERIOD.includes(mode))mode=PERIOD.includes(NOW)?NOW:PERIOD[0];
@@ -806,9 +825,7 @@ function renderBudget(){
  }else{const fixed=items.filter(x=>!x.only);
   html=oneOffBox()+(fixed.length?groupHead('💰','Faste inntekter',fixed.length,'data-inc="1"',fixed.reduce((a,x)=>a+amountFor(x,mode),0))+incomeLine()+fixed.map(rowHTML).join(''):'');}
  if(!items.length&&tab!=='income')html=(tab==='savings'?balanceBox():'')+'<p class="empty">Ingen poster her i '+mName(mode).toLowerCase()+'.</p>';
- if(tab==='savings'){const have=n=>data.savings.some(x=>!x.only&&x.name.toLowerCase().includes(n));
-  const sug=SAVE_SUGGEST.filter(o=>!have(o[0].toLowerCase()));
-  if(sug.length)html+=`<div class="suggest" style="margin:14px 0 0">${sug.map(o=>`<button type="button" data-sg="${o[0]}">+ ${o[1]} ${o[0]}</button>`).join('')}</div>`;}
+ if(tab==='savings'){const ch=suggestChips(mode);if(ch)html+=`<div class="suggest" style="margin:14px 0 0">${ch}</div>`;}
  if(tab==='savings')html+=`<button class="addbtn" type="button" id="add-once">+ Engangsinnskudd i ${mName(mode).toLowerCase()}</button>`;
  html+=`<button class="addbtn" type="button" id="add">+ Ny ${tab==='income'?'fast inntekt':tab==='expenses'?'utgift':'fast sparing'}</button>`;
  const list=document.getElementById('list');list.innerHTML=html;
@@ -823,8 +840,7 @@ function renderBudget(){
  });
  list.querySelectorAll('.rname').forEach(b=>b.onclick=()=>openSheet(tab,b.dataset.id));
  document.getElementById('add').onclick=()=>openSheet(tab,null);
- list.querySelectorAll('[data-sg]').forEach(b=>b.onclick=()=>{const o=SAVE_SUGGEST.find(x=>x[0]===b.dataset.sg);
-  openSheet('savings',null,{name:o[0],icon:o[1],newGoal:true,kind:o[2],goal:{on:true,type:o[2]==='transfer'?'debt':'save',amount:'',before:'',motivate:true}});});
+ bindSuggest(list,mode);
  const ao=document.getElementById('add-once');if(ao)ao.onclick=()=>{const first=data.savings.find(x=>!x.only&&kindOf(x)!=='transfer');openSheet('savings',null,{name:'Engangsinnskudd',icon:'➕',only:mode,target:first?first.id:''});};
  bindOneOff(list);bindBalance(list);
 }
@@ -1172,6 +1188,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alle beløp 
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
+const APP_VERSION='24.10.2026 · mål 2';set('app-version',APP_VERSION);
 function renderAll(){
  renderHome();if(view==='budget')renderBudget();if(view==='year')renderYear();if(view==='more')renderSSB();
  renderLeftbar();
