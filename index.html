@@ -139,6 +139,11 @@ details.rates summary{cursor:pointer;color:var(--acc);font-weight:600;font-size:
 .emptymonth{text-align:center;padding:18px 6px}
 .emptymonth h3{margin:0 0 6px}
 .emptymonth .btns{flex-direction:column}
+.infobtn{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--acc);background:none;color:var(--acc);font:italic 700 14px Georgia,serif;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.cmpbar.mini{padding:8px 12px;margin:10px 0 0;border-radius:12px;gap:10px}
+.cmpbar.mini b{font-size:13px}
+.cmpbar.mini .profsum,.cmpbar.mini .profsum .linkbtn{font-size:12px;margin-top:1px}
+.cmpbar.mini .switch{transform:scale(.75);transform-origin:right center;flex:0 0 52px}
 .clamp{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
 .clamp.open{display:block!important;-webkit-line-clamp:unset;line-clamp:unset;overflow:visible}
 .morebtn{display:inline-flex;align-items:center;gap:4px;border:0;background:none;color:var(--acc);font-weight:700;font-size:13px;padding:4px 0 2px;margin:0 0 4px;cursor:pointer}
@@ -332,16 +337,14 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
 
 <!-- BUDSJETT -->
 <section class="view" id="v-budget">
-  <h2>Budsjett</h2>
-  <p class="lead">Velg måned. Hver måned planlegges for seg og starter med basisbudsjettet.</p>
+  <h2 style="display:flex;align-items:center;gap:8px">Budsjett <button type="button" class="infobtn" id="b-info" aria-label="Slik fungerer budsjettet">i</button></h2>
   <div class="monthbar" id="monthbar"></div>
   <div class="modeinfo" id="modeinfo"></div>
   <div id="usebase"></div>
   <div id="plan-empty"></div>
-  <div class="cmpbar" id="cmpbar"><label class="switch"><input type="checkbox" id="cmp-on" aria-label="Sammenlign med andre"><span></span></label>
-   <div class="t"><b>Sammenlign med andre</b><div class="profsum" id="cmp-sub"></div></div></div>
   <div class="tabs" id="tabs"></div>
   <div class="card" id="list"></div>
+  <div class="cmpbar mini" id="cmpbar"><div class="t"><b>Sammenlign med andre (SSB)</b><div class="profsum" id="cmp-sub"></div></div><label class="switch"><input type="checkbox" id="cmp-on" aria-label="Sammenlign med andre"><span></span></label></div>
 </section>
 
 <!-- ÅRET -->
@@ -492,6 +495,17 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
   <h3 id="cf-title" style="font-size:19px;margin:0 0 6px"></h3>
   <p id="cf-text" style="margin:0;color:var(--muted);font-size:15px;line-height:1.45"></p>
   <div class="btns"><button class="btn dangerfill grow" type="button" id="cf-yes"></button><button class="btn grow" type="button" id="cf-no">Nei</button></div>
+</div></div>
+<div class="sheetbg" id="infobg"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="in-title">
+  <div class="grab"></div>
+  <h3 id="in-title" style="font-size:18px;margin:0 0 8px">Slik fungerer budsjettet</h3>
+  <div style="font-size:15px;line-height:1.5;color:var(--ink)">
+   <p style="margin:0 0 8px">Hver måned planlegges for seg. Endringer i én måned gjelder bare den måneden.</p>
+   <p style="margin:0 0 8px"><b>⭐ Basisbudsjettet</b> er malen nye måneder starter med: de faste inntektene, utgiftene og sparingen. Engangsbeløp hører ikke med.</p>
+   <p style="margin:0 0 8px">Vil du ha et nytt basisbudsjett, tilpasser du en måned og trykker «⭐ Bruk som basisbudsjett» nederst i måneden.</p>
+   <p style="margin:0">«Sammenlign med andre» nederst viser om du ligger over eller under snittet hos SSB.</p>
+  </div>
+  <div class="btns"><button type="button" class="btn grow" id="in-base">⭐ Hent basisbudsjettet på nytt</button><button type="button" class="btn pri grow" id="in-close">Lukk</button></div>
 </div></div>
 <div class="toast" id="toast"></div>
 
@@ -892,6 +906,11 @@ function deleteMonth(k){
    data.savings.forEach(d=>{if(d.removed===k)delete d.removed;});
    rebuildPeriod();close();save(mLabel(k)+' er slettet');};bg.classList.add('open');};
  step1();}
+document.getElementById('b-info').onclick=()=>{const ib=document.getElementById('in-base');ib.style.display=Object.keys(data.base).length&&isPlanned(mode)&&mode!==BASE?'':'none';
+ ib.textContent='⭐ Hent basisbudsjettet på nytt for '+mName(mode).toLowerCase();document.getElementById('infobg').classList.add('open');};
+document.getElementById('in-close').onclick=()=>document.getElementById('infobg').classList.remove('open');
+document.getElementById('infobg').onclick=e=>{if(e.target.id==='infobg')e.currentTarget.classList.remove('open');};
+document.getElementById('in-base').onclick=()=>{if(confirm('Erstatte de faste beløpene i '+mLabel(mode).toLowerCase()+' med basisbudsjettet? Engangsbeløp blir liggende.')){copyMonth(BASE,mode);document.getElementById('infobg').classList.remove('open');save(mName(mode)+' bruker nå basisbudsjettet');}};
 function regOneOffs(m){return['income','expenses','savings'].flatMap(t=>data[t].filter(it=>it.only===m).map(it=>({t,it})));}
 function renderBudget(){queueClamp();
  if(!mode||mode===BASE||!PERIOD.includes(mode))mode=PERIOD.includes(homeM)?homeM:PERIOD.includes(NOW)?NOW:PERIOD[0];
@@ -901,13 +920,15 @@ function renderBudget(){queueClamp();
  mb.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{mode=c.dataset.m;renderBudget();renderLeftbar();});
  const on=mb.querySelector('.chip.on');if(on&&on.scrollIntoView)on.scrollIntoView({inline:'center',block:'nearest'});
  const planned=isPlanned(mode),prev=prevPlanned(mode),src=nearestPlanned(mode);
- ['cmpbar','tabs','list'].forEach(id=>document.getElementById(id).style.display=planned?'':'none');
- const mi=document.getElementById('modeinfo');mi.style.display=planned?'':'none';
+ ['tabs','list'].forEach(id=>document.getElementById(id).style.display=planned?'':'none');
+ document.getElementById('cmpbar').style.display=planned&&tab!=='savings'?'':'none';
+ const mi=document.getElementById('modeinfo');mi.style.display=mode===BASE?'':'none';
  if(mode===BASE)mi.innerHTML=`⭐ <b>Basisbudsjettet</b> er malen hver ny måned starter med. Endringer her påvirker ikke måneder som allerede er planlagt.${originalData()?' <button type="button" class="linkbtn" id="restorebase">Hent det opprinnelige budsjettet</button>':''}`;
  else if(planned)mi.innerHTML=`Du planlegger <b>${mLabel(mode).toLowerCase()}</b>. Endringer gjelder bare denne måneden.`;
  /* ⭐ Bruk basisbudsjettet – øverst i planlagte måneder */
  const ub=document.getElementById('usebase'),bc=Object.keys(data.base).length;
- if(planned&&mode!==BASE){
+ const hasFixedM=['income','expenses','savings'].some(t=>data[t].some(it=>!it.only&&inMonth(it,mode)));
+ if(planned&&mode!==BASE&&!hasFixedM){
   ub.innerHTML=`<div class="usebase"><button type="button" class="basebtn" id="ub-btn" ${bc?'':'disabled'}>⭐ Bruk basisbudsjettet</button>
    <p class="muted" style="margin:0 2px;font-size:13px">${bc?`Klikker du her, får du opp alle de faste inntektene, utgiftene og sparingen fra basisbudsjettet (${bc} poster). Du kan redigere dem fritt etterpå, og engangsbeløp blir liggende. Ønsker du et nytt basisbudsjett? Tilpass måneden og trykk «⭐ Bruk som basisbudsjett» nederst.`:'Basisbudsjettet er tomt. Fyll ut måneden og trykk «⭐ Bruk som basisbudsjett» nederst, så kan du bruke det i de neste månedene.'}</p>
    ${!bc&&originalData()?'<button type="button" class="linkbtn" id="ub-orig" style="margin:6px 2px 0">Hent budsjettet du hadde fra før</button>':''}</div>`;
@@ -934,6 +955,7 @@ function renderBudget(){queueClamp();
  const tb=document.getElementById('tabs');
  tb.innerHTML=tabs.map(([k,n,v])=>`<button class="tab ${tab===k?'on':''}" data-k="${k}">${n}<small>${fmt(v)}</small></button>`).join('');
  tb.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{tab=b.dataset.k;renderBudget();});
+ document.getElementById('cmpbar').style.display=tab!=='savings'?'':'none';
  const items=data[tab].filter(it=>inMonth(it,mode));
  let html='';
  if(tab==='expenses'){
@@ -953,7 +975,7 @@ function renderBudget(){queueClamp();
  if(mode!==BASE)html+=`<button class="delmonth" type="button" id="delmonth">Slett ${mLabel(mode).toLowerCase()}</button>`;
  const monthEmpty=mode!==BASE&&!['income','expenses','savings'].some(t=>data[t].some(it=>inMonth(it,mode)));
  const baseCount=Object.keys(data.base).length;
- if(monthEmpty)html=`<div class="emptymonth"><h3>${mLabel(mode)} er tom</h3><p class="muted">${baseCount?'Trykk «⭐ Bruk basisbudsjettet» øverst, eller bygg måneden selv med «+ Ny» under.':'Legg til poster selv, eller hent budsjettet du hadde fra før.'}</p></div>`+html.replace(/<p class="empty">[^<]*<\/p>/,'');
+ if(monthEmpty)html=`<div class="emptymonth"><h3>${mLabel(mode)} er tom</h3><p class="muted">${baseCount?'Trykk «⭐ Bruk basisbudsjettet» over, eller bygg måneden selv med «+ Ny» under.':'Legg til poster selv, eller hent budsjettet du hadde fra før.'}</p></div>`+html.replace(/<p class="empty">[^<]*<\/p>/,'');
  if(mode===BASE&&!baseCount)html=`<div class="emptymonth"><h3>Basisbudsjettet er tomt</h3><p class="muted">Legg til faste inntekter, utgifter og sparing her${originalData()?', eller hent budsjettet du hadde fra før':''}. Du kan også gå til en utfylt måned og trykke «Bruk som ny basis».</p>
   ${originalData()?'<div class="btns"><button type="button" class="btn pri" id="em-orig">Hent budsjettet du hadde fra før</button></div>':''}</div>`+html;
  const list=document.getElementById('list');list.innerHTML=html;
@@ -1327,7 +1349,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alle beløp 
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='25.10.2026 · vis detaljer';set('app-version',APP_VERSION);
+const APP_VERSION='25.10.2026 · ryddig budsjett';set('app-version',APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
