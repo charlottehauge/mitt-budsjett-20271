@@ -717,31 +717,35 @@ const eqHTML=(v,lbl='')=>`<span>Inngående${lbl}<b>${fmt(v.start)}</b></span><sp
 let estOpen=false;
 function renderSavings(){queueClamp();
  const P=savingsModel(false),R=savingsModel(true),curY=YEARS_H();
- const showYears=[curY,curY+1].filter(y=>P.years.includes(y));
- if(!showYears.includes(savYear))savYear=curY;
+ const hy=mYear(homeM&&homeM!==BASE?homeM:NOW),showYears=[...new Set([curY,curY+1,hy])].filter(y=>P.years.includes(y)).sort();
+ if(!showYears.includes(savYear))savYear=hy;
  const st=document.getElementById('savtabs');
  st.innerHTML=showYears.map(y=>`<button type="button" class="${y===savYear?'on':''}" data-sy="${y}">${y}${y===curY?' · i år':''}</button>`).join('');
  st.querySelectorAll('[data-sy]').forEach(b=>b.onclick=()=>{savYear=+b.dataset.sy;renderSavings();});
  /* ---- Så langt i valgt år: bare planlagte måneder t.o.m. denne måneden ---- */
- const done=PERIOD.filter(k=>mYear(k)===savYear&&k<=NOW),doneP=done.filter(isPlanned);
- const sofar=doneP.reduce((a,k)=>a+savedIn(k),0);
- set('sav-lbl','Spart så langt i '+savYear);
- set('sav-sofar',done.length?fmt(sofar):'–');
- set('sav-start',!done.length?`${savYear} har ikke startet ennå. Se estimatet under.`:doneP.length?`Sparingen i ${doneP.map(k=>mName(k).toLowerCase()).join(', ')}. Overføringer er ikke med.`:'Ingen måneder er planlagt ennå i år.');
+ /* Siste måned som regnes med: måneden du har valgt i «Vis måned» (eller hele året for tidligere år) */
+ const hk=homeM&&homeM!==BASE?homeM:NOW,cut=savYear===mYear(hk)?hk:savYear<mYear(hk)?mkey(savYear,11):null;
+ const done=cut?PERIOD.filter(k=>mYear(k)===savYear&&k<=cut):[],doneP=done.filter(isPlanned);
+ const sofar=doneP.reduce((a,k)=>a+savedIn(k),0),nameList=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+' og '+a[a.length-1];
+ set('sav-lbl',cut?`Spart i ${savYear}, t.o.m. ${mName(cut).toLowerCase()}`:`Spart i ${savYear}`);
+ set('sav-sofar',doneP.length?fmt(sofar):'–');
+ set('sav-start',!cut?`Velg en måned i ${savYear} under «Vis måned» øverst for å se sparingen så langt. Estimatet for hele året står under.`
+  :doneP.length?`Satt av i ${nameList(doneP.map(k=>mName(k).toLowerCase()))}.${isPlanned(cut)?'':' '+mName(cut)+' er ikke planlagt ennå.'}${R.transfers.length?' Overføringer vises nederst.':''}`
+  :`Ingen av månedene t.o.m. ${mName(cut).toLowerCase()} er planlagt ennå.`);
  const soFarRow=rw=>{const ks=done.filter(k=>rw.month[k]);if(!ks.length)return null;const a=rw.month[ks[0]],b=rw.month[ks[ks.length-1]];
   const v={start:a.start,contrib:ks.reduce((x,k)=>x+rw.month[k].inn,0),out:ks.reduce((x,k)=>x+rw.month[k].out,0),end:b.end};v.ret=v.end-v.start-v.contrib+v.out;return v;};
- const nowEq=v=>`<span>Inngående<b>${fmt(v.start)}</b></span><span>+ Spart<b>${fmt(v.contrib)}</b></span><span class="gain">+ Avkastning<b>${fmt(v.ret)}</b></span>${v.out?`<span>− Tatt ut<b>${fmt(v.out)}</b></span>`:''}<span class="end">= På kontoen nå<b>${fmt(v.end)}</b></span>`;
+ const nowEq=v=>`<span>Inngående<b>${fmt(v.start)}</b></span><span>+ Spart<b>${fmt(v.contrib)}</b></span><span class="gain">+ Avkastning<b>${fmt(v.ret)}</b></span>${v.out?`<span>− Tatt ut<b>${fmt(v.out)}</b></span>`:''}<span class="end">= Etter ${cut?mName(cut).toLowerCase():''}<b>${fmt(v.end)}</b></span>`;
  const head=rw=>{const mon=rw.it?effAmount(rw.it,effMonth(NOW)):0;return`<div class="top"><span><span class="ico" aria-hidden="true">${rw.icon}</span>${esc(rw.name)} <span class="muted">· ${KIND_NAMES[rw.kd]} ${String(data.rates[rw.kd]).replace('.',',')} %</span></span>${rw.it?`<strong>${fmt(mon)}<span class="muted"> / mnd</span></strong>`:''}</div>`;};
  let listHTML='';
- if(done.length){const rows=R.rows.map(rw=>({rw,v:soFarRow(rw)})).filter(o=>o.v&&(o.v.end||o.v.contrib));
+ if(doneP.length){const rows=R.rows.map(rw=>({rw,v:soFarRow(rw)})).filter(o=>o.v&&(o.v.end||o.v.contrib));
   const T=rows.reduce((t,{v})=>{['start','contrib','ret','out','end'].forEach(f=>t[f]+=v[f]);return t;},{start:0,contrib:0,ret:0,out:0,end:0});
   listHTML=rows.map(({rw,v})=>`<div class="savitem">${head(rw)}<div class="eq">${nowEq(v)}</div></div>`).join('')
-   +(rows.length?`<div class="savtotal"><b>Totalt så langt i ${savYear}</b><div class="eq">${nowEq(T)}</div></div>`:'<p class="empty">Ingen sparing i planlagte måneder ennå.</p>');
-  const tr=R.transfers.map(t=>({t,v:done.reduce((a,k)=>a+amountFor(t.it,k),0)})).filter(o=>o.v);
-  if(tr.length)listHTML+=`<div class="trlist"><b>Overføringer</b> <span class="muted">– ikke sparing</span>${tr.map(({t,v})=>`<div class="dline"><span>${ic(t.it,'savings')}${esc(t.it.name)}</span><span>${fmt(v)} så langt</span></div>`).join('')}</div>`;}
+   +(rows.length?`<div class="savtotal"><b>Totalt t.o.m. ${mName(cut).toLowerCase()} ${savYear}</b><div class="eq">${nowEq(T)}</div></div>`:'<p class="empty">Ingen sparing i planlagte måneder ennå.</p>');
+  const tr=R.transfers.map(t=>({t,v:done.reduce((a,k)=>a+amountFor(t.it,k)+data.savings.filter(o=>o.only===k&&o.target===t.it.id&&isPlanned(k)).reduce((x,o)=>x+o.amount,0),0)})).filter(o=>o.v);
+  if(tr.length)listHTML+=`<div class="trlist"><b>Overføringer</b> <span class="muted">– ikke sparing</span>${tr.map(({t,v})=>`<div class="dline"><span>${ic(t.it,'savings')}${esc(t.it.name)}</span><span>${fmt(v)} overført t.o.m. ${mName(cut).toLowerCase()}</span></div>`).join('')}</div>`;}
  document.getElementById('sav-list').innerHTML=listHTML;
  /* ---- Estimat ved utgangen av året (inkludert tidligere år) ---- */
- const est=document.getElementById('est');if(!done.length)est.open=true;else est.open=estOpen;est.ontoggle=()=>{if(done.length)estOpen=est.open;};
+ const est=document.getElementById('est');if(!doneP.length)est.open=true;else est.open=estOpen;est.ontoggle=()=>{if(doneP.length)estOpen=est.open;};
  set('est-sum',`Estimert ved utgangen av ${savYear}, inkl. avkastning`);
  const firstY=P.years[0],upto=P.years.filter(y=>y<=savYear);
  const deposits=P.tot[firstY].start+upto.reduce((a,y)=>a+P.tot[y].contrib-P.tot[y].out,0),gain=upto.reduce((a,y)=>a+P.tot[y].ret,0),endT=P.tot[savYear].end;
@@ -764,15 +768,15 @@ const addMonths=(k,n)=>{let y=mYear(k),m=+k.slice(5)-1+n;y+=Math.floor(m/12);m=(
 function monthsText(n){const y=Math.floor(n/12),m=n%12;return[y?y+(y===1?' år':' år'):'',m?m+(m===1?' måned':' måneder'):''].filter(Boolean).join(' og ')||'under én måned';}
 function contribAt(it,k){return effAmount(it,k)+data.savings.filter(o=>o.only&&o.target===it.id).reduce((a,o)=>a+(o.only===k&&(!o.removed||o.removed>k)?o.amount:0),0);}
 /* Status for et mål: hvor langt du har kommet, hva som gjenstår, og når du er i mål med dagens beløp */
-function goalStatus(it,extra=0){const g=it.goal,last=PERIOD[PERIOD.length-1];
+function goalStatus(it,extra=0,at=homeM||NOW){const g=it.goal,last=PERIOD[PERIOD.length-1];if(at===BASE)at=NOW;
  const futureAmt=k=>(PERIOD.includes(k)?contribAt(it,k):contribAt(it,effMonth(last)||last))+extra;
  let have,rate=0;
- if(g.type==='debt'){have=g.before+PERIOD.filter(k=>k<=NOW&&isPlanned(k)).reduce((a,k)=>a+contribAt(it,k),0);}
- else{const row=savingsModel(true).rows.find(r=>r.it===it);have=row?(row.monthEnd[NOW]!=null?row.monthEnd[NOW]:(it.balance||0)):(it.balance||0);rate=kindOf(it)==='transfer'?0:monthRate(kindOf(it));}
+ if(g.type==='debt'){have=g.before+PERIOD.filter(k=>k<=at&&isPlanned(k)).reduce((a,k)=>a+contribAt(it,k),0);}
+ else{const row=savingsModel(true).rows.find(r=>r.it===it);have=row?(row.monthEnd[at]!=null?row.monthEnd[at]:(it.balance||0)):(it.balance||0);rate=kindOf(it)==='transfer'?0:monthRate(kindOf(it));}
  const target=g.amount,pct=target?Math.min(100,have/target*100):0;
- let eta=null,months=0,bal=have,k=NOW;
- if(have>=target)eta=NOW;else{for(let n=1;n<=600;n++){k=addMonths(NOW,n);bal=bal*(1+rate)+futureAmt(k);if(bal>=target){eta=k;months=n;break;}}}
- return{have,target,pct,left:Math.max(0,target-have),eta,months,monthly:futureAmt(addMonths(NOW,1))-extra};}
+ let eta=null,months=0,bal=have,k=at;
+ if(have>=target)eta=at;else{for(let n=1;n<=600;n++){k=addMonths(at,n);bal=bal*(1+rate)+futureAmt(k);if(bal>=target){eta=k;months=n;break;}}}
+ return{have,target,pct,left:Math.max(0,target-have),eta,months,monthly:futureAmt(addMonths(at,1))-extra,at};}
 const QUOTES={
  ferie:[['Første steg mot sol og saltvann er tatt ☀️','Hver krone her er et lite stykke ferie.'],['Snart har du råd til flybilletter tur-retur ✈️','Kan du kjenne lukta av sjø? 🌊'],['Over halvveis – solkremen kan snart kjøpes 🧴','Du er nærmere stranda enn kontoret nå.'],['Nesten der! Begynn å pakke kofferten i tankene 🧳','Bare litt igjen før ferien er betalt.'],['Ferien er betalt – nyt hvert minutt! 🏖️']],
  gjeld:[['Godt i gang – hver innbetaling teller.','Hver krone her er en krone mindre å tenke på.'],['Du har allerede tatt en god bit av det 💪','Det går fremover, måned for måned.'],['Over halvveis! Det kjennes, gjør det ikke?','Mer betalt enn det som gjenstår nå.'],['Snart gjeldfri – tenk hvordan det kommer til å kjennes 🌿','Innspurten! Bare litt igjen.'],['Ferdig nedbetalt 🎉 Godt jobbet!']],
@@ -791,7 +795,7 @@ function renderGoals(){queueClamp();const gs=data.savings.filter(x=>!x.only&&x.g
  const tail=`<div style="margin-top:${gs.length?'12':'4'}px">${gs.length?'':'<p class="muted" style="margin:0 0 4px">Sett et mål for en sparepost – se hvor langt du har kommet, prosent og når du er i mål.</p>'}
   <div class="suggest">${suggestChips(wm)}${noGoal.map(x=>`<button type="button" data-setgoal="${x.id}">🎯 Mål for ${esc(x.name)}</button>`).join('')}</div></div>`;
  document.getElementById('goals').innerHTML=gs.map(it=>{const st=goalStatus(it),debt=it.goal.type==='debt',done=st.pct>=100;
-  const boost=!done&&st.eta?goalStatus(it,500):null,saved=boost&&boost.eta?st.months-boost.months:0;
+  const boost=!done&&st.eta?goalStatus(it,500,st.at):null,saved=boost&&boost.eta?st.months-boost.months:0;
   return`<div class="goal"><div class="ring">${ringSVG(st.pct)}<span>${Math.floor(st.pct)} %</span></div>
    <div><h4>${ic(it,'savings')}${esc(it.name)}</h4>
     <div class="gl"><b>${fmt(st.have)}</b> av ${fmt(st.target)} ${debt?'betalt':'spart'} · <b>${fmt(st.left)}</b> ${debt?'gjenstår':'igjen'}</div>
@@ -818,7 +822,7 @@ function renderHome(){
  if(!PERIOD.includes(homeM))homeM=PERIOD.includes(NOW)?NOW:PERIOD[0];
  const hs=document.getElementById('home-m');
  hs.innerHTML=PERIOD.map(k=>`<option value="${k}">${mLabel(k)}${k===NOW?' (nå)':''}${isPlanned(k)?'':' – ikke planlagt'}</option>`).join('');
- hs.value=homeM;hs.onchange=()=>{homeM=hs.value;renderHome();renderNewMonth();};
+ hs.value=homeM;hs.onchange=()=>{homeM=hs.value;savYear=mYear(homeM);renderHome();renderNewMonth();};
  set('h-lbl','Igjen i '+mLabel(homeM).toLowerCase());
  const t=tot(homeM),planned=isPlanned(homeM);
  set('h-left',planned?fmt(t.left):'Ikke planlagt');
@@ -1057,7 +1061,7 @@ function groupHead(ico,label,n,attr,sum){return`<div class="group"><div><span cl
 function rowHTML(it){
  let meta='';
  const tg=targetOf(it);
- if(tab==='savings'&&!it.only&&it.goal&&it.goal.on&&it.goal.amount>0){const st=goalStatus(it);
+ if(tab==='savings'&&!it.only&&it.goal&&it.goal.on&&it.goal.amount>0){const st=goalStatus(it,0,mode);
   return`<div class="row"><button type="button" class="rname" data-id="${it.id}"><span class="n">${ic(it)}${esc(it.name)}</span><span class="m">${Math.floor(st.pct)} % · ${fmt(st.left)} ${it.goal.type==='debt'?'gjenstår':'igjen'}</span><span class="minibar"><i style="width:${st.pct.toFixed(1)}%"></i></span></button><input class="amt" data-id="${it.id}" type="number" inputmode="numeric" min="0" step="50" value="${amountFor(it,mode)}" aria-label="Beløp for ${esc(it.name)}"></div>`;}
  if(it.only&&tab==='savings')meta=`<span class="m edit">Engangsinnskudd${tg?' til '+esc(tg.name):''} – ${it.keep===false?'bare denne måneden':'blir liggende og vises videre'}</span>`;
  else if(it.only&&tg)meta=`<span class="m edit">Engangsinnskudd til ${esc(tg.name)}</span>`;
@@ -1329,7 +1333,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alle beløp 
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='24.10.2026 · sparing så langt';set('app-version',APP_VERSION);
+const APP_VERSION='24.10.2026 · sparing per måned';set('app-version',APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
