@@ -47,6 +47,31 @@ h2{font-size:20px;letter-spacing:-.02em;margin:22px 4px 4px}
 .monthbar::-webkit-scrollbar{display:none}
 .chip{flex:0 0 auto;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:8px 14px;font-size:14px;font-weight:600;color:var(--muted)}
 .chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.cmpbar{display:flex;align-items:center;gap:12px;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:10px 14px;margin:0 0 10px}
+.cmpbar .t{flex:1;min-width:0}
+.cmpbar b{display:block;font-size:15px}
+.cmpbar select{margin-top:6px;width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;font-size:16px}
+.switch{position:relative;flex:0 0 52px;width:52px;height:32px}
+.switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;z-index:1}
+.switch span{position:absolute;inset:0;border-radius:99px;background:var(--line);transition:background .2s}
+.switch span::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.switch input:checked+span{background:var(--acc)}
+.switch input:checked+span::after{transform:translateX(20px)}
+.switch input:focus-visible+span{outline:2px solid var(--acc);outline-offset:2px}
+.rname .m.cmp{font-size:12px;margin-top:2px}
+.rname .m.cmp.neg{color:var(--red)}.rname .m.cmp.pos{color:var(--green)}
+.profsum{font-size:14px;margin-top:4px;line-height:1.35}
+.profsum a,.linkbtn{color:var(--acc);font-weight:600;text-decoration:underline;background:none;border:0;padding:0;font-size:14px}
+.seg3{display:flex;flex-wrap:wrap;gap:6px}
+.seg3 button{flex:1 1 auto;border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 12px;font-weight:600;color:var(--muted)}
+.seg3 button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.stepper{display:flex;align-items:center;gap:12px}
+.stepper button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:22px;line-height:1}
+.stepper output{font-size:20px;font-weight:700;min-width:24px;text-align:center}
+.kids{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px}
+.kids label span{font-size:12px}
+.result{background:var(--acc2);border-radius:14px;padding:12px 14px;margin-top:14px;font-size:14px}
+.cmpline{font-size:14px;padding:6px 0 4px}
 .ydiv{flex:0 0 auto;align-self:center;font-size:13px;font-weight:800;color:var(--acc);padding:0 2px 0 8px}
 .chip em,.mhead em{font-style:normal;font-size:11px;font-weight:700;background:var(--acc2);color:var(--acc);border-radius:99px;padding:1px 7px;margin-left:6px}
 .chip.on em{background:rgba(255,255,255,.25);color:#fff}
@@ -68,6 +93,8 @@ h2{font-size:20px;letter-spacing:-.02em;margin:22px 4px 4px}
 .rname .m.edit{color:var(--acc)}
 .amt{width:118px;flex:0 0 118px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 10px;text-align:right;font-weight:650;font-size:16px}
 .amt.changed{border-color:var(--acc);background:var(--acc2)}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .amt:focus{outline:2px solid var(--acc);border-color:transparent}
 .reset{border:0;background:none;color:var(--acc);font-size:12px;padding:0;text-decoration:underline}
 .addbtn{width:100%;margin-top:12px;border:1.5px dashed var(--line);background:transparent;border-radius:14px;padding:12px;font-weight:600;color:var(--acc)}
@@ -114,9 +141,20 @@ th{font-size:12px;color:var(--muted);font-weight:600}
 .num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .src{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.45}
 .src a{color:var(--acc)}
-.swatches{display:flex;gap:10px;margin-top:8px}
-.sw{width:40px;height:40px;border-radius:50%;border:3px solid var(--paper);box-shadow:0 0 0 1px var(--line)}
-.sw.on{box-shadow:0 0 0 2px var(--ink)}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:12px;margin-top:10px}
+.swl{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;color:var(--muted);background:none;border:0;padding:0}
+.swl.on{color:var(--ink);font-weight:700}
+.swl input[type=color]{width:44px;height:44px;border:0;padding:0;border-radius:50%;overflow:hidden;background:none;cursor:pointer}
+.swl input[type=color]::-webkit-color-swatch-wrapper{padding:0}.swl input[type=color]::-webkit-color-swatch{border:3px solid var(--paper);border-radius:50%;box-shadow:0 0 0 1px var(--line)}
+.hbtns{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.colorbtn{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600}
+.colorbtn i{width:14px;height:14px;border-radius:50%;background:var(--acc);display:inline-block}
+.ico{display:inline-block;width:1.5em;text-align:center;margin-right:6px}
+.icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px;max-height:156px;overflow:auto;padding:2px}
+.icons button{height:44px;border:1px solid var(--line);background:#fff;border-radius:11px;font-size:22px;line-height:1}
+.icons button.on{border:2px solid var(--acc);background:var(--acc2)}
+.sw{width:44px;height:44px;border-radius:50%;border:3px solid var(--paper);box-shadow:0 0 0 1px var(--line);display:block}
+.swl.on .sw,.swl.on input[type=color]::-webkit-color-swatch{box-shadow:0 0 0 2px var(--ink)}
 /* Bunnmeny og "igjen"-linje */
 .bottom{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--paper);background:color-mix(in srgb,var(--paper) 94%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 .leftbar{display:none;max-width:640px;margin:0 auto;padding:10px 20px 0;justify-content:space-between;align-items:baseline;font-size:15px}
@@ -141,7 +179,7 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
 <div class="app">
 <header>
   <div><h1 id="title">Mitt budsjett</h1><p id="subtitle">Veien mot økonomisk frihet</p></div>
-  <div class="yearpill" id="yearpill">2027</div>
+  <div class="hbtns"><div class="yearpill" id="yearpill">2027</div><button type="button" class="colorbtn" id="colorbtn"><i></i>Farge</button></div>
 </header>
 
 <!-- OVERSIKT -->
@@ -168,7 +206,7 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
     <div id="top"></div>
   </div>
   <div class="card">
-    <h3>Sparing i 2027</h3>
+    <h3>Sparing</h3>
     <div class="muted" id="sav-year"></div>
     <div id="sav-list"></div>
   </div>
@@ -180,13 +218,16 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
   <p class="lead">Velg «Hver måned» for faste beløp, eller en måned for å justere bare den.</p>
   <div class="monthbar" id="monthbar"></div>
   <div class="modeinfo" id="modeinfo"></div>
+  <div class="cmpbar"><label class="switch"><input type="checkbox" id="cmp-on" aria-label="Sammenlign med andre"><span></span></label>
+   <div class="t"><b>Sammenlign med andre</b><div class="profsum" id="cmp-sub"></div></div></div>
   <div class="tabs" id="tabs"></div>
   <div class="card" id="list"></div>
 </section>
 
 <!-- ÅRET -->
 <section class="view" id="v-year">
-  <h2>Året 2027</h2>
+  <h2 id="y-title">Året</h2>
+  <div class="tabs" id="ytabs" style="grid-template-columns:repeat(2,1fr)"></div>
   <p class="lead" id="y-lead"></p>
   <div class="stats">
     <div class="stat"><div class="l">Inntekt</div><div class="v" id="y-inc"></div></div>
@@ -242,7 +283,7 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
   </div>
   <div class="card" id="ssb">
     <h3>Sammenlign med andre (SSB)</h3>
-    <label class="field"><span>Husholdningen din</span><select id="ssb-type"></select></label>
+    <div class="profsum" id="ssb-prof"></div>
     <div id="ssb-out"></div>
   </div>
   <div class="card">
@@ -275,6 +316,7 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
   <h3 id="sh-title" style="font-size:18px;margin:0 0 4px"></h3>
   <label class="field"><span>Navn</span><input id="sh-name" maxlength="60"></label>
   <label class="field"><span id="sh-amt-lbl">Beløp per måned (kr)</span><input id="sh-amt" type="number" inputmode="numeric" min="0"></label>
+  <div class="field"><span>Ikon</span><div class="icons" id="sh-icons"></div></div>
   <label class="field" id="sh-cat-wrap"><span>Kategori</span><select id="sh-cat"></select></label>
   <label class="field"><span>Gjelder</span><select id="sh-when"></select></label>
   <div class="btns">
@@ -286,6 +328,28 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
     <button class="btn" type="button" id="sh-down">↓ Flytt ned</button>
     <button class="btn danger" type="button" id="sh-del">Slett posten</button>
   </div>
+</div></div>
+<div class="sheetbg" id="profbg"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pf-title">
+  <div class="grab"></div>
+  <h3 id="pf-title" style="font-size:18px;margin:0 0 2px">Om deg</h3>
+  <p class="muted" style="margin:0">Brukes bare til å finne riktig sammenligningsgruppe hos SSB. Lagres kun på denne enheten.</p>
+  <div class="field"><span>Kjønn</span><div class="seg3" data-f="gender"><button type="button" data-v="kvinne">Kvinne</button><button type="button" data-v="mann">Mann</button><button type="button" data-v="annet">Annet</button></div></div>
+  <label class="field"><span>Fødselsår</span><input id="pf-year" type="number" inputmode="numeric" min="1920" max="2010" placeholder="F.eks. 1988"></label>
+  <div class="field"><span>Sivilstatus</span><div class="seg3" data-f="household"><button type="button" data-v="single">Bor alene / enslig</button><button type="button" data-v="couple">Gift / samboer</button></div></div>
+  <div class="field"><span>Barn som bor hos deg</span><div class="seg3" data-f="children"><button type="button" data-v="no">Nei</button><button type="button" data-v="yes">Ja</button></div></div>
+  <div id="pf-kidsbox">
+   <div class="field"><span>Antall barn</span><div class="stepper"><button type="button" id="pf-minus" aria-label="Færre barn">−</button><output id="pf-count">1</output><button type="button" id="pf-plus" aria-label="Flere barn">+</button></div></div>
+   <div class="field"><span>Alder på barna</span><div class="kids" id="pf-kids"></div></div>
+  </div>
+  <div class="result" id="pf-result"></div>
+  <div class="btns"><button class="btn pri grow" type="button" id="pf-save">Lagre</button><button class="btn" type="button" id="pf-cancel">Avbryt</button></div>
+</div></div>
+<div class="sheetbg" id="colorbg"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="cl-title">
+  <div class="grab"></div>
+  <h3 id="cl-title" style="font-size:18px;margin:0 0 2px">Velg farge</h3>
+  <p class="muted" style="margin:0">Trykk på en farge – den lagres med en gang.</p>
+  <div class="swatches" id="swatches2"></div>
+  <div class="btns"><button class="btn pri grow" type="button" id="cl-close">Ferdig</button></div>
 </div></div>
 <div class="toast" id="toast"></div>
 
@@ -339,6 +403,25 @@ function ssbCat(name){const n=name.toLowerCase();
  if(/skole|kurs|utdanning/.test(n))return'utdanning';
  return null;}
 
+/* ============ IKONER ============ */
+const ICON_RULES=[[/feriepenger/,'🏖️'],[/skatt/,'🧾'],[/barnestøtte|barnetrygd|bidrag|nav/,'💰'],[/lønn|inntekt|bonus/,'💰'],
+ [/boliglån|husleie|felleskost/,'🏠'],[/strømme|stream|netflix|hbo|spotify|viaplay|tv/,'📺'],[/strøm/,'⚡'],[/bilforsikring/,'🚗'],[/forsikring/,'🛡️'],
+ [/studielån/,'🎓'],[/vann|kommunal|avgift/,'💧'],[/barnehage|sfo/,'🧸'],[/mat|dagligvare|hushold/,'🛒'],[/parkering|bom|bilvask/,'🅿️'],
+ [/bil|drivstoff|bensin|lading/,'🚘'],[/tann/,'🦷'],[/lege|helse|medisin|apotek/,'💊'],[/klær til barn|barneklær/,'👕'],[/klær|sko/,'👗'],
+ [/trening|treningssenter|sport/,'🏋️'],[/restaurant|kino|kafé|kafe|uteliv/,'🍽️'],[/mobil|telefon|internett|bredbånd/,'📱'],[/ferie|reise/,'✈️'],
+ [/gave|jul/,'🎁'],[/buffer/,'🛟'],[/fond|aksje|langtid|pensjon/,'📈'],[/mamma|mor|pappa|far/,'💛'],[/barn|unge|sønn|datter/,'🧒']];
+const ICON_CHOICES=['💰','🏖️','🧾','🏠','⚡','💧','🛡️','🚗','🚘','🅿️','⛽','🚌','🛒','🍽️','☕','🧸','👶','🧒','👦🏼','👧🏼','👦','👧','👨🏼','👩🏼','👕','👗','👟','💇','🦷','💊','🏋️','⚽','🎮','📺','📱','💻','🎓','📚','🐶','🐱','✈️','🎁','🎄','🛟','📈','🐷','🏦','💳','💛','❤️','⭐','🌿','🔧','🧹','📦'];
+const EMOJI_RE=/^\s*((?:\p{Extended_Pictographic}|\p{Regional_Indicator})(?:\uFE0F|\u200D(?:\p{Extended_Pictographic})|\p{Emoji_Modifier})*)\s*/u;
+const isEmoji=v=>typeof v==='string'&&v.trim()!==''&&EMOJI_RE.test(v)&&v.trim().replace(EMOJI_RE,'')==='';
+function splitIcon(name){const m=String(name).match(EMOJI_RE);return m?{icon:m[1],name:String(name).slice(m[0].length).trim()||String(name)}:{icon:'',name:String(name).trim()};}
+const isPersonName=n=>/^[A-ZÆØÅ][a-zæøåéèü]+(?:[ -][A-ZÆØÅ][a-zæøåéèü]+)?$/.test(String(n).trim());
+function guessIcon(name,type){const n=String(name).toLowerCase();for(const[r,e]of ICON_RULES)if(r.test(n))return e;
+ if(type==='savings'&&isPersonName(name))return'🧒';
+ return type==='income'?'💰':type==='savings'?'🏦':'💳';}
+function iconOf(it,type){return it.icon||guessIcon(it.name,type||typeOf(it));}
+function typeOf(it){return data.income.includes(it)?'income':data.savings.includes(it)?'savings':'expenses';}
+const ic=(it,type)=>`<span class="ico" aria-hidden="true">${iconOf(it,type)}</span>`;
+
 /* ============ LAGRING ============ */
 let n0=0;const uid=()=>'p'+Date.now().toString(36)+(n0++).toString(36);
 function guessCat(n){return /boliglån|strøm|forsikring|studielån|kommunale|barnehage|abonnement/i.test(n)?'Faste utgifter':/mat|bil|parkering|bom|tannlege/i.test(n)?'Løpende utgifter':'Egne utgifter og familieliv';}
@@ -346,8 +429,13 @@ function normalize(raw){
  let d=raw&&raw.data?raw.data:raw;
  if(!d||!Array.isArray(d.income)||!Array.isArray(d.expenses)||!Array.isArray(d.savings))return null;
  const conv=(arr,type)=>arr.map(x=>{
-  if(Array.isArray(x))return{id:uid(),name:String(x[0]),amount:Math.max(0,+x[1]||0),...(type==='expenses'?{cat:x[2]||guessCat(String(x[0]))}:{})};
-  const o={id:x.id||uid(),name:String(x.name||'Post'),amount:Math.max(0,+x.amount||0)};
+  if(Array.isArray(x)){const sp=splitIcon(x[0]),extra=x.slice(2);
+   const o={id:uid(),name:sp.name,amount:Math.max(0,+x[1]||0)};const em=extra.find(isEmoji);o.icon=sp.icon||em||'';
+   if(type==='expenses'){const c=extra.find(v=>CATS.some(([k])=>k===v));o.cat=c||guessCat(sp.name);}
+   return o;}
+  const sp=splitIcon(x.name||'Post');
+  const o={id:x.id||uid(),name:sp.name,amount:Math.max(0,+x.amount||0),icon:x.icon||x.emoji||sp.icon||''};
+  if(o.icon==='🐷'&&type==='savings'&&isPersonName(o.name))o.icon='';
   if(type==='expenses')o.cat=x.cat||guessCat(o.name);
   const ok=toKey(x.only);if(ok)o.only=ok;
   return o;});
@@ -384,12 +472,13 @@ function toast(t){const el=document.getElementById('toast');el.textContent=t;el.
 
 /* ============ OVERSIKT ============ */
 let homeM=PERIOD.includes(NOW)?NOW:null;
+const YEARS_H=()=>{const ys=[...new Set(PERIOD.map(mYear))];return ys.includes(TODAY.getFullYear())?TODAY.getFullYear():BUDGET_YEAR;};
 function renderHome(){
  const hs=document.getElementById('home-m');
  hs.innerHTML='<option value="">En vanlig måned</option>'+PERIOD.map(k=>`<option value="${k}">${mLabel(k)}${k===NOW?' (nå)':''}</option>`).join('');
  hs.value=homeM||'';hs.onchange=()=>{homeM=hs.value||null;renderHome();};
  set('h-lbl',homeM==null?'Igjen i en vanlig måned':'Igjen i '+mLabel(homeM).toLowerCase());
- const t=tot(homeM),y=yearTot();
+ const curY=YEARS_H(),cKeys=PERIOD.filter(k=>mYear(k)===curY),y=yearTot(cKeys);const t=tot(homeM);
  const varies=y.months.some(x=>x.left!==tot(null).left);
  set('h-left',fmt(t.left));
  set('h-hint',t.left<0?'Du bruker '+fmt(-t.left)+' mer enn du tjener. Juster utgifter eller sparing.':t.left===0?'Hele inntekten er fordelt. Det er slik et nullbudsjett skal se ut.':fmt(t.left)+' er ikke fordelt ennå – gi dem en jobb, f.eks. ekstra sparing.');
@@ -399,13 +488,14 @@ function renderHome(){
  document.getElementById('b-sav').style.width=(t.i?Math.min(100,t.s/t.i*100):0)+'%';
  set('b-left',t.left>0?fmt(t.left)+' ufordelt':t.left<0?fmt(-t.left)+' for mye':'Alt fordelt');
  const ex=data.expenses.filter(x=>x.only==null).slice().sort((a,b)=>b.amount-a.amount).slice(0,5),mx=ex[0]?ex[0].amount:1;
- document.getElementById('top').innerHTML=ex.map(x=>`<div class="toprow"><span>${esc(x.name)}</span><strong>${fmt(x.amount)}</strong><div class="track"><i style="width:${x.amount/mx*100}%"></i></div></div>`).join('')||'<p class="empty">Ingen utgifter lagt inn.</p>';
- set('sav-year','Totalt '+fmt(y.s)+' i løpet av 2027'+(varies?'. Noen måneder er justert – se Året.':'.'));
- document.getElementById('sav-list').innerHTML=data.savings.filter(x=>x.only==null).map(x=>`<div class="toprow"><span>${esc(x.name)}</span><strong>${fmt(x.amount*12)}<span class="muted"> / år</span></strong></div>`).join('');
+ document.getElementById('top').innerHTML=ex.map(x=>`<div class="toprow"><span>${ic(x,'expenses')}${esc(x.name)}</span><strong>${fmt(x.amount)}</strong><div class="track"><i style="width:${x.amount/mx*100}%"></i></div></div>`).join('')||'<p class="empty">Ingen utgifter lagt inn.</p>';
+ set('sav-year','Totalt '+fmt(y.s)+(cKeys.length<12?' i resten av '+curY:' i '+curY)+(varies?'. Noen måneder er justert – se Året.':'.'));
+ document.getElementById('sav-list').innerHTML=data.savings.filter(x=>x.only==null).map(x=>`<div class="toprow"><span>${ic(x,'savings')}${esc(x.name)}</span><strong>${fmt(x.amount)}<span class="muted"> / mnd</span></strong></div>`).join('');
 }
 
 /* ============ BUDSJETT ============ */
 function renderBudget(){
+ renderCmpBar();
  const mb=document.getElementById('monthbar');
  mb.innerHTML=`<button class="chip ${mode==null?'on':''}" data-m="">Hver måned</button>`+PERIOD.map((k,i)=>(BEFORE.length&&(i===0||k===YEAR_KEYS[0])?`<span class="ydiv">${mYear(k)}</span>`:'')+`<button class="chip ${mode===k?'on':''}" data-m="${k}">${mName(k)}${k===NOW?'<em>nå</em>':''}${monthAdjusted(k)?'<span class="dot"></span>':''}</button>`).join('');
  mb.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{mode=c.dataset.m===''?null:c.dataset.m;renderBudget();renderLeftbar();});
@@ -422,7 +512,7 @@ function renderBudget(){
  if(tab==='expenses'){
   CATS.forEach(([key,label])=>{const g=items.filter(x=>(x.cat||'Egne utgifter og familieliv')===key);if(!g.length)return;
    html+=`<div class="group">${label}<span data-cat="${key}">${fmt(g.reduce((a,x)=>a+amountFor(x,mode),0))}</span></div>`+g.map(rowHTML).join('');});
- }else html=items.map(rowHTML).join('');
+ }else html=(tab==='income'?incomeLine():'')+items.map(rowHTML).join('');
  if(!items.length)html='<p class="empty">Ingen poster her ennå.</p>';
  html+=`<button class="addbtn" type="button" id="add">+ Ny ${tab==='income'?'inntekt':tab==='expenses'?'utgift':'sparepost'}</button>`;
  const list=document.getElementById('list');list.innerHTML=html;
@@ -440,29 +530,110 @@ function renderBudget(){
  bindResets(list);
  document.getElementById('add').onclick=()=>openSheet(tab,null);
 }
+/* ---- Sammenligning (SSB) ---- */
+let cmpOn=true;try{cmpOn=localStorage.getItem('personalBudget2027compare')!=='0';}catch(e){}
+function getProfile(){let p={};try{p=JSON.parse(localStorage.getItem('personalBudget2027profile')||'{}')||{};}catch(e){}
+ // støtter også profiler fra den gamle versjonen (fødselsdato og alder som tekst)
+ if(!p.birthYear&&p.birth)p.birthYear=+String(p.birth).slice(0,4)||'';
+ if(typeof p.ages==='string')p.ages=p.ages.split(/[,; og]+/).map(Number).filter(x=>!isNaN(x)&&x>=0&&x<40);
+ if(!Array.isArray(p.ages))p.ages=[];
+ if(p.gender)p.gender=String(p.gender).toLowerCase();
+ p.count=Math.max(1,+p.count||p.ages.length||1);
+ return p;}
+function hasProfile(p=getProfile()){return!!(p.household&&p.children);}
+function ageOf(p){return p.birthYear?TODAY.getFullYear()-p.birthYear:null;}
+function groupKey(p){
+ const age=ageOf(p),kids=(p.ages||[]).filter(x=>x!==''&&!isNaN(x)),young=kids.length?Math.min(...kids):null;
+ if(p.children==='yes'){if(young==null)return null;
+  const pre=p.household==='couple'?'pb':'e';return pre+(young<=5?'05':young<=17?'617':'18');}
+ if(age==null||!p.household)return null;
+ if(p.household==='single')return age<30?'a30':age<45?'a3044':age<67?'a4566':'a67';
+ return age<30?'p30':age<45?'p3044':age<67?'p4566':'p67';}
+function ssbGroup(){const k=groupKey(getProfile());return SSB_INCOME.find(x=>x[0]===k)||SSB_INCOME[0];}
+function profileText(p=getProfile()){if(!hasProfile(p))return'';const a=ageOf(p),parts=[];
+ if(p.gender&&p.gender!=='annet')parts.push(p.gender[0].toUpperCase()+p.gender.slice(1));
+ if(a!=null)parts.push(a+' år');
+ parts.push(p.household==='couple'?'gift/samboer':'enslig');
+ if(p.children==='yes'){const n=p.count;parts.push(n+(n===1?' barn':' barn')+(p.ages.length?' ('+p.ages.slice(0,n).join(', ')+' år)':''));}else parts.push('ingen barn');
+ return parts.join(', ');}
+let pf={};
+function openProfile(){pf=getProfile();if(!pf.children)pf.children='no';
+ document.getElementById('pf-year').value=pf.birthYear||'';paintProfile();document.getElementById('profbg').classList.add('open');}
+function paintProfile(){
+ document.querySelectorAll('#profbg .seg3').forEach(g=>g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',pf[g.dataset.f]===b.dataset.v)));
+ const yes=pf.children==='yes';document.getElementById('pf-kidsbox').style.display=yes?'':'none';
+ document.getElementById('pf-count').textContent=pf.count;
+ const kb=document.getElementById('pf-kids');const cur=[...kb.querySelectorAll('input')].map(i=>i.value);
+ kb.innerHTML=Array.from({length:pf.count},(_,i)=>`<label class="field" style="margin:0"><span>Barn ${i+1}</span><input type="number" inputmode="numeric" min="0" max="30" data-kid="${i}" value="${cur[i]??(pf.ages[i]??'')}" placeholder="år"></label>`).join('');
+ kb.querySelectorAll('input').forEach(i=>i.oninput=()=>{readKids();showResult();});
+ showResult();}
+function readKids(){pf.ages=[...document.querySelectorAll('#pf-kids input')].map(i=>i.value===''?'':+i.value).filter(v=>v!=='');}
+function showResult(){pf.birthYear=+document.getElementById('pf-year').value||'';
+ const k=pf.household&&pf.children?groupKey(Object.assign({},pf,{ages:pf.children==='yes'?pf.ages:[]})):null,g=SSB_INCOME.find(x=>x[0]===k);
+ let msg;
+ if(!pf.household)msg='Velg sivilstatus.';
+ else if(pf.children==='yes'&&!pf.ages.length)msg='Skriv inn alderen på barna – det er alderen på det yngste barnet som avgjør gruppen.';
+ else if(pf.children!=='yes'&&!pf.birthYear)msg='Skriv inn fødselsår.';
+ else msg=g?`Du sammenlignes med <b>${g[1].toLowerCase()}</b>. Median inntekt etter skatt i denne gruppen: <b>${fmt(g[2]/12)}</b> i måneden.`:'Fyll ut feltene over.';
+ if(pf.gender)msg+=' <span class="muted">SSB deler ikke husholdningstallene på kjønn.</span>';
+ document.getElementById('pf-result').innerHTML=msg;}
+document.querySelectorAll('#profbg .seg3').forEach(g=>g.querySelectorAll('button').forEach(b=>b.onclick=()=>{pf[g.dataset.f]=b.dataset.v;if(g.dataset.f==='children'){readKids();}paintProfile();}));
+document.getElementById('pf-year').oninput=showResult;
+document.getElementById('pf-minus').onclick=()=>{readKids();pf.count=Math.max(1,pf.count-1);paintProfile();};
+document.getElementById('pf-plus').onclick=()=>{readKids();pf.count=Math.min(10,pf.count+1);paintProfile();};
+document.getElementById('pf-cancel').onclick=()=>document.getElementById('profbg').classList.remove('open');
+document.getElementById('profbg').onclick=e=>{if(e.target.id==='profbg')e.currentTarget.classList.remove('open');};
+document.getElementById('pf-save').onclick=()=>{readKids();showResult();
+ if(!pf.household){toast('Velg sivilstatus');return;}
+ const out={gender:pf.gender||'',birthYear:pf.birthYear||'',household:pf.household,children:pf.children||'no',count:pf.children==='yes'?pf.count:0,ages:pf.children==='yes'?pf.ages.slice(0,pf.count):[]};
+ try{localStorage.setItem('personalBudget2027profile',JSON.stringify(out));localStorage.setItem('personalBudget2027compare','1');}catch(e){}
+ cmpOn=true;document.getElementById('profbg').classList.remove('open');renderAll();toast('Profilen er lagret');};
+function diffTxt(d,word){return Math.abs(Math.round(d))<50?'på '+word:fmt(Math.abs(d))+(d>0?' over ':' under ')+word;}
+function catDiff(c,m){const P=SSB_SPEND[ssbGroup()[3]];const mine=data.expenses.filter(x=>ssbCat(x.name)===c).reduce((a,x)=>a+amountFor(x,m),0);return mine-P.v[c]/12;}
+function cmpSpan(it){if(!cmpOn)return'';const c=ssbCat(it.name);if(!c)return'';const d=catDiff(c,mode);
+ const many=data.expenses.filter(x=>ssbCat(x.name)===c&&amountFor(x,mode)>0).length>1;
+ return`<span class="m cmp ${d>0?'neg':'pos'}" data-c="${c}">${SSB_CAT_NAMES[c]}${many?' samlet':''}: ${diffTxt(d,'snittet')}</span>`;}
+function incomeLine(){if(!cmpOn)return'';const g=ssbGroup(),d=tot(mode).i-g[2]/12;return`<div class="cmpline" id="cmp-inc">Inntekten din er <b class="${d<0?'neg':'pos'}">${diffTxt(d,'medianen')}</b> for ${g[1].toLowerCase()}.</div>`;}
+function refreshCmp(){document.querySelectorAll('#list .cmp[data-c]').forEach(sp=>{const c=sp.dataset.c,d=catDiff(c,mode);sp.className='m cmp '+(d>0?'neg':'pos');sp.textContent=sp.textContent.split(':')[0]+': '+diffTxt(d,'snittet');});
+ const il=document.getElementById('cmp-inc');if(il)il.outerHTML=incomeLine();}
+function renderCmpBar(){const on=document.getElementById('cmp-on');on.checked=cmpOn;
+ const sub=document.getElementById('cmp-sub'),p=getProfile();
+ if(!cmpOn)sub.innerHTML='<span class="muted">Viser om du ligger over eller under snittet (SSB)</span>';
+ else if(!hasProfile(p))sub.innerHTML='<span class="muted">Sammenligner med alle husholdninger.</span> <button type="button" class="linkbtn" data-prof>Fyll inn om deg</button>';
+ else sub.innerHTML=`<span class="muted">${esc(profileText(p))}</span> · <button type="button" class="linkbtn" data-prof>Endre</button>`;
+ sub.querySelectorAll('[data-prof]').forEach(b=>b.onclick=openProfile);}
+document.getElementById('cmp-on').onchange=e=>{cmpOn=e.target.checked;if(cmpOn&&!hasProfile())setTimeout(openProfile,250);try{localStorage.setItem('personalBudget2027compare',cmpOn?'1':'0')}catch(err){}renderBudget();toast(cmpOn?'Sammenligning vises':'Sammenligning skjult');};
+
 function rowHTML(it){
  const ch=hasOv(it,mode);let meta='';
  if(it.only!=null)meta=`<span class="m edit">Bare i ${mLabel(it.only).toLowerCase()}</span>`;
  else if(ch)meta=`<span class="m edit">Vanligvis ${fmt(it.amount)} · <span class="reset" role="button" data-id="${it.id}">tilbakestill</span></span>`;
- return`<div class="row"><button type="button" class="rname" data-id="${it.id}"><span class="n">${esc(it.name)}</span>${meta}</button><input class="amt${ch?' changed':''}" data-id="${it.id}" type="number" inputmode="numeric" min="0" step="50" value="${amountFor(it,mode)}" aria-label="Beløp for ${esc(it.name)}"></div>`;
+ return`<div class="row"><button type="button" class="rname" data-id="${it.id}"><span class="n">${ic(it)}${esc(it.name)}</span>${meta}${tab==='expenses'?cmpSpan(it):''}</button><input class="amt${ch?' changed':''}" data-id="${it.id}" type="number" inputmode="numeric" min="0" step="50" value="${amountFor(it,mode)}" aria-label="Beløp for ${esc(it.name)}"></div>`;
 }
 function bindResets(root){root.querySelectorAll('.reset').forEach(b=>b.onclick=e=>{e.stopPropagation();delete data.ov[mode][b.dataset.id];save('Tilbakestilt til vanlig beløp');});}
 function updateTotals(){
  const t=tot(mode),v={income:t.i,expenses:t.e,savings:t.s};
  document.querySelectorAll('#tabs .tab').forEach(b=>{b.querySelector('small').textContent=fmt(v[b.dataset.k]);});
  document.querySelectorAll('#list .group span[data-cat]').forEach(sp=>{const k=sp.dataset.cat;sp.textContent=fmt(data.expenses.filter(x=>(x.cat||'Egne utgifter og familieliv')===k).reduce((a,x)=>a+amountFor(x,mode),0));});
- renderLeftbar();}
+ refreshCmp();renderLeftbar();}
 function renderLeftbar(){const lb=document.getElementById('leftbar');lb.classList.toggle('show',view==='budget');if(view!=='budget')return;
  const t=tot(mode);set('lb-lbl',mode==null?'Igjen hver måned':'Igjen i '+mLabel(mode).toLowerCase());const el=document.getElementById('lb-val');el.textContent=fmt(t.left);el.className=t.left<0?'neg':t.left>0?'pos':'';}
 function find(id){for(const t of['income','expenses','savings']){const it=data[t].find(x=>x.id===id);if(it)return it;}return null;}
 
 /* ---- Redigeringsark ---- */
 let sh={type:null,id:null};
+let shIcon='';
+function renderIcons(){const box=document.getElementById('sh-icons');const auto=guessIcon(document.getElementById('sh-name').value,sh.type);
+ const list=[...new Set([shIcon||auto,...ICON_CHOICES])];
+ box.innerHTML=list.map(e=>`<button type="button" class="${e===(shIcon||auto)?'on':''}" data-e="${e}" aria-label="Ikon ${e}">${e}</button>`).join('');
+ box.querySelectorAll('button').forEach(b=>b.onclick=()=>{shIcon=b.dataset.e;box.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));});}
+document.getElementById('sh-name').addEventListener('input',()=>{if(!shIcon)renderIcons();});
 function openSheet(type,id){
  sh={type,id};const it=id?find(id):null;
  const word=type==='income'?'inntekt':type==='expenses'?'utgift':'sparepost';
  set('sh-title',it?'Endre '+word:'Ny '+word);
  document.getElementById('sh-name').value=it?it.name:'';
+ shIcon=it?iconOf(it,type):'';renderIcons();
  const when=it?(it.only||''):(mode||'');
  document.getElementById('sh-amt').value=it?it.amount:'';
  const cw=document.getElementById('sh-cat-wrap');cw.style.display=type==='expenses'?'':'none';
@@ -481,12 +652,12 @@ function closeSheet(){document.getElementById('sheetbg').classList.remove('open'
 document.getElementById('sh-cancel').onclick=closeSheet;
 document.getElementById('sheetbg').onclick=e=>{if(e.target.id==='sheetbg')closeSheet();};
 document.getElementById('sh-save').onclick=()=>{
- const name=document.getElementById('sh-name').value.trim();if(!name){document.getElementById('sh-name').focus();return;}
+ const name=document.getElementById('sh-name').value.trim();if(!name||!splitIcon(name).name){document.getElementById('sh-name').focus();return;}
  const amount=Math.max(0,Math.round(+document.getElementById('sh-amt').value||0));
  const w=document.getElementById('sh-when').value;const only=w===''?null:w;
  let it=sh.id?find(sh.id):null;
  if(!it){it={id:uid(),name,amount};data[sh.type].push(it);}
- it.name=name;it.amount=amount;
+ const sp=splitIcon(name);it.name=sp.name;it.amount=amount;it.icon=sp.icon||shIcon||guessIcon(sp.name,sh.type);
  if(sh.type==='expenses')it.cat=document.getElementById('sh-cat').value;
  if(only==null)delete it.only;else{it.only=only;Object.values(data.ov).forEach(o=>delete o[it.id]);}
  closeSheet();save(sh.id?'Endret':'Lagt til');
@@ -507,26 +678,32 @@ function monthRow(t){const k=t.k,adj=monthAdjusted(k);
  const base=Math.max(t.i,t.e+t.s,1),w=v=>(Math.max(0,v)/base*100).toFixed(1)+'%';
  const lft=t.left===0?'Alt fordelt':t.left>0?fmt(t.left)+' til overs':fmt(-t.left)+' for lite';
  const lines=(type,title)=>{const its=data[type].filter(it=>amountFor(it,k)>0);if(!its.length)return'';
-  return`<h4>${title}</h4>`+its.map(it=>`<div class="dline"><span>${esc(it.name)}${it.only===k?' <span class="chg">bare denne måneden</span>':hasOv(it,k)?' <span class="chg">justert</span>':''}</span><span>${fmt(amountFor(it,k))}</span></div>`).join('');};
+  return`<h4>${title}</h4>`+its.map(it=>`<div class="dline"><span>${ic(it,type)}${esc(it.name)}${it.only===k?' <span class="chg">bare denne måneden</span>':hasOv(it,k)?' <span class="chg">justert</span>':''}</span><span>${fmt(amountFor(it,k))}</span></div>`).join('');};
  return`<div class="mrow${openM===k?' open':''}" data-m="${k}">
   <button type="button" class="mhead" aria-expanded="${openM===k}"><span class="mn">${mName(k)}${k===NOW?'<em>nå</em>':''}${adj?'<small>justert</small>':''}</span><span class="ml ${t.left<0?'neg':t.left>0?'pos':''}">${lft}</span><span class="chev">›</span>
    <span class="mbar"><i style="width:${w(t.e)};background:var(--acc)"></i><i style="width:${w(t.s)};background:#c7aa79"></i><i style="width:${w(t.left)};background:var(--green)"></i></span>
    <span class="mnums">Inn ${fmt(t.i)} · Ut ${fmt(t.e)} · Spart ${fmt(t.s)}</span></button>
   <div class="mdetail">${lines('income','Inntekter')}${lines('expenses','Utgifter')}${lines('savings','Sparing')}
    <button type="button" class="btn pri" style="width:100%;margin-top:12px" data-adjust="${k}">Juster ${mLabel(k).toLowerCase()}</button></div></div>`;}
+const YEARS=[...new Set(PERIOD.map(mYear))];
+let selYear=YEARS.includes(TODAY.getFullYear())?TODAY.getFullYear():BUDGET_YEAR;
 function renderYear(){
- const y=yearTot(),pre=yearTot(BEFORE);
+ const keys=PERIOD.filter(k=>mYear(k)===selYear),y=yearTot(keys),partial=keys.length<12;
+ const yt=document.getElementById('ytabs');yt.style.display=YEARS.length>1?'':'none';
+ yt.innerHTML=YEARS.map(yr=>`<button type="button" class="tab ${yr===selYear?'on':''}" data-y="${yr}">${yr}<small>${yr===TODAY.getFullYear()?'nå':yr>TODAY.getFullYear()&&DAYS_TO>0?'om '+DAYS_TO+' dager':''}</small></button>`).join('');
+ yt.querySelectorAll('[data-y]').forEach(b=>b.onclick=()=>{selYear=+b.dataset.y;openM=null;renderYear();});
+ set('y-title',partial?'Resten av '+selYear:'Året '+selYear);
  set('y-inc',fmt(y.i));set('y-exp',fmt(y.e));set('y-sav',fmt(y.s));
  const yl=document.getElementById('y-left');yl.textContent=fmt(y.left);yl.className='v '+(y.left<0?'neg':y.left>0?'pos':'');
  const anyAdj=PERIOD.some(k=>monthAdjusted(k));
- set('y-lead',(BEFORE.length?'Tallene øverst gjelder hele 2027. Listen starter med resten av 2026, så du kan planlegge overgangen. ':'')+(anyAdj?'Alle måneder følger standardbudsjettet, pluss justeringene du har gjort.':'Alle månedene er like. Trykk på en måned for å se den, og «Juster» for å endre bare den måneden.'));
- let html='';
- if(BEFORE.length){html+=`<div class="ygroup">Resten av ${mYear(BEFORE[0])}<span>Spart ${fmt(pre.s)}</span></div>`+pre.months.map(monthRow).join('');
-  html+=`<div class="ygroup">2027<span>${DAYS_TO>0?'Starter om '+DAYS_TO+' dager':'I gang'}</span></div>`;}
- html+=y.months.map(monthRow).join('');
+ set('y-lead',(partial?`Tallene gjelder ${mName(keys[0]).toLowerCase()}–desember ${selYear}. `:'')+(anyAdj?'Alle måneder følger standardbudsjettet, pluss justeringene du har gjort.':'Alle månedene er like. Trykk på en måned for å se den, og «Juster» for å endre bare den måneden.'));
+ let html=y.months.map(monthRow).join('');
+ const nextY=YEARS.find(v=>v>selYear);
+ if(nextY)html+=`<button type="button" class="ygroup" style="width:100%;border:0;cursor:pointer" data-goyear="${nextY}">${nextY} starter om ${DAYS_TO} dager<span>Se ${nextY} ›</span></button>`;
  document.getElementById('months').innerHTML=html;
  document.querySelectorAll('.mrow .mhead').forEach(b=>b.onclick=()=>{const k=b.parentElement.dataset.m;openM=openM===k?null:k;
   document.querySelectorAll('.mrow').forEach(r=>{const o=r.dataset.m===openM;r.classList.toggle('open',o);r.querySelector('.mhead').setAttribute('aria-expanded',o);});});
+ document.querySelectorAll('[data-goyear]').forEach(b=>b.onclick=()=>{selYear=+b.dataset.goyear;openM=null;renderYear();window.scrollTo({top:0});});
  document.querySelectorAll('[data-adjust]').forEach(b=>b.onclick=()=>{mode=b.dataset.adjust;tab='expenses';show('budget');});
  // Buffer: hvor lavt går kontoen gjennom hele perioden?
  let bal=0,min=0,minK=null;PERIOD.forEach(k=>{bal+=tot(k).left;if(bal<min){min=bal;minK=k;}});
@@ -540,14 +717,14 @@ function renderYear(){
  if(cur&&PERIOD.includes(cur))om.value=cur;
  const ones=[];['income','expenses'].forEach(t=>data[t].forEach(it=>{if(it.only)ones.push({t,it});}));
  ones.sort((a,b)=>a.it.only<b.it.only?-1:1);
- document.getElementById('o-list').innerHTML=ones.map(({t,it})=>`<div class="oneoff"><span><b>${mLabel(it.only)}</b> · ${esc(it.name)}</span><span><span class="${t==='income'?'pos':'neg'}">${t==='income'?'+':'−'}${fmt(it.amount)}</span><button type="button" class="x" data-id="${it.id}" data-t="${t}" aria-label="Slett ${esc(it.name)}">×</button></span></div>`).join('');
+ document.getElementById('o-list').innerHTML=ones.map(({t,it})=>`<div class="oneoff"><span><b>${mLabel(it.only)}</b> · ${ic(it,t)}${esc(it.name)}</span><span><span class="${t==='income'?'pos':'neg'}">${t==='income'?'+':'−'}${fmt(it.amount)}</span><button type="button" class="x" data-id="${it.id}" data-t="${t}" aria-label="Slett ${esc(it.name)}">×</button></span></div>`).join('');
  document.querySelectorAll('#o-list .x').forEach(b=>b.onclick=()=>{data[b.dataset.t]=data[b.dataset.t].filter(x=>x.id!==b.dataset.id);save('Fjernet');});
- // Spart gjennom 2027
- let acc=0;const pts=y.months.map(t=>acc+=t.s);const max=Math.max(1,acc);
- const xy=pts.map((v,i)=>[i/11*296+2,104-v/max*96]);
+ // Spart gjennom valgt år
+ let acc=0;const pts=y.months.map(t=>acc+=t.s);const max=Math.max(1,acc),nn=Math.max(1,pts.length-1);
+ const xy=pts.length===1?[[2,104-pts[0]/max*96],[298,104-pts[0]/max*96]]:pts.map((v,i)=>[i/nn*296+2,104-v/max*96]);
  const line=xy.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
  document.getElementById('spark').innerHTML=`<path d="${line} L298 106 L2 106 Z" fill="var(--acc2)"/><path d="${line}" fill="none" stroke="var(--acc)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>`;
- set('spark-txt',`${fmt(y.s)} satt av til sparing i 2027 – ${fmt(pts[5])} allerede etter juni.`);
+ set('spark-txt',partial?`${fmt(y.s)} satt av til sparing ut ${selYear}.`:`${fmt(y.s)} satt av til sparing i ${selYear} – ${fmt(pts[5])} allerede etter juni.`);
 }
 document.querySelectorAll('#o-type button').forEach(b=>b.onclick=()=>{oType=b.dataset.t;document.querySelectorAll('#o-type button').forEach(x=>x.classList.toggle('on',x===b));});
 document.querySelectorAll('[data-sug]').forEach(b=>b.onclick=()=>{const[n,t,m]=b.dataset.sug.split('|');
@@ -557,8 +734,8 @@ document.querySelectorAll('[data-sug]').forEach(b=>b.onclick=()=>{const[n,t,m]=b
 document.getElementById('o-add').onclick=()=>{
  const name=document.getElementById('o-name').value.trim(),amt=Math.max(0,Math.round(+document.getElementById('o-amt').value||0)),m=document.getElementById('o-month').value;
  if(!name){document.getElementById('o-name').focus();return;}if(!amt){document.getElementById('o-amt').focus();return;}
- if(oType==='inntekt')data.income.push({id:uid(),name,amount:amt,only:m});
- else data.expenses.push({id:uid(),name,amount:amt,cat:'Egne utgifter og familieliv',only:m});
+ if(oType==='inntekt')data.income.push({id:uid(),name,amount:amt,only:m,icon:guessIcon(name,'income')});
+ else data.expenses.push({id:uid(),name,amount:amt,cat:'Egne utgifter og familieliv',only:m,icon:guessIcon(name,'expenses')});
  document.getElementById('o-name').value='';document.getElementById('o-amt').value='';
  save(name+' lagt til i '+mLabel(m).toLowerCase());
 };
@@ -571,14 +748,29 @@ const THEMES={
  blue:{'--bg':'#edf1f4','--paper':'#fbfdff','--ink':'#27333c','--muted':'#6f7d88','--line':'#d9e1e7','--acc':'#526f86','--acc2':'#dfe9f0','--red':'#a94e42','--green':'#4f7a55'},
  dark:{'--bg':'#1f2422','--paper':'#2b322f','--ink':'#f2f0e9','--muted':'#b4bcb5','--line':'#414a44','--acc':'#9fbea2','--acc2':'#35473a','--red':'#e08b7d','--green':'#9fd0a5'}
 };
+const THEME_NAMES={sand:'Sand',sage:'Salvie',rose:'Dus rosa',blue:'Blågrå',dark:'Mørk',custom:'Egen'};
+function mixHex(a,b,t){const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const A=p(a),B=p(b);return'#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('');}
+let customColor='#8a6746';try{customColor=localStorage.getItem('personalBudget2027custom')||customColor;}catch(e){}
+function buildCustom(){const base=THEMES.sand;THEMES.custom=Object.assign({},base,{'--acc':customColor,'--acc2':mixHex(customColor,'#ffffff',.82),'--bg':mixHex(customColor,'#ffffff',.9),'--paper':mixHex(customColor,'#ffffff',.97),'--line':mixHex(customColor,'#ffffff',.75)});}
+buildCustom();
 let theme='sand';try{theme=localStorage.getItem('personalBudget2027theme')||'sand';}catch(e){}
 function applyTheme(n){theme=THEMES[n]?n:'sand';Object.entries(THEMES[theme]).forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
  document.querySelector('meta[name=theme-color]').content=THEMES[theme]['--bg'];
  document.documentElement.style.colorScheme=theme==='dark'?'dark':'light';
  try{localStorage.setItem('personalBudget2027theme',theme)}catch(e){}
- document.querySelectorAll('.sw').forEach(s=>s.classList.toggle('on',s.dataset.t===theme));}
-document.getElementById('swatches').innerHTML=Object.entries(THEMES).map(([k,v])=>`<button type="button" class="sw" data-t="${k}" aria-label="Fargetema ${k}" style="background:linear-gradient(135deg,${v['--bg']} 50%,${v['--acc']} 50%)"></button>`).join('');
-document.querySelectorAll('.sw').forEach(s=>s.onclick=()=>{applyTheme(s.dataset.t);toast('Farger endret');});
+ document.querySelectorAll('.swl').forEach(s=>s.classList.toggle('on',s.dataset.t===theme));}
+function renderSwatches(id){const box=document.getElementById(id);
+ box.innerHTML=Object.entries(THEMES).filter(([k])=>k!=='custom').map(([k,v])=>`<button type="button" class="swl" data-t="${k}"><span class="sw" style="background:linear-gradient(135deg,${v['--bg']} 50%,${v['--acc']} 50%)"></span>${THEME_NAMES[k]}</button>`).join('')
+  +`<label class="swl" data-t="custom"><input type="color" value="${customColor}" aria-label="Velg din egen farge">Egen farge</label>`;
+ box.querySelectorAll('button.swl').forEach(b=>b.onclick=()=>{applyTheme(b.dataset.t);toast('Farge: '+THEME_NAMES[b.dataset.t]);});
+ const ci=box.querySelector('input[type=color]');
+ ci.oninput=()=>{customColor=ci.value;try{localStorage.setItem('personalBudget2027custom',customColor)}catch(e){}buildCustom();applyTheme('custom');document.querySelectorAll('.swatches input[type=color]').forEach(x=>{if(x!==ci)x.value=customColor;});};
+ ci.onclick=()=>{if(theme!=='custom'){buildCustom();applyTheme('custom');}};
+ box.querySelectorAll('.swl').forEach(s=>s.classList.toggle('on',s.dataset.t===theme));}
+renderSwatches('swatches');renderSwatches('swatches2');
+document.getElementById('colorbtn').onclick=()=>document.getElementById('colorbg').classList.add('open');
+document.getElementById('cl-close').onclick=()=>document.getElementById('colorbg').classList.remove('open');
+document.getElementById('colorbg').onclick=e=>{if(e.target.id==='colorbg')e.currentTarget.classList.remove('open');};
 applyTheme(theme);
 
 function prefs(){try{return JSON.parse(localStorage.getItem('personalBudget2027dashboard')||'{}')}catch(e){return{}}}
@@ -586,12 +778,11 @@ function applyPrefs(){const p=prefs();set('title',p.title||'Mitt budsjett');set(
 ['p-title','p-sub'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{const p=prefs();p.title=document.getElementById('p-title').value.trim();p.subtitle=document.getElementById('p-sub').value.trim();try{localStorage.setItem('personalBudget2027dashboard',JSON.stringify(p))}catch(e){}set('title',p.title||'Mitt budsjett');set('subtitle',p.subtitle||'Veien mot økonomisk frihet');}));
 applyPrefs();
 
-const sel=document.getElementById('ssb-type');
-sel.innerHTML=SSB_INCOME.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('');
-try{sel.value=localStorage.getItem('personalBudget2027ssb')||'alle';}catch(e){}
-sel.onchange=()=>{try{localStorage.setItem('personalBudget2027ssb',sel.value)}catch(e){}renderSSB();};
 function renderSSB(){
- const g=SSB_INCOME.find(x=>x[0]===sel.value)||SSB_INCOME[0],y=yearTot(),P=SSB_SPEND[g[3]];
+ const pp=getProfile(),pe=document.getElementById('ssb-prof');
+ pe.innerHTML=hasProfile(pp)?`${esc(profileText(pp))} → <b>${ssbGroup()[1].toLowerCase()}</b><br><button type="button" class="linkbtn" data-prof>Endre opplysningene</button>`:'Du sammenlignes med alle husholdninger. <button type="button" class="linkbtn" data-prof>Fyll inn om deg</button>';
+ pe.querySelectorAll('[data-prof]').forEach(b=>b.onclick=openProfile);
+ const g=ssbGroup(),y=yearTot(),P=SSB_SPEND[g[3]];
  const mine={};let unmatched=0;
  data.expenses.forEach(it=>{const c=ssbCat(it.name);const v=YEAR_KEYS.reduce((a,k)=>a+amountFor(it,k),0);if(c)mine[c]=(mine[c]||0)+v;else unmatched+=v;});
  const rows=Object.keys(SSB_CAT_NAMES).filter(c=>mine[c]).map(c=>{const d=mine[c]/12,s=P.v[c]/12,diff=d-s;
