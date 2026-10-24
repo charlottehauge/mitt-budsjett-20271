@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f4eadc">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Mitt budsjett 2027</title>
@@ -144,6 +146,10 @@ details.rates summary{cursor:pointer;color:var(--acc);font-weight:600;font-size:
 .cmpbar.mini b{font-size:13px}
 .cmpbar.mini .profsum,.cmpbar.mini .profsum .linkbtn{font-size:12px;margin-top:1px}
 .cmpbar.mini .switch{transform:scale(.75);transform-origin:right center;flex:0 0 52px}
+.toggler{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:14px;padding:12px 0 4px;border:0;border-top:1px solid var(--line);background:none;color:var(--acc);font-weight:750;font-size:15px;text-align:left}
+.toggler .chev{font-size:18px;transition:transform .2s}
+.toggler[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.appver{text-align:center;font-size:11px;color:var(--muted);margin:6px 0 0;opacity:.7}
 .clamp{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
 .clamp.open{display:block!important;-webkit-line-clamp:unset;line-clamp:unset;overflow:visible}
 .morebtn{display:inline-flex;align-items:center;gap:4px;border:0;background:none;color:var(--acc);font-weight:700;font-size:13px;padding:4px 0 2px;margin:0 0 4px;cursor:pointer}
@@ -316,7 +322,8 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
     <div class="muted" id="sav-lbl" style="margin-top:10px"></div>
     <div class="savebig" id="sav-sofar"></div>
     <div class="muted" id="sav-start"></div>
-    <details class="estimate" id="savdet"><summary id="savdet-sum">Vis detaljer</summary><div id="sav-list" style="margin-top:6px"></div></details>
+    <button type="button" class="toggler" id="savdet-btn" aria-expanded="false" aria-controls="sav-list"><span id="savdet-sum">Vis detaljer</span><span class="chev" aria-hidden="true">⌄</span></button>
+    <div id="sav-list" style="margin-top:6px" hidden></div>
     <div id="sav-month"></div>
     <details class="estimate" id="est">
       <summary id="est-sum"></summary>
@@ -333,6 +340,7 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
     </details>
   </div>
   <button type="button" class="delmonth" id="home-del" style="display:none"></button>
+  <p class="appver" id="app-version2"></p>
 </section>
 
 <!-- BUDSJETT -->
@@ -745,17 +753,22 @@ function renderSavings(){queueClamp();
  const monK=cut&&isPlanned(cut)?cut:(doneP.length?doneP[doneP.length-1]:effMonth(NOW));
  const head=rw=>{const mon=rw.it?amountFor(rw.it,monK)+data.savings.filter(o=>o.only===monK&&o.target===rw.it.id).reduce((x,o)=>x+o.amount,0):0;return`<div class="top"><span><span class="ico" aria-hidden="true">${rw.icon}</span>${esc(rw.name)} <span class="muted">· ${KIND_NAMES[rw.kd]}${rw.kd==='transfer'?'':' '+String(data.rates[rw.kd]).replace('.',',')+' %'}</span></span>${rw.it?`<strong>${fmt(mon)}<span class="muted"> / mnd</span></strong>`:''}</div>`;};
  let listHTML='';
- if(doneP.length){const rows=R.rows.map(rw=>({rw,v:soFarRow(rw)})).filter(o=>o.v&&(o.v.end||o.v.contrib));
+ const mEq=v=>`<span>Inngående<b>${fmt(v.start)}</b></span><span>+ Satt inn i ${mName(cut).toLowerCase()}<b>${fmt(v.contrib)}</b></span><span class="gain">+ Avkastning<b>${fmt(v.ret)}</b></span>${v.out?`<span>− Tatt ut<b>${fmt(v.out)}</b></span>`:''}<span class="end">= Etter ${mName(cut).toLowerCase()}<b>${fmt(v.end)}</b></span>`;
+ const monthV=rw=>{const m=rw.month[cut];return m?{start:m.start,contrib:m.inn,ret:m.ret,out:m.out,end:m.end}:null;};
+ if(doneP.length){const rows=R.rows.map(rw=>({rw,v:monthV(rw)})).filter(o=>o.v&&(o.v.end||o.v.contrib||o.v.start));
   const T=rows.reduce((t,{v})=>{['start','contrib','ret','out','end'].forEach(f=>t[f]+=v[f]);return t;},{start:0,contrib:0,ret:0,out:0,end:0});
-  listHTML=rows.map(({rw,v})=>`<div class="savitem">${head(rw)}<div class="eq">${nowEq(v)}</div></div>`).join('')
-   +(rows.length?`<div class="savtotal"><b>På sparekonto og fond t.o.m. ${mName(cut).toLowerCase()}</b><div class="eq">${nowEq(T)}</div></div>`:'');
-  const tr=R.transfers.map(t=>({t,v:doneP.reduce((a,k)=>a+amountFor(t.it,k)+data.savings.filter(o=>o.only===k&&o.target===t.it.id).reduce((x,o)=>x+o.amount,0),0)})).filter(o=>o.v);
-  listHTML+=tr.map(({t,v})=>{const g=t.it.goal&&t.it.goal.on&&t.it.goal.type==='debt'&&t.it.goal.amount?t.it.goal:null,paid=v+(g?g.before:0);
-   return`<div class="savitem">${head({it:t.it,icon:iconOf(t.it,'savings'),name:t.it.name,kd:'transfer'})}<div class="eq"><span>Overført t.o.m. ${mName(cut).toLowerCase()}<b>${fmt(v)}</b></span>${g?`<span>Gjenstår av gjelden<b>${fmt(Math.max(0,g.amount-paid))}</b></span>`:''}</div></div>`;}).join('');}
+  listHTML=rows.map(({rw,v})=>`<div class="savitem">${head(rw)}<div class="eq">${mEq(v)}</div></div>`).join('')
+   +(rows.length?`<div class="savtotal"><b>Sparekonto og fond i ${mName(cut).toLowerCase()}</b><div class="eq">${mEq(T)}</div></div>`:'');
+  const trM=t=>amountFor(t.it,cut)+data.savings.filter(o=>o.only===cut&&o.target===t.it.id).reduce((x,o)=>x+o.amount,0);
+  const tr=R.transfers.map(t=>({t,m:isPlanned(cut)?trM(t):0,v:doneP.reduce((a,k)=>a+amountFor(t.it,k)+data.savings.filter(o=>o.only===k&&o.target===t.it.id).reduce((x,o)=>x+o.amount,0),0)})).filter(o=>o.v);
+  listHTML+=tr.map(({t,m,v})=>{const g=t.it.goal&&t.it.goal.on&&t.it.goal.type==='debt'&&t.it.goal.amount?t.it.goal:null,paid=v+(g?g.before:0);
+   return`<div class="savitem">${head({it:t.it,icon:iconOf(t.it,'savings'),name:t.it.name,kd:'transfer'})}<div class="eq"><span>Overført i ${mName(cut).toLowerCase()}<b>${fmt(m)}</b></span><span>Totalt overført<b>${fmt(v)}</b></span>${g?`<span>Gjenstår av gjelden<b>${fmt(Math.max(0,g.amount-paid))}</b></span>`:''}</div></div>`;}).join('');}
  document.getElementById('sav-list').innerHTML=listHTML;
  /* Detaljene kan skjules; totalen for måneden vises alltid */
- const sd=document.getElementById('savdet');sd.style.display=listHTML?'':'none';sd.open=detOpen;
- const sdl=()=>set('savdet-sum',sd.open?'Skjul detaljer':'Vis detaljer');sdl();sd.ontoggle=()=>{detOpen=sd.open;sdl();if(sd.open)queueClamp();};
+ const sb=document.getElementById('savdet-btn'),sl=document.getElementById('sav-list');
+ sb.style.display=listHTML?'':'none';
+ const paintDet=()=>{sl.hidden=!detOpen||!listHTML;sb.setAttribute('aria-expanded',String(detOpen));set('savdet-sum',detOpen?'Skjul detaljer':'Vis detaljer');};
+ paintDet();sb.onclick=()=>{detOpen=!detOpen;paintDet();if(detOpen)queueClamp();};
  const sm=document.getElementById('sav-month');
  if(cut&&doneP.length){const inMonthTot=isPlanned(cut)?tot(cut).s:0,onAcc=R.rows.reduce((a,rw)=>a+(rw.month[cut]?rw.month[cut].end:0),0);
   sm.innerHTML=`<div class="savtotal" style="margin-top:12px"><b>Totalt for ${mName(cut).toLowerCase()}</b><div class="eq" style="margin-left:0"><span>Satt av i ${mName(cut).toLowerCase()}<b>${isPlanned(cut)?fmt(inMonthTot):'Ikke planlagt'}</b></span><span>På sparekonto og fond<b>${fmt(onAcc)}</b></span></div></div>`;}
@@ -1349,7 +1362,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alle beløp 
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='25.10.2026 · ryddig budsjett';set('app-version',APP_VERSION);
+const APP_VERSION='25.10.2026 · inngående 2';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
