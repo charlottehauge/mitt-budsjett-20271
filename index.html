@@ -845,15 +845,18 @@ function renderNewMonth(){const el=document.getElementById('newmonth');const k=h
   <div class="btns">${bc?`<button type="button" class="btn pri grow" id="nm-copy">⭐ Bruk basisbudsjettet for ${nm}</button>`:(originalData()?`<button type="button" class="btn pri grow" id="nm-orig">Hent budsjettet du hadde fra før</button>`:'')}<button type="button" class="btn grow" id="nm-adj">🛠️ Bygg nytt budsjett</button></div>`;
  const c=document.getElementById('nm-copy');if(c)c.onclick=()=>{copyMonth(BASE,k);save(mName(k)+' bruker nå basisbudsjettet');};
  const o=document.getElementById('nm-orig');if(o)o.onclick=()=>{const n=restoreBase();if(n)copyMonth(BASE,k);save(n?mName(k)+' er planlagt':'Fant ikke budsjettet fra før');};
- document.getElementById('nm-adj').onclick=()=>{if(!isPlanned(k))data.plan[k]={};persist();mode=k;tab='income';show('budget');toast('Legg til postene for '+mName(k).toLowerCase());};}
+ document.getElementById('nm-adj').onclick=()=>{if(!isPlanned(k))data.plan[k]={};persist();setMonth(k);tab='income';show('budget');toast('Legg til postene for '+mName(k).toLowerCase());};}
 const startMonth=()=>{if(data.plan[NOW])return NOW;const earlier=Object.keys(data.plan).filter(k=>k<NOW).length;const nx=Object.keys(data.plan).filter(k=>k>NOW).sort()[0];return !earlier&&nx?nx:NOW;};
 let homeM=startMonth();
+/* Oversikt og Budsjett viser alltid samme måned */
+function setMonth(k){if(!k||k===BASE)return;homeM=k;mode=k;savYear=mYear(k);}
 const YEARS_H=()=>{const ys=[...new Set(PERIOD.map(mYear))];return ys.includes(TODAY.getFullYear())?TODAY.getFullYear():BUDGET_YEAR;};
 function renderHome(){
  if(!PERIOD.includes(homeM))homeM=PERIOD.includes(NOW)?NOW:PERIOD[0];
+ if(mode&&mode!==BASE&&PERIOD.includes(mode))homeM=mode;
  const hs=document.getElementById('home-m');
  hs.innerHTML=PERIOD.map(k=>`<option value="${k}">${mLabel(k)}${k===NOW?' (nå)':''}${isPlanned(k)?'':' – ikke planlagt'}</option>`).join('');
- hs.value=homeM;hs.onchange=()=>{homeM=hs.value;savYear=mYear(homeM);renderHome();renderNewMonth();};
+ hs.value=homeM;hs.onchange=()=>{setMonth(hs.value);renderHome();renderNewMonth();};
  set('h-lbl','Igjen i '+mLabel(homeM).toLowerCase());
  const t=tot(homeM),planned=isPlanned(homeM);
  set('h-left',planned?fmt(t.left):'Ikke planlagt');
@@ -927,10 +930,11 @@ document.getElementById('in-base').onclick=()=>{if(confirm('Erstatte de faste be
 function regOneOffs(m){return['income','expenses','savings'].flatMap(t=>data[t].filter(it=>it.only===m).map(it=>({t,it})));}
 function renderBudget(){queueClamp();
  if(!mode||mode===BASE||!PERIOD.includes(mode))mode=PERIOD.includes(homeM)?homeM:PERIOD.includes(NOW)?NOW:PERIOD[0];
+ homeM=mode;
  renderCmpBar();
  const mb=document.getElementById('monthbar');
  mb.innerHTML=PERIOD.map((k,i)=>(YEARS.length>1&&(i===0||mYear(k)!==mYear(PERIOD[i-1]))?`<span class="ydiv">${mYear(k)}</span>`:'')+`<button class="chip ${mode===k?'on':''} ${isPlanned(k)?'':'unpl'}" data-m="${k}">${mName(k)}${k===NOW?'<em>nå</em>':''}${isPlanned(k)?'':' +'}</button>`).join('');
- mb.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{mode=c.dataset.m;renderBudget();renderLeftbar();});
+ mb.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{setMonth(c.dataset.m);renderBudget();renderLeftbar();});
  const on=mb.querySelector('.chip.on');if(on&&on.scrollIntoView)on.scrollIntoView({inline:'center',block:'nearest'});
  const planned=isPlanned(mode),prev=prevPlanned(mode),src=nearestPlanned(mode);
  ['tabs','list'].forEach(id=>document.getElementById(id).style.display=planned?'':'none');
@@ -1252,8 +1256,8 @@ function renderYear(){queueClamp();
  document.querySelectorAll('.mrow .mhead').forEach(b=>b.onclick=()=>{const k=b.parentElement.dataset.m;openM=openM===k?null:k;
   document.querySelectorAll('.mrow').forEach(r=>{const o=r.dataset.m===openM;r.classList.toggle('open',o);r.querySelector('.mhead').setAttribute('aria-expanded',o);});});
  document.querySelectorAll('[data-goyear]').forEach(b=>b.onclick=()=>{selYear=+b.dataset.goyear;openM=null;renderYear();window.scrollTo({top:0});});
- document.querySelectorAll('#months [data-adjust]').forEach(b=>b.onclick=()=>{mode=b.dataset.adjust;tab='expenses';show('budget');});
- document.querySelectorAll('#months [data-build]').forEach(b=>b.onclick=()=>{const k=b.dataset.build;if(!isPlanned(k))data.plan[k]={};persist();mode=k;tab='income';show('budget');toast('Legg til postene for '+mName(k).toLowerCase());});
+ document.querySelectorAll('#months [data-adjust]').forEach(b=>b.onclick=()=>{setMonth(b.dataset.adjust);tab='expenses';show('budget');});
+ document.querySelectorAll('#months [data-build]').forEach(b=>b.onclick=()=>{const k=b.dataset.build;if(!isPlanned(k))data.plan[k]={};persist();setMonth(k);tab='income';show('budget');toast('Legg til postene for '+mName(k).toLowerCase());});
  document.querySelectorAll('#months [data-del]').forEach(b=>b.onclick=()=>deleteMonth(b.dataset.del));
  document.querySelectorAll('#months [data-copy]').forEach(b=>b.onclick=()=>{copyMonth(b.dataset.src,b.dataset.copy);save(mName(b.dataset.copy)+' bruker nå '+(b.dataset.src==='base'?'basisbudsjettet':'budsjettet fra '+mName(b.dataset.src).toLowerCase()));});
  // Buffer: hvor lavt går kontoen gjennom hele perioden?
@@ -1362,7 +1366,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alle beløp 
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='25.10.2026 · inngående 2';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
+const APP_VERSION='25.10.2026 · samme måned';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
