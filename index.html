@@ -14,7 +14,7 @@ html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.4}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
-.app{max-width:640px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) 16px calc(150px + env(safe-area-inset-bottom))}
+.app{max-width:640px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) 16px calc(190px + env(safe-area-inset-bottom))}
 header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px 4px 6px}
 header h1{font-size:26px;line-height:1.1;letter-spacing:-.03em;margin:0}
 header p{margin:4px 0 0;color:var(--muted);font-size:14px}
@@ -319,6 +319,7 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
     <div class="muted" id="sav-note" style="margin:6px 0 2px;font-size:13px"></div>
     <div id="sav-list"></div>
   </div>
+  <button type="button" class="delmonth" id="home-del" style="display:none"></button>
 </section>
 
 <!-- BUDSJETT -->
@@ -817,6 +818,7 @@ function renderHome(){
  const tm=effMonth(homeM),ex=data.expenses.map(x=>({x,a:tm?amountFor(x,tm):0})).filter(o=>o.a>0).sort((a,b)=>b.a-a.a).slice(0,5),mx=ex[0]?ex[0].a:1;
  document.getElementById('top').innerHTML=ex.map(({x,a})=>`<div class="toprow"><span>${ic(x,'expenses')}${esc(x.name)}</span><strong>${fmt(a)}</strong><div class="track"><i style="width:${a/mx*100}%"></i></div></div>`).join('')||'<p class="empty">Ingen utgifter lagt inn.</p>';
  renderGoals();renderSavings();renderNewMonth();
+ const hd=document.getElementById('home-del');if(isPlanned(homeM)&&homeM!==BASE){hd.style.display='';hd.textContent='Slett '+mLabel(homeM).toLowerCase();hd.onclick=()=>deleteMonth(homeM);}else hd.style.display='none';
 }
 
 /* ============ BUDSJETT ============ */
@@ -1312,7 +1314,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alle beløp 
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='24.10.2026 · basis 8';set('app-version',APP_VERSION);
+const APP_VERSION='24.10.2026 · basis 9';set('app-version',APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
