@@ -117,6 +117,11 @@ details.rates summary{cursor:pointer;color:var(--acc);font-weight:600;font-size:
 .togrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .togrow b{font-size:15px}
 .togrow small{display:block;font-size:12px;color:var(--muted);font-weight:400}
+.clamp{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+.clamp.open{display:block!important;-webkit-line-clamp:unset;line-clamp:unset;overflow:visible}
+.morebtn{display:inline-flex;align-items:center;gap:4px;border:0;background:none;color:var(--acc);font-weight:700;font-size:13px;padding:4px 0 2px;margin:0 0 4px;cursor:pointer}
+.morebtn svg{width:12px;height:12px;transition:transform .2s}
+.morebtn.open svg{transform:rotate(180deg)}
 .newmonth{background:var(--acc);color:#fff;border-radius:20px;padding:16px;margin:10px 0}
 .newmonth h3{margin:0 0 4px;font-size:17px}
 .newmonth p{margin:0;opacity:.9;font-size:14px}
@@ -649,7 +654,7 @@ function savingsModel(){
  years.forEach(y=>{tot[y]={start:0,contrib:0,ret:0,out:0,end:0};rows.forEach(r=>{const v=r.years[y];if(!v)return;['start','contrib','ret','out','end'].forEach(f=>tot[y][f]+=v[f]);});});
  return{rows,transfers,tot,years};}
 const eqHTML=v=>`<span>Inngående<b>${fmt(v.start)}</b></span><span>+ Spart<b>${fmt(v.contrib)}</b></span><span class="gain">+ Avkastning<b>${fmt(v.ret)}</b></span>${v.out?`<span>− Tatt ut<b>${fmt(v.out)}</b></span>`:''}<span class="end">= Ved årsslutt<b>${fmt(v.end)}</b></span>`;
-function renderSavings(){
+function renderSavings(){queueClamp();
  const M=savingsModel(),curY=YEARS_H(),last=PERIOD[PERIOD.length-1],lastY=mYear(last);
  // Spart så langt: bare planlagte måneder t.o.m. inneværende måned
  const doneKeys=PERIOD.filter(k=>mYear(k)===curY&&k<=NOW&&isPlanned(k));
@@ -713,7 +718,7 @@ function quoteFor(it,st){const n=it.name.toLowerCase();
  const step=st.pct>=100?4:st.pct>=75?3:st.pct>=50?2:st.pct>=25?1:0,list=QUOTES[theme][step];
  return list[(+NOW.slice(5))%list.length];}
 function ringSVG(p){const r=30,c=2*Math.PI*r;return`<svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="${r}" fill="none" stroke="var(--acc2)" stroke-width="8"/><circle cx="36" cy="36" r="${r}" fill="none" stroke="${p>=100?'var(--green)':'var(--acc)'}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(c*Math.min(p,100)/100).toFixed(1)} ${c.toFixed(1)}"/></svg>`;}
-function renderGoals(){const gs=data.savings.filter(x=>!x.only&&x.goal&&x.goal.on&&x.goal.amount>0);
+function renderGoals(){queueClamp();const gs=data.savings.filter(x=>!x.only&&x.goal&&x.goal.on&&x.goal.amount>0);
  const card=document.getElementById('goals-card');card.style.display='';
  const wm=workMonth(),noGoal=data.savings.filter(x=>!x.only&&!(x.goal&&x.goal.on&&x.goal.amount>0)&&inMonth(x,wm));
  const tail=`<div style="margin-top:${gs.length?'12':'4'}px">${gs.length?'':'<p class="muted" style="margin:0 0 4px">Sett et mål for en sparepost – se hvor langt du har kommet, prosent og når du er i mål.</p>'}
@@ -787,7 +792,7 @@ function bindSuggest(root,m,afterOpen){
  root.querySelectorAll('[data-setgoal]').forEach(b=>b.onclick=()=>{mode=m;tab='savings';openSheet('savings',b.dataset.setgoal);
   const on=document.getElementById('g-on');on.checked=true;paintGoal();});}
 function regOneOffs(m){return['income','expenses','savings'].flatMap(t=>data[t].filter(it=>it.only===m).map(it=>({t,it})));}
-function renderBudget(){
+function renderBudget(){queueClamp();
  if(!mode||!PERIOD.includes(mode))mode=PERIOD.includes(NOW)?NOW:PERIOD[0];
  renderCmpBar();
  const mb=document.getElementById('monthbar');
@@ -1063,7 +1068,7 @@ function monthRow(t){const k=t.k,adj=monthAdjusted(k);
   <div class="mdetail">${lines('income','Inntekter')}${lines('expenses','Utgifter')}${lines('savings','Sparing')}
    <button type="button" class="btn pri" style="width:100%;margin-top:12px" data-adjust="${k}">Endre ${mLabel(k).toLowerCase()}</button></div></div>`;}
 let selYear=YEARS.includes(TODAY.getFullYear())?TODAY.getFullYear():BUDGET_YEAR;
-function renderYear(){
+function renderYear(){queueClamp();
  const keys=PERIOD.filter(k=>mYear(k)===selYear),y=yearTot(keys),partial=keys.length<12;
  const yt=document.getElementById('ytabs');yt.style.display=YEARS.length>1?'':'none';
  yt.innerHTML=YEARS.map(yr=>`<button type="button" class="tab ${yr===selYear?'on':''}" data-y="${yr}">${yr}<small>${yr===TODAY.getFullYear()?'nå':yr>TODAY.getFullYear()?'om '+daysTo(yr)+' dager':''}</small></button>`).join('');
@@ -1155,7 +1160,7 @@ function applyPrefs(){const p=prefs();set('title',p.title||'Mitt budsjett');set(
 ['p-title','p-sub'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{const p=prefs();p.title=document.getElementById('p-title').value.trim();p.subtitle=document.getElementById('p-sub').value.trim();try{localStorage.setItem('personalBudget2027dashboard',JSON.stringify(p))}catch(e){}set('title',p.title||'Mitt budsjett');set('subtitle',p.subtitle||'Veien mot økonomisk frihet');}));
 applyPrefs();
 
-function renderSSB(){
+function renderSSB(){queueClamp();
  const pp=getProfile(),pe=document.getElementById('ssb-prof');
  pe.innerHTML=hasProfile(pp)?`${esc(profileText(pp))} → <b>${ssbGroup()[1].toLowerCase()}</b><br><button type="button" class="linkbtn" data-prof>Endre opplysningene</button>`:'Du sammenlignes med alle husholdninger. <button type="button" class="linkbtn" data-prof>Fyll inn om deg</button>';
  pe.querySelectorAll('[data-prof]').forEach(b=>b.onclick=openProfile);
@@ -1188,8 +1193,32 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alle beløp 
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='24.10.2026 · mål 2';set('app-version',APP_VERSION);
-function renderAll(){
+const APP_VERSION='24.10.2026 · les mer';set('app-version',APP_VERSION);
+/* ============ LES MER / VIS MINDRE ============
+   Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
+const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .modeinfo, .note';
+const openTexts=new Set();
+const clampKey=el=>el.id||el.textContent.trim().slice(0,60);
+const chev='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>';
+function applyClamp(){
+ document.querySelectorAll('.morebtn').forEach(b=>b.remove());
+ document.querySelectorAll(CLAMP_SEL).forEach(el=>{
+  el.classList.remove('clamp','open');
+  if(!el.offsetParent||el.closest('.hero,.newmonth,.sheet,.projtotal'))return;
+  if(el.querySelector('button,input,select,textarea'))return;
+  const d=getComputedStyle(el).display;if(d.includes('flex')||d.includes('grid')||d==='inline')return;
+  el.classList.add('clamp');
+  if(el.scrollHeight<=el.clientHeight+2){el.classList.remove('clamp');return;}
+  const key=clampKey(el),open=openTexts.has(key);if(open)el.classList.add('open');
+  const b=document.createElement('button');b.type='button';b.className='morebtn'+(open?' open':'');
+  b.setAttribute('aria-expanded',open);b.innerHTML=(open?'Vis mindre':'Les mer')+chev;
+  b.onclick=()=>{const o=!el.classList.contains('open');el.classList.toggle('open',o);b.classList.toggle('open',o);b.setAttribute('aria-expanded',o);
+   b.innerHTML=(o?'Vis mindre':'Les mer')+chev;if(o)openTexts.add(key);else openTexts.delete(key);};
+  el.insertAdjacentElement('afterend',b);});}
+let clampQueued=false;
+function queueClamp(){if(clampQueued)return;clampQueued=true;requestAnimationFrame(()=>{clampQueued=false;applyClamp();});}
+window.addEventListener('resize',queueClamp);
+function renderAll(){queueClamp();
  renderHome();if(view==='budget')renderBudget();if(view==='year')renderYear();if(view==='more')renderSSB();
  renderLeftbar();
 }
