@@ -8,7 +8,11 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Mitt budsjett 2027</title>
+<title>Mitt budsjett</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-title" content="Budsjett">
 <style>
 :root{--fieldbg:#fff;--bg:#f4eadc;--paper:#fff8ee;--ink:#3b3026;--muted:#827365;--line:#e5d5c2;--acc:#8a6746;--acc2:#efe0cd;--red:#a94e42;--green:#4f7a55;--shadow:0 6px 22px rgba(60,45,30,.06)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -147,9 +151,37 @@ details.rates summary{cursor:pointer;color:var(--acc);font-weight:600;font-size:
 .cmpbar.mini .profsum,.cmpbar.mini .profsum .linkbtn{font-size:12px;margin-top:1px}
 .cmpbar.mini .switch{transform:scale(.75);transform-origin:right center;flex:0 0 52px}
 .toggler{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:14px;padding:12px 0 4px;border:0;border-top:1px solid var(--line);background:none;color:var(--acc);font-weight:750;font-size:15px;text-align:left}
-.toggler .chev{font-size:18px;transition:transform .2s}
+.toggler .chev{display:inline-flex;transition:transform .2s}
 .toggler[aria-expanded="true"] .chev{transform:rotate(180deg)}
 .appver{text-align:center;font-size:11px;color:var(--muted);margin:6px 0 0;opacity:.7}
+.monthnav{position:sticky;top:0;z-index:9;display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:6px;margin:4px -16px 10px;padding:calc(8px + env(safe-area-inset-top)) 16px 8px;background:var(--bg);background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.monthnav[hidden]{display:none}
+.mnbtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--paper);font-size:26px;line-height:1;color:var(--acc);padding:0 0 3px}
+.mnbtn:disabled{opacity:.3}
+.mnlabel{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:1px;padding:2px}
+.mnlabel b{font-size:19px;letter-spacing:-.02em}
+.mnlabel small{font-size:12px;font-weight:600;border-radius:99px;padding:1px 9px;background:var(--acc2);color:var(--acc)}
+.mnlabel small.unpl{background:none;border:1px dashed var(--line);color:var(--muted)}
+.mnlabel small.now{background:var(--acc);color:var(--paper)}
+.mplist{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 14px}
+.mplist button{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 6px;font-weight:650;font-size:14px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.mplist button small{font-size:11px;font-weight:500;color:var(--muted)}
+.mplist button.on{background:var(--acc);border-color:var(--acc);color:var(--paper)}.mplist button.on small{color:var(--paper)}
+.mplist button.unpl{border-style:dashed}
+.mpyear{font-weight:800;color:var(--acc);font-size:14px;margin-top:6px}
+.updbar{position:fixed;left:12px;right:12px;top:calc(10px + env(safe-area-inset-top));z-index:50;display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--ink);color:var(--paper);border-radius:14px;padding:10px 12px 10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:14px;font-weight:600}
+.updbar[hidden]{display:none}
+.updbar button{border:0;background:var(--paper);color:var(--ink);border-radius:10px;padding:8px 14px;font-weight:700}
+.backupcard{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:14px;padding:12px 14px;margin:0 0 10px;font-size:14px}
+.backupcard[hidden]{display:none}
+.backupcard .btns{margin-top:8px}
+.collapseall{display:flex;justify-content:flex-end;margin:2px 4px -6px;min-height:0}
+.collapseall .linkbtn{font-size:13px}
+.group{cursor:pointer;user-select:none}
+.group .gchev{display:inline-flex;margin-left:10px;vertical-align:middle;transition:transform .2s;opacity:.9}
+.group.closed .gchev{transform:rotate(-90deg)}
+.group.closed{margin-bottom:2px}
+.gbody[hidden]{display:none}
 .clamp{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
 .clamp.open{display:block!important;-webkit-line-clamp:unset;line-clamp:unset;overflow:visible}
 .morebtn{display:inline-flex;align-items:center;gap:4px;border:0;background:none;color:var(--acc);font-weight:700;font-size:13px;padding:4px 0 2px;margin:0 0 4px;cursor:pointer}
@@ -288,9 +320,17 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
   <div class="hbtns"><div class="yearpill" id="yearpill">2027</div><button type="button" class="colorbtn" id="colorbtn"><i></i>Farge</button></div>
 </header>
 
+<div class="updbar" id="updbar" hidden><span>Ny versjon av appen er klar</span><button type="button" id="upd-go">Oppdater</button></div>
+<div class="monthnav" id="monthnav">
+  <button type="button" class="mnbtn" id="mn-prev" aria-label="Forrige måned">‹</button>
+  <button type="button" class="mnlabel" id="mn-label" aria-label="Velg måned"><b id="mn-name"></b><small id="mn-status"></small></button>
+  <button type="button" class="mnbtn" id="mn-next" aria-label="Neste måned">›</button>
+</div>
+
 <!-- OVERSIKT -->
 <section class="view active" id="v-home">
-  <label class="field" style="margin:6px 0 0"><span>Vis måned</span><select id="home-m"></select></label>
+  <div class="backupcard" id="backupcard" hidden></div>
+  <label class="field" style="display:none"><span>Vis måned</span><select id="home-m"></select></label>
   <div class="newmonth" id="newmonth" style="display:none"></div>
   <div class="hero">
     <div class="lbl" id="h-lbl">Igjen i en vanlig måned</div>
@@ -322,7 +362,7 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
     <div class="muted" id="sav-lbl" style="margin-top:10px"></div>
     <div class="savebig" id="sav-sofar"></div>
     <div class="muted" id="sav-start"></div>
-    <button type="button" class="toggler" id="savdet-btn" aria-expanded="false" aria-controls="sav-list"><span id="savdet-sum">Vis detaljer</span><span class="chev" aria-hidden="true">⌄</span></button>
+    <button type="button" class="toggler" id="savdet-btn" aria-expanded="false" aria-controls="sav-list"><span id="savdet-sum">Vis detaljer</span><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4.5l3.5 3.5 3.5-3.5"/></svg></span></button>
     <div id="sav-list" style="margin-top:6px" hidden></div>
     <div id="sav-month"></div>
     <details class="estimate" id="est">
@@ -346,11 +386,12 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
 <!-- BUDSJETT -->
 <section class="view" id="v-budget">
   <h2 style="display:flex;align-items:center;gap:8px">Budsjett <button type="button" class="infobtn" id="b-info" aria-label="Slik fungerer budsjettet">i</button></h2>
-  <div class="monthbar" id="monthbar"></div>
+  <div class="monthbar" id="monthbar" style="display:none"></div>
   <div class="modeinfo" id="modeinfo"></div>
   <div id="usebase"></div>
   <div id="plan-empty"></div>
   <div class="tabs" id="tabs"></div>
+  <div class="collapseall" id="collapseall"></div>
   <div class="card" id="list"></div>
   <div class="cmpbar mini" id="cmpbar"><div class="t"><b>Sammenlign med andre (SSB)</b><div class="profsum" id="cmp-sub"></div></div><label class="switch"><input type="checkbox" id="cmp-on" aria-label="Sammenlign med andre"><span></span></label></div>
 </section>
@@ -514,6 +555,11 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
    <p style="margin:0">«Sammenlign med andre» nederst viser om du ligger over eller under snittet hos SSB.</p>
   </div>
   <div class="btns"><button type="button" class="btn grow" id="in-base">⭐ Hent basisbudsjettet på nytt</button><button type="button" class="btn pri grow" id="in-close">Lukk</button></div>
+</div></div>
+<div class="sheetbg" id="mpickbg"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mp-title">
+  <div class="grab"></div>
+  <h3 id="mp-title" style="font-size:18px;margin:0 0 6px">Velg måned</h3>
+  <div id="mp-list"></div>
 </div></div>
 <div class="toast" id="toast"></div>
 
@@ -937,7 +983,7 @@ function renderBudget(){queueClamp();
  mb.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{setMonth(c.dataset.m);renderBudget();renderLeftbar();});
  const on=mb.querySelector('.chip.on');if(on&&on.scrollIntoView)on.scrollIntoView({inline:'center',block:'nearest'});
  const planned=isPlanned(mode),prev=prevPlanned(mode),src=nearestPlanned(mode);
- ['tabs','list'].forEach(id=>document.getElementById(id).style.display=planned?'':'none');
+ ['tabs','list','collapseall'].forEach(id=>document.getElementById(id).style.display=planned?'':'none');
  document.getElementById('cmpbar').style.display=planned&&tab!=='savings'?'':'none';
  const mi=document.getElementById('modeinfo');mi.style.display=mode===BASE?'':'none';
  if(mode===BASE)mi.innerHTML=`⭐ <b>Basisbudsjettet</b> er malen hver ny måned starter med. Endringer her påvirker ikke måneder som allerede er planlagt.${originalData()?' <button type="button" class="linkbtn" id="restorebase">Hent det opprinnelige budsjettet</button>':''}`;
@@ -977,12 +1023,12 @@ function renderBudget(){queueClamp();
  let html='';
  if(tab==='expenses'){
   CATS.forEach(([key,label])=>{const g=items.filter(x=>(x.cat||'Egne utgifter og familieliv')===key);if(!g.length)return;
-   html+=groupHead(GROUP_ICON[key],label,g.length,`data-cat="${key}"`,g.reduce((a,x)=>a+amountFor(x,mode),0))+g.map(rowHTML).join('');});
+   html+=groupHead(GROUP_ICON[key],label,g.length,`data-cat="${key}"`,g.reduce((a,x)=>a+amountFor(x,mode),0))+gOpen(tab+':'+label)+g.map(rowHTML).join('')+'</div>';});
  }else if(tab==='savings'){
   [['bank','🏦','Sparekonto'],['fond','📈','Fond og aksjer'],['transfer','💛','Overføringer']].forEach(([kd,ico,label])=>{const all=items.filter(x=>kindOf(x)===kd),g=all.filter(x=>!targetOf(x));if(!g.length)return;
-   html+=groupHead(ico,label,g.length,`data-kind="${kd}"`,all.reduce((a,x)=>a+amountFor(x,mode),0))+g.map(x=>mode===BASE?rowHTML(x):rowHTML(x).replace('<div class="row">','<div class="row hasSub">')+`<div class="subline" data-sub="${x.id}">${subline(x)}</div>`).join('');});
+   html+=groupHead(ico,label,g.length,`data-kind="${kd}"`,all.reduce((a,x)=>a+amountFor(x,mode),0))+gOpen(tab+':'+label)+g.map(x=>mode===BASE?rowHTML(x):rowHTML(x).replace('<div class="row">','<div class="row hasSub">')+`<div class="subline" data-sub="${x.id}">${subline(x)}</div>`).join('')+'</div>';});
  }else{const fixed=items.filter(x=>!x.only);
-  html=(mode===BASE?'':oneOffBox())+(fixed.length?groupHead('💰','Faste inntekter',fixed.length,'data-inc="1"',fixed.reduce((a,x)=>a+amountFor(x,mode),0))+incomeLine()+fixed.map(rowHTML).join(''):'');}
+  html=(mode===BASE?'':oneOffBox())+(fixed.length?groupHead('💰','Faste inntekter',fixed.length,'data-inc="1"',fixed.reduce((a,x)=>a+amountFor(x,mode),0))+gOpen(tab+':Faste inntekter')+incomeLine()+fixed.map(rowHTML).join('')+'</div>':'');}
  if(!items.length&&tab!=='income')html='<p class="empty">Ingen poster her i '+mName(mode).toLowerCase()+'.</p>';
  if(tab==='savings'){const ch=suggestChips(mode);if(ch)html+=`<div class="suggest" style="margin:14px 0 0">${ch}</div>`;}
  if(tab==='savings'&&mode!==BASE)html+=`<button class="addbtn" type="button" id="add-once">+ Engangsinnskudd i ${mName(mode).toLowerCase()}</button>`;
@@ -1014,6 +1060,15 @@ function renderBudget(){queueClamp();
  bindSuggest(list,mode);
  const ao=document.getElementById('add-once');if(ao)ao.onclick=()=>{const first=data.savings.find(x=>!x.only&&kindOf(x)!=='transfer');openSheet('savings',null,{name:'Engangsinnskudd',icon:'➕',only:mode,target:first?first.id:''});};
  bindOneOff(list);bindBalance(list);bindSublines(list);
+ /* lukk/åpne kategori */
+ const toggleG=h=>{const gk=h.dataset.gk,b=list.querySelector(`[data-gb="${CSS.escape(gk)}"]`);const c=!h.classList.contains('closed');
+  h.classList.toggle('closed',c);h.setAttribute('aria-expanded',String(!c));if(b)b.hidden=c;if(c)closedGroups[gk]=1;else delete closedGroups[gk];saveClosed();paintCollapseAll();};
+ list.querySelectorAll('.group[data-gk]').forEach(h=>{h.onclick=e=>{if(e.target.closest('button,input'))return;toggleG(h);};h.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleG(h);}};});
+ const paintCollapseAll=()=>{const hs=[...list.querySelectorAll('.group[data-gk]')],ca=document.getElementById('collapseall');
+  if(hs.length<2){ca.innerHTML='';return;}const anyOpen=hs.some(h=>!h.classList.contains('closed'));
+  ca.innerHTML=`<button type="button" class="linkbtn">${anyOpen?'Lukk alle':'Åpne alle'}</button>`;
+  ca.firstChild.onclick=()=>{hs.forEach(h=>{const gk=h.dataset.gk,b=list.querySelector(`[data-gb="${CSS.escape(gk)}"]`);h.classList.toggle('closed',anyOpen);h.setAttribute('aria-expanded',String(!anyOpen));if(b)b.hidden=anyOpen;if(anyOpen)closedGroups[gk]=1;else delete closedGroups[gk];});saveClosed();paintCollapseAll();};};
+ paintCollapseAll();
 }
 /* ---- Sammenligning (SSB) ---- */
 let cmpOn=true;try{cmpOn=localStorage.getItem('personalBudget2027compare')!=='0';}catch(e){}
@@ -1090,7 +1145,12 @@ function renderCmpBar(){const on=document.getElementById('cmp-on');on.checked=cm
 document.getElementById('cmp-on').onchange=e=>{cmpOn=e.target.checked;if(cmpOn&&!hasProfile())setTimeout(openProfile,250);try{localStorage.setItem('personalBudget2027compare',cmpOn?'1':'0')}catch(err){}renderBudget();toast(cmpOn?'Sammenligning vises':'Sammenligning skjult');};
 
 const GROUP_ICON={'Faste utgifter':'📌','Løpende utgifter':'🔄','Egne utgifter og familieliv':'👨‍👩‍👧'};
-function groupHead(ico,label,n,attr,sum){return`<div class="group"><div><span class="gi" aria-hidden="true">${ico}</span>${label}<small>${n} ${n===1?'post':'poster'}</small></div><span class="sum" ${attr}>${fmt(sum)}</span></div>`;}
+/* Kategorier kan lukkes og åpnes – valget huskes */
+let closedGroups={};try{closedGroups=JSON.parse(localStorage.getItem('personalBudget2027closed')||'{}')||{};}catch(e){}
+const saveClosed=()=>{try{localStorage.setItem('personalBudget2027closed',JSON.stringify(closedGroups))}catch(e){}};
+function groupHead(ico,label,n,attr,sum){const gk=tab+':'+label,c=!!closedGroups[gk];
+ return`<div class="group${c?' closed':''}" role="button" tabindex="0" aria-expanded="${!c}" data-gk="${esc(gk)}"><div><span class="gi" aria-hidden="true">${ico}</span>${label}<small>${n} ${n===1?'post':'poster'}</small></div><span class="sum" ${attr}>${fmt(sum)}<span class="gchev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4.5l3.5 3.5 3.5-3.5"/></svg></span></span></div>`;}
+const gOpen=gk=>`<div class="gbody" data-gb="${esc(gk)}"${closedGroups[gk]?' hidden':''}>`;
 function rowHTML(it){
  let meta='';
  const tg=targetOf(it);
@@ -1355,7 +1415,7 @@ function renderSSB(){queueClamp();
 function summary(){const t=tot(effMonth(NOW)||NOW),y=yearTot();return`Budsjett 2027\nInntekt: ${fmt(t.i)} i måneden\nUtgifter: ${fmt(t.e)} i måneden\nSparing: ${fmt(t.s)} i måneden\nIgjen: ${fmt(t.left)} i måneden\n\nHele året: inntekt ${fmt(y.i)}, sparing ${fmt(y.s)}, til overs ${fmt(y.left)}.`;}
 function download(name,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
 document.getElementById('m-share').onclick=async()=>{const t=summary();try{if(navigator.share)await navigator.share({title:'Budsjett 2027',text:t});else{await navigator.clipboard.writeText(t);toast('Kopiert');}}catch(e){if(e.name!=='AbortError')download('budsjett-2027.txt',t,'text/plain');}};
-document.getElementById('m-export').onclick=()=>{download('budsjett-2027-sikkerhetskopi.json',JSON.stringify({version:5,year:2027,data},null,2),'application/json');toast('Sikkerhetskopi lastet ned');};
+document.getElementById('m-export').onclick=()=>{const d=new Date();download('budsjett-sikkerhetskopi-'+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'.json',JSON.stringify({version:5,year:2027,data},null,2),'application/json');try{localStorage.setItem('personalBudget2027backup',String(Date.now()))}catch(e){}toast('Sikkerhetskopi lastet ned');renderBackupCard();};
 document.getElementById('m-import').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=normalize(JSON.parse(r.result));if(!d)throw 0;data=d;rebuildPeriod();mode=NOW;save('Budsjettet er hentet inn');}catch(err){alert('Filen ser ikke ut som en sikkerhetskopi av budsjettet.');}};r.readAsText(f);e.target.value='';};
 document.getElementById('m-csv').onclick=()=>{
  const head=['Type','Kategori','Post',...PERIOD.map(mLabel),'Sum'];const rows=[head];
@@ -1366,7 +1426,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alle beløp 
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='25.10.2026 · samme måned';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
+const APP_VERSION='25.10.2026 · app 1';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
@@ -1391,11 +1451,52 @@ function applyClamp(){
 let clampQueued=false;
 function queueClamp(){if(clampQueued)return;clampQueued=true;requestAnimationFrame(()=>{clampQueued=false;applyClamp();});}
 window.addEventListener('resize',queueClamp);
+/* ============ FELLES MÅNEDSVELGER ============ */
+function monthStatus(k){if(!isPlanned(k))return['Ikke planlagt','unpl'];const has=['income','expenses','savings'].some(t=>data[t].some(it=>!it.only&&inMonth(it,k)));
+ if(!has)return['Tom','unpl'];return k===NOW?['Pågår nå','now']:k<NOW?['Ferdig','']:['Planlagt',''];}
+function renderMonthNav(){const nav=document.getElementById('monthnav');nav.hidden=!(view==='home'||view==='budget');if(nav.hidden)return;
+ const k=homeM&&PERIOD.includes(homeM)?homeM:NOW,i=PERIOD.indexOf(k),[st,cls]=monthStatus(k);
+ set('mn-name',mName(k)+' '+mYear(k));const se=document.getElementById('mn-status');se.textContent=st;se.className=cls;
+ document.getElementById('mn-prev').disabled=i<=0;document.getElementById('mn-next').disabled=i<0||i>=PERIOD.length-1;}
+function stepMonth(d){const i=PERIOD.indexOf(homeM),j=i+d;if(i<0||j<0||j>=PERIOD.length)return;setMonth(PERIOD[j]);renderAll();
+ if(navigator.vibrate)try{navigator.vibrate(8)}catch(e){}}
+document.getElementById('mn-prev').onclick=()=>stepMonth(-1);
+document.getElementById('mn-next').onclick=()=>stepMonth(1);
+document.getElementById('mn-label').onclick=()=>{
+ const ys=[...new Set(PERIOD.map(mYear))];
+ document.getElementById('mp-list').innerHTML=ys.map(y=>`<div class="mpyear">${y}</div><div class="mplist">${PERIOD.filter(k=>mYear(k)===y).map(k=>{const[st,cls]=monthStatus(k);return`<button type="button" class="${k===homeM?'on':''} ${cls==='unpl'?'unpl':''}" data-pick="${k}">${mName(k)}<small>${k===NOW?'nå · ':''}${st.toLowerCase()}</small></button>`;}).join('')}</div>`).join('');
+ document.querySelectorAll('#mp-list [data-pick]').forEach(b=>b.onclick=()=>{setMonth(b.dataset.pick);document.getElementById('mpickbg').classList.remove('open');renderAll();});
+ document.getElementById('mpickbg').classList.add('open');};
+document.getElementById('mpickbg').onclick=e=>{if(e.target.id==='mpickbg')e.currentTarget.classList.remove('open');};
+/* sveip til venstre/høyre for å bytte måned */
+(()=>{let x0=null,y0=null,ok=false;const app=document.querySelector('.app');
+ app.addEventListener('touchstart',e=>{const t=e.touches[0];ok=(view==='home'||view==='budget')&&!e.target.closest('input,select,textarea,.monthbar,.icons,.sheet,.switch');x0=t.clientX;y0=t.clientY;},{passive:true});
+ app.addEventListener('touchend',e=>{if(!ok||x0==null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;x0=null;
+  if(Math.abs(dx)>70&&Math.abs(dy)<45)stepMonth(dx<0?1:-1);},{passive:true});})();
+
+/* ============ OPPDATERING OG SIKKERHETSKOPI ============ */
+const pagePath=()=>location.href.split('#')[0].split('?')[0];
+async function checkUpdate(){if(!/^https?:/.test(location.protocol))return;
+ try{const r=await fetch(pagePath()+'?sjekk='+Date.now(),{cache:'no-store'});const t=await r.text();const m=t.match(/const APP_VERSION='([^']*)'/);
+  if(m&&m[1]!==APP_VERSION){const b=document.getElementById('updbar');b.hidden=false;}}catch(e){}}
+document.getElementById('upd-go').onclick=async()=>{try{if('serviceWorker' in navigator){const rs=await navigator.serviceWorker.getRegistrations();for(const r of rs)await r.update();}
+ if(window.caches){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}}catch(e){}location.replace(pagePath()+'?v='+Date.now());};
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate();});
+if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+function renderBackupCard(){const el=document.getElementById('backupcard');let last=0,snooze=0;
+ try{last=+localStorage.getItem('personalBudget2027backup')||0;snooze=+localStorage.getItem('personalBudget2027backupSnooze')||0;}catch(e){}
+ const now=Date.now(),hasData=Object.keys(data.plan).length>0,due=hasData&&now-last>30*864e5&&now>snooze;
+ el.hidden=!due;if(!due)return;
+ el.innerHTML=`<b>Ta en sikkerhetskopi</b><div class="muted" style="font-size:13px">${last?'Det er over en måned siden sist.':'Du har ikke tatt sikkerhetskopi ennå.'} Budsjettet ligger bare på denne telefonen.</div>
+  <div class="btns"><button type="button" class="btn pri grow" id="bk-now">Last ned nå</button><button type="button" class="btn" id="bk-later">Om en uke</button></div>`;
+ document.getElementById('bk-now').onclick=()=>document.getElementById('m-export').click();
+ document.getElementById('bk-later').onclick=()=>{try{localStorage.setItem('personalBudget2027backupSnooze',String(now+7*864e5))}catch(e){}renderBackupCard();};}
 function renderAll(){queueClamp();
  renderHome();if(view==='budget')renderBudget();if(view==='year')renderYear();if(view==='more')renderSSB();
- renderLeftbar();
+ renderLeftbar();renderMonthNav();renderBackupCard();
 }
 renderAll();
+setTimeout(checkUpdate,1500);
 </script>
 </body>
 </html>
