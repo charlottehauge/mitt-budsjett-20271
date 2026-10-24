@@ -311,7 +311,8 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
     <div class="muted" id="sav-lbl" style="margin-top:10px"></div>
     <div class="savebig" id="sav-sofar"></div>
     <div class="muted" id="sav-start"></div>
-    <div id="sav-list" style="margin-top:8px"></div>
+    <details class="estimate" id="savdet"><summary id="savdet-sum">Vis detaljer</summary><div id="sav-list" style="margin-top:6px"></div></details>
+    <div id="sav-month"></div>
     <details class="estimate" id="est">
       <summary id="est-sum"></summary>
       <div class="proj" style="margin-top:10px"><div><span>Satt inn totalt</span><b id="pj-plain"></b></div><div><span>Forventet avkastning</span><b id="pj-gain" class="pos"></b></div></div>
@@ -706,7 +707,7 @@ function savingsModel(actual=false){
  years.forEach(y=>{tot[y]={start:0,contrib:0,ret:0,out:0,end:0};rows.forEach(r=>{const v=r.years[y];if(!v)return;['start','contrib','ret','out','end'].forEach(f=>tot[y][f]+=v[f]);});});
  return{rows,transfers,tot,years};}
 const eqHTML=(v,lbl='')=>`<span>Inngående${lbl}<b>${fmt(v.start)}</b></span><span>+ Spart<b>${fmt(v.contrib)}</b></span><span class="gain">+ Avkastning<b>${fmt(v.ret)}</b></span>${v.out?`<span>− Tatt ut<b>${fmt(v.out)}</b></span>`:''}<span class="end">= Ved årsslutt<b>${fmt(v.end)}</b></span>`;
-let estOpen=false;
+let estOpen=false,detOpen=false;
 function renderSavings(){queueClamp();
  const P=savingsModel(false),R=savingsModel(true),curY=YEARS_H();
  const hy=mYear(homeM&&homeM!==BASE?homeM:NOW),showYears=[...new Set([curY,curY+1,hy])].filter(y=>P.years.includes(y)).sort();
@@ -738,6 +739,13 @@ function renderSavings(){queueClamp();
   listHTML+=tr.map(({t,v})=>{const g=t.it.goal&&t.it.goal.on&&t.it.goal.type==='debt'&&t.it.goal.amount?t.it.goal:null,paid=v+(g?g.before:0);
    return`<div class="savitem">${head({it:t.it,icon:iconOf(t.it,'savings'),name:t.it.name,kd:'transfer'})}<div class="eq"><span>Overført t.o.m. ${mName(cut).toLowerCase()}<b>${fmt(v)}</b></span>${g?`<span>Gjenstår av gjelden<b>${fmt(Math.max(0,g.amount-paid))}</b></span>`:''}</div></div>`;}).join('');}
  document.getElementById('sav-list').innerHTML=listHTML;
+ /* Detaljene kan skjules; totalen for måneden vises alltid */
+ const sd=document.getElementById('savdet');sd.style.display=listHTML?'':'none';sd.open=detOpen;
+ const sdl=()=>set('savdet-sum',sd.open?'Skjul detaljer':'Vis detaljer');sdl();sd.ontoggle=()=>{detOpen=sd.open;sdl();if(sd.open)queueClamp();};
+ const sm=document.getElementById('sav-month');
+ if(cut&&doneP.length){const inMonthTot=isPlanned(cut)?tot(cut).s:0,onAcc=R.rows.reduce((a,rw)=>a+(rw.month[cut]?rw.month[cut].end:0),0);
+  sm.innerHTML=`<div class="savtotal" style="margin-top:12px"><b>Totalt for ${mName(cut).toLowerCase()}</b><div class="eq" style="margin-left:0"><span>Satt av i ${mName(cut).toLowerCase()}<b>${isPlanned(cut)?fmt(inMonthTot):'Ikke planlagt'}</b></span><span>På sparekonto og fond<b>${fmt(onAcc)}</b></span></div></div>`;}
+ else sm.innerHTML='';
  /* ---- Estimat ved utgangen av året (inkludert tidligere år) ---- */
  const est=document.getElementById('est');if(!doneP.length)est.open=true;else est.open=estOpen;est.ontoggle=()=>{if(doneP.length)estOpen=est.open;};
  set('est-sum',`Estimert ved utgangen av ${savYear}, inkl. avkastning`);
@@ -1319,7 +1327,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alle beløp 
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='25.10.2026 · retting 2';set('app-version',APP_VERSION);
+const APP_VERSION='25.10.2026 · vis detaljer';set('app-version',APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
