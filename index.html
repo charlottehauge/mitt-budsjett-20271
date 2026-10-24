@@ -92,6 +92,11 @@ details.rates summary{cursor:pointer;color:var(--acc);font-weight:600;font-size:
 .projtotal{display:flex;justify-content:space-between;align-items:baseline;gap:10px;background:var(--acc);color:var(--paper);border-radius:14px;padding:12px 14px}
 .projtotal span{font-size:14px;opacity:.9}
 .projtotal b{font-size:22px;letter-spacing:-.02em}
+.estimate{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+.estimate>summary{cursor:pointer;font-weight:750;font-size:15px;color:var(--acc);list-style:none;display:flex;justify-content:space-between;align-items:center}
+.estimate>summary::-webkit-details-marker{display:none}
+.estimate>summary::after{content:'⌄';font-size:18px;transition:transform .2s}
+.estimate[open]>summary::after{transform:rotate(180deg)}
 .savtotal{background:var(--acc2);border-radius:14px;padding:10px 12px;margin-top:10px}
 .savtotal .eq{margin-left:0}
 .trlist{margin-top:12px;font-size:14px}
@@ -302,22 +307,24 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
   </div>
   <div class="card">
     <h3>Sparing</h3>
-    <div class="muted" id="sav-lbl"></div>
+    <div class="savtabs" id="savtabs" style="margin-top:8px"></div>
+    <div class="muted" id="sav-lbl" style="margin-top:10px"></div>
     <div class="savebig" id="sav-sofar"></div>
     <div class="muted" id="sav-start"></div>
-    <div class="savtabs" id="savtabs" style="margin-top:18px"></div>
-    <div style="margin-top:10px;font-weight:700" id="pj-lbl"></div>
-    <div class="proj" style="margin-top:6px"><div><span>Satt inn totalt</span><b id="pj-plain"></b></div><div><span>Forventet avkastning</span><b id="pj-gain" class="pos"></b></div></div>
-    <div class="projtotal"><span>= Totalt, inkludert avkastning</span><b id="pj-ret"></b></div>
-    <p class="explain" id="pj-text"></p>
-    <details class="rates"><summary>Endre startbeløp og avkastning</summary>
-      <label class="field"><span>Spart før oktober 2026</span><input id="r-start" type="number" inputmode="numeric" min="0"></label>
-      <div class="grid2"><label class="field"><span>Fond, % i året</span><input id="r-fond" type="number" inputmode="decimal" step="0.1" min="0" max="20"></label>
-      <label class="field"><span>Sparekonto, % i året</span><input id="r-bank" type="number" inputmode="decimal" step="0.1" min="0" max="15"></label></div>
+    <div id="sav-list" style="margin-top:8px"></div>
+    <details class="estimate" id="est">
+      <summary id="est-sum"></summary>
+      <div class="proj" style="margin-top:10px"><div><span>Satt inn totalt</span><b id="pj-plain"></b></div><div><span>Forventet avkastning</span><b id="pj-gain" class="pos"></b></div></div>
+      <div class="projtotal"><span>= Totalt, inkludert avkastning</span><b id="pj-ret"></b></div>
+      <p class="explain" id="pj-text"></p>
+      <div class="muted" id="sav-note" style="margin:10px 0 2px;font-size:13px"></div>
+      <div id="est-list"></div>
+      <details class="rates"><summary>Endre startbeløp og avkastning</summary>
+        <label class="field"><span>Spart før oktober 2026</span><input id="r-start" type="number" inputmode="numeric" min="0"></label>
+        <div class="grid2"><label class="field"><span>Fond, % i året</span><input id="r-fond" type="number" inputmode="decimal" step="0.1" min="0" max="20"></label>
+        <label class="field"><span>Sparekonto, % i året</span><input id="r-bank" type="number" inputmode="decimal" step="0.1" min="0" max="15"></label></div>
+      </details>
     </details>
-    <h3 style="margin-top:22px" id="pk-title">Per konto</h3>
-    <div class="muted" id="sav-note" style="margin:6px 0 2px;font-size:13px"></div>
-    <div id="sav-list"></div>
   </div>
   <button type="button" class="delmonth" id="home-del" style="display:none"></button>
 </section>
@@ -637,7 +644,9 @@ function prevPlanned(k){if(k===BASE)return null;const ks=Object.keys(data.plan).
 function nearestPlanned(k){if(k===BASE)return null;return prevPlanned(k)||Object.keys(data.plan).filter(x=>x>k).sort()[0]||null;}
 const effMonth=k=>isPlanned(k)?k:BASE;
 /* Prognose: en måned som ikke er planlagt ennå, regnes som basisbudsjettet */
-function effAmount(it,k){if(it.only)return it.only===k?it.amount:0;const e=effMonth(k);return e?amountFor(it,e):0;}
+/* Prognose: en fremtidig måned som ikke er planlagt ennå, regnes som basisbudsjettet.
+   En måned som har vært (eller er slettet) og ikke er planlagt, teller som 0. */
+function effAmount(it,k){if(it.only)return it.only===k?it.amount:0;if(isPlanned(k))return amountFor(it,k);return k>NOW?amountFor(it,BASE):0;}
 function copyMonth(from,to){data.plan[to]=Object.assign({},from===BASE?data.base:(data.plan[from]||{}));}
 const hasOneOff=m=>['income','expenses','savings'].some(t=>data[t].some(it=>it.only===m));
 function tot(m){const s=t=>data[t].reduce((a,it)=>a+amountFor(it,m),0);const i=s('income'),e=s('expenses'),v=s('savings');return{i,e,s:v,left:i-e-v};}
@@ -674,8 +683,9 @@ let savYear=null;
 /* Er et engangsinnskudd fortsatt på kontoen i måned k? */
 function removeKey(d){if(d.removed)return d.removed;if(d.keep===false){const i=PERIOD.indexOf(d.only);return PERIOD[i+1]||null;}return null;}
 const depositActive=(d,k)=>d.only&&k>=d.only&&(!removeKey(d)||k<removeKey(d));
-function savingsModel(){
+function savingsModel(actual=false){
  const rows=[],transfers=[];
+ const A=(it,k)=>actual?amountFor(it,k):effAmount(it,k),okDep=k=>!actual||isPlanned(k);
  /* Hver konto: fast sparing + egne «under-saldoer» for hvert engangsinnskudd.
     Et engangsinnskudd settes inn én gang og blir liggende (videreført) med avkastning til det eventuelt fjernes. */
  const add=(it,name,icon,kd,startBal,regular,deposits)=>{const r=monthRate(kd);let bal=startBal;const sub=deposits.map(()=>0);const years={},monthEnd={},month={};
@@ -685,7 +695,7 @@ function savingsModel(){
    deposits.forEach((d,n)=>{if(removeKey(d)===k&&sub[n]){years[y].out+=sub[n];mOut+=sub[n];sub[n]=0;}});
    bal+=bal*r;deposits.forEach((d,n)=>{sub[n]+=sub[n]*r;});
    const c=regular(k);bal+=c;years[y].contrib+=c;mIn+=c;
-   deposits.forEach((d,n)=>{if(d.only===k&&(!d.removed||d.removed>k)){sub[n]+=d.amount;years[y].contrib+=d.amount;mIn+=d.amount;}});
+   deposits.forEach((d,n)=>{if(d.only===k&&okDep(k)&&(!d.removed||d.removed>k)){sub[n]+=d.amount;years[y].contrib+=d.amount;mIn+=d.amount;}});
    const tot=bal+sub.reduce((a,b)=>a+b,0);years[y].raw=tot;monthEnd[k]=Math.round(tot);
    const ms={start:Math.round(m0),out:Math.round(mOut),inn:Math.round(mIn),end:Math.round(tot)};ms.ret=ms.end-ms.start+ms.out-ms.inn;month[k]=ms;});
   Object.values(years).forEach(v=>{v.start=Math.round(v.start);v.contrib=Math.round(v.contrib);v.out=Math.round(v.out);v.end=Math.round(v.raw);v.ret=v.end-v.start-v.contrib+v.out;});
@@ -694,51 +704,57 @@ function savingsModel(){
  data.savings.forEach(it=>{if(targetOf(it))return;
   const kd=kindOf(it);
   if(it.only){ // engangsinnskudd uten konto: egen rad
-   if(kd==='transfer'){const years={};PERIOD.forEach(k=>{const y=mYear(k);years[y]=(years[y]||0)+effAmount(it,k);});if(PERIOD.includes(it.only))transfers.push({it,years});return;}
+   if(kd==='transfer'){const years={};PERIOD.forEach(k=>{const y=mYear(k);years[y]=(years[y]||0)+A(it,k);});if(PERIOD.includes(it.only))transfers.push({it,years});return;}
    if(PERIOD.includes(it.only))add(it,it.name,iconOf(it,'savings'),kd,0,()=>0,[it]);return;}
-  const ones=linked(it.id),regular=k=>effAmount(it,k);
-  if(kd==='transfer'){const used=PERIOD.some(k=>regular(k)>0)||ones.length;if(used){const years={};PERIOD.forEach(k=>{const y=mYear(k);years[y]=(years[y]||0)+regular(k)+ones.reduce((a,o)=>a+effAmount(o,k),0);});transfers.push({it,years});}return;}
+  const ones=linked(it.id),regular=k=>A(it,k);
+  if(kd==='transfer'){const used=PERIOD.some(k=>regular(k)>0)||ones.length;if(used){const years={};PERIOD.forEach(k=>{const y=mYear(k);years[y]=(years[y]||0)+regular(k)+ones.reduce((a,o)=>a+A(o,k),0);});transfers.push({it,years});}return;}
   if(PERIOD.some(k=>regular(k)>0)||it.balance||ones.length)add(it,it.name,iconOf(it,'savings'),kd,it.balance||0,regular,ones);});
  if(data.start)add(null,'Annen sparing fra før','💼','bank',data.start,()=>0,[]);
  const years=[...new Set(PERIOD.map(mYear))],tot={};
  years.forEach(y=>{tot[y]={start:0,contrib:0,ret:0,out:0,end:0};rows.forEach(r=>{const v=r.years[y];if(!v)return;['start','contrib','ret','out','end'].forEach(f=>tot[y][f]+=v[f]);});});
  return{rows,transfers,tot,years};}
 const eqHTML=(v,lbl='')=>`<span>Inngående${lbl}<b>${fmt(v.start)}</b></span><span>+ Spart<b>${fmt(v.contrib)}</b></span><span class="gain">+ Avkastning<b>${fmt(v.ret)}</b></span>${v.out?`<span>− Tatt ut<b>${fmt(v.out)}</b></span>`:''}<span class="end">= Ved årsslutt<b>${fmt(v.end)}</b></span>`;
+let estOpen=false;
 function renderSavings(){queueClamp();
- const M=savingsModel(),curY=YEARS_H(),last=PERIOD[PERIOD.length-1],lastY=mYear(last);
- // Spart så langt: bare planlagte måneder t.o.m. inneværende måned
- const doneKeys=PERIOD.filter(k=>mYear(k)===curY&&k<=NOW&&isPlanned(k));
- const sofar=doneKeys.reduce((a,k)=>a+savedIn(k),0);
- set('sav-lbl','Spart så langt i '+curY);
- set('sav-sofar',fmt(sofar));
- set('sav-start',doneKeys.length?`Sparingen i ${doneKeys.map(k=>mName(k).toLowerCase()).join(', ')} (planlagte måneder). Overføringer er ikke med.`:'Ingen måneder er planlagt ennå i år.');
- // Prognose = summen av tabellen for siste år
- const showYears=[curY,curY+1].filter(y=>M.years.includes(y));
+ const P=savingsModel(false),R=savingsModel(true),curY=YEARS_H();
+ const showYears=[curY,curY+1].filter(y=>P.years.includes(y));
  if(!showYears.includes(savYear))savYear=curY;
- const firstY=M.years[0],upto=M.years.filter(y=>y<=savYear);
- const deposits=M.tot[firstY].start+upto.reduce((a,y)=>a+M.tot[y].contrib-M.tot[y].out,0),gain=upto.reduce((a,y)=>a+M.tot[y].ret,0),endT=M.tot[savYear].end;
- set('pj-lbl','Ved utgangen av '+savYear+' (prognose)');set('pj-plain',fmt(deposits));document.getElementById('pj-plain').previousElementSibling.textContent=upto.some(y=>M.tot[y].out)?'Satt inn, minus det som er tatt ut':'Satt inn totalt';set('pj-gain','+'+fmt(gain));set('pj-ret',fmt(endT));
+ const st=document.getElementById('savtabs');
+ st.innerHTML=showYears.map(y=>`<button type="button" class="${y===savYear?'on':''}" data-sy="${y}">${y}${y===curY?' · i år':''}</button>`).join('');
+ st.querySelectorAll('[data-sy]').forEach(b=>b.onclick=()=>{savYear=+b.dataset.sy;renderSavings();});
+ /* ---- Så langt i valgt år: bare planlagte måneder t.o.m. denne måneden ---- */
+ const done=PERIOD.filter(k=>mYear(k)===savYear&&k<=NOW),doneP=done.filter(isPlanned);
+ const sofar=doneP.reduce((a,k)=>a+savedIn(k),0);
+ set('sav-lbl','Spart så langt i '+savYear);
+ set('sav-sofar',done.length?fmt(sofar):'–');
+ set('sav-start',!done.length?`${savYear} har ikke startet ennå. Se estimatet under.`:doneP.length?`Sparingen i ${doneP.map(k=>mName(k).toLowerCase()).join(', ')}. Overføringer er ikke med.`:'Ingen måneder er planlagt ennå i år.');
+ const soFarRow=rw=>{const ks=done.filter(k=>rw.month[k]);if(!ks.length)return null;const a=rw.month[ks[0]],b=rw.month[ks[ks.length-1]];
+  const v={start:a.start,contrib:ks.reduce((x,k)=>x+rw.month[k].inn,0),out:ks.reduce((x,k)=>x+rw.month[k].out,0),end:b.end};v.ret=v.end-v.start-v.contrib+v.out;return v;};
+ const nowEq=v=>`<span>Inngående<b>${fmt(v.start)}</b></span><span>+ Spart<b>${fmt(v.contrib)}</b></span><span class="gain">+ Avkastning<b>${fmt(v.ret)}</b></span>${v.out?`<span>− Tatt ut<b>${fmt(v.out)}</b></span>`:''}<span class="end">= På kontoen nå<b>${fmt(v.end)}</b></span>`;
+ const head=rw=>{const mon=rw.it?effAmount(rw.it,effMonth(NOW)):0;return`<div class="top"><span><span class="ico" aria-hidden="true">${rw.icon}</span>${esc(rw.name)} <span class="muted">· ${KIND_NAMES[rw.kd]} ${String(data.rates[rw.kd]).replace('.',',')} %</span></span>${rw.it?`<strong>${fmt(mon)}<span class="muted"> / mnd</span></strong>`:''}</div>`;};
+ let listHTML='';
+ if(done.length){const rows=R.rows.map(rw=>({rw,v:soFarRow(rw)})).filter(o=>o.v&&(o.v.end||o.v.contrib));
+  const T=rows.reduce((t,{v})=>{['start','contrib','ret','out','end'].forEach(f=>t[f]+=v[f]);return t;},{start:0,contrib:0,ret:0,out:0,end:0});
+  listHTML=rows.map(({rw,v})=>`<div class="savitem">${head(rw)}<div class="eq">${nowEq(v)}</div></div>`).join('')
+   +(rows.length?`<div class="savtotal"><b>Totalt så langt i ${savYear}</b><div class="eq">${nowEq(T)}</div></div>`:'<p class="empty">Ingen sparing i planlagte måneder ennå.</p>');
+  const tr=R.transfers.map(t=>({t,v:done.reduce((a,k)=>a+amountFor(t.it,k),0)})).filter(o=>o.v);
+  if(tr.length)listHTML+=`<div class="trlist"><b>Overføringer</b> <span class="muted">– ikke sparing</span>${tr.map(({t,v})=>`<div class="dline"><span>${ic(t.it,'savings')}${esc(t.it.name)}</span><span>${fmt(v)} så langt</span></div>`).join('')}</div>`;}
+ document.getElementById('sav-list').innerHTML=listHTML;
+ /* ---- Estimat ved utgangen av året (inkludert tidligere år) ---- */
+ const est=document.getElementById('est');if(!done.length)est.open=true;else est.open=estOpen;est.ontoggle=()=>{if(done.length)estOpen=est.open;};
+ set('est-sum',`Estimert ved utgangen av ${savYear}, inkl. avkastning`);
+ const firstY=P.years[0],upto=P.years.filter(y=>y<=savYear);
+ const deposits=P.tot[firstY].start+upto.reduce((a,y)=>a+P.tot[y].contrib-P.tot[y].out,0),gain=upto.reduce((a,y)=>a+P.tot[y].ret,0),endT=P.tot[savYear].end;
+ set('pj-plain',fmt(deposits));document.getElementById('pj-plain').previousElementSibling.textContent=upto.some(y=>P.tot[y].out)?'Satt inn, minus det som er tatt ut':'Satt inn totalt';set('pj-gain','+'+fmt(gain));set('pj-ret',fmt(endT));
  const r=data.rates;
- document.getElementById('pj-text').innerHTML=`«Satt inn totalt» er det du har fra før pluss det du sparer hver måned ut ${savYear}. «Forventet avkastning» er all avkastning fram til da. Måneder som ikke er planlagt ennå, regnes som basisbudsjettet. «Med forventet avkastning» bruker <b>${String(r.fond).replace('.',',')} %</b> i året på fond og <b>${String(r.bank).replace('.',',')} %</b> på sparekonto (Finans Norges langsiktige forventning, 2026), lagt til hver måned. Fond kan også gå ned. Skatt og kostnader er ikke trukket fra. Totalen er det samme som «Ved årsslutt» i tabellen under.`;
+ document.getElementById('pj-text').innerHTML=`Det du har satt inn${upto.length>1?' i '+upto.join(' og '):''} og forventet avkastning, til og med desember ${savYear}. Fremtidige måneder som ikke er planlagt ennå, regnes som basisbudsjettet. Avkastningen er <b>${String(r.fond).replace('.',',')} %</b> i året på fond og <b>${String(r.bank).replace('.',',')} %</b> på sparekonto (Finans Norges langsiktige forventning, 2026), lagt til hver måned. Fond kan også gå ned. Skatt og kostnader er ikke trukket fra.`;
  const rs=document.getElementById('r-start'),rf=document.getElementById('r-fond'),rb=document.getElementById('r-bank');
  if(document.activeElement!==rs)rs.value=data.start||'';if(document.activeElement!==rf)rf.value=r.fond;if(document.activeElement!==rb)rb.value=r.bank;
  rs.labels[0].querySelector('span').textContent='Annen sparing fra før (som ikke står på en egen post)';
- const st=document.getElementById('savtabs');
- st.innerHTML=showYears.map(y=>`<button type="button" class="${y===savYear?'on':''}" data-sy="${y}">${y}${y===curY?' · i år':''}</button>`).join('');
- set('pk-title','Per konto i '+savYear);
- st.querySelectorAll('[data-sy]').forEach(b=>b.onclick=()=>{savYear=+b.dataset.sy;renderSavings();});
- const ks=PERIOD.filter(k=>mYear(k)===savYear),unpl=ks.filter(k=>!isPlanned(k)).length;
- set('sav-note',(ks.length<12?`Gjelder ${mName(ks[0]).toLowerCase()}–desember. `:'')+(unpl?`${unpl} av ${ks.length} måneder er ikke planlagt ennå og er regnet som basisbudsjettet.`:`Alle månedene er planlagt.`));
- const oneNote=rw=>{const os=(rw.ones||[]).filter(o=>o.only&&mYear(o.only)<=savYear&&(!removeKey(o)||mYear(removeKey(o))>=savYear));if(!os.length)return'';
-  return`<div class="det" style="margin-top:6px">${os.map(o=>{const rk=removeKey(o);return`<span>${mYear(o.only)===savYear?'Engangsinnskudd':'Videreført'} ${fmt(o.amount)} fra ${mLabel(o.only).toLowerCase()}${rk&&mYear(rk)===savYear?' – tatt ut i '+mName(rk).toLowerCase():' – ligger på kontoen'}</span>`;}).join('')}</div>`;};
- const startLbl='';
- const rowsHTML=M.rows.filter(rw=>rw.years[savYear]).map(rw=>{const v=rw.years[savYear],mon=rw.it?effAmount(rw.it,effMonth(NOW)||NOW):0;
-  return`<div class="savitem"><div class="top"><span><span class="ico" aria-hidden="true">${rw.icon}</span>${esc(rw.name)} <span class="muted">· ${KIND_NAMES[rw.kd]} ${String(data.rates[rw.kd]).replace('.',',')} %</span></span>${rw.it?`<strong>${fmt(mon)}<span class="muted"> / mnd</span></strong>`:''}</div><div class="eq">${eqHTML(v,startLbl)}</div>${oneNote(rw)}</div>`;}).join('');
- const T=M.tot[savYear];
- const trHTML=M.transfers.length?`<div class="trlist"><b>Overføringer</b> <span class="muted">– ikke sparing, ingen avkastning</span>${M.transfers.map(t=>`<div class="dline"><span>${ic(t.it,'savings')}${esc(t.it.name)}</span><span>${fmt(t.years[savYear]||0)} i ${savYear}</span></div>`).join('')}</div>`:'';
- document.getElementById('sav-list').innerHTML=(rowsHTML||'<p class="empty">Ingen sparing lagt inn.</p>')
-  +(M.rows.length?`<div class="savtotal"><b>Totalt ${savYear}</b><div class="eq">${eqHTML(T,startLbl)}</div></div>`:'')+trHTML
-  +`<p class="explain">Inngående = det som stod på kontoen fra før. I Budsjett ser du det for hver måned. Legg inn saldoen på hver konto (Budsjett → Sparing → trykk på posten → «Står der nå»), så blir avkastningen riktig.</p>`;
+ const ks=PERIOD.filter(k=>mYear(k)===savYear),unpl=ks.filter(k=>k>NOW&&!isPlanned(k)).length;
+ set('sav-note',`Per konto ved utgangen av ${savYear}${unpl?` – ${unpl} måneder er ikke planlagt ennå og er regnet som basisbudsjettet`:''}:`);
+ document.getElementById('est-list').innerHTML=P.rows.filter(rw=>rw.years[savYear]&&(rw.years[savYear].end||rw.years[savYear].contrib)).map(rw=>`<div class="savitem">${head(rw)}<div class="eq">${eqHTML(rw.years[savYear])}</div></div>`).join('')
+  +(P.rows.length?`<div class="savtotal"><b>Totalt ved utgangen av ${savYear}</b><div class="eq">${eqHTML(P.tot[savYear])}</div></div>`:'');
 }
 ['r-start','r-fond','r-bank'].forEach(id=>document.getElementById(id).addEventListener('change',e=>{const v=Math.max(0,+String(e.target.value).replace(',','.')||0);
  if(id==='r-start')data.start=Math.round(v);else data.rates[id==='r-fond'?'fond':'bank']=Math.min(20,v);save('Lagret');}));
@@ -752,7 +768,7 @@ function goalStatus(it,extra=0){const g=it.goal,last=PERIOD[PERIOD.length-1];
  const futureAmt=k=>(PERIOD.includes(k)?contribAt(it,k):contribAt(it,effMonth(last)||last))+extra;
  let have,rate=0;
  if(g.type==='debt'){have=g.before+PERIOD.filter(k=>k<=NOW&&isPlanned(k)).reduce((a,k)=>a+contribAt(it,k),0);}
- else{const row=savingsModel().rows.find(r=>r.it===it);have=row?(row.monthEnd[NOW]!=null?row.monthEnd[NOW]:(it.balance||0)):(it.balance||0);rate=kindOf(it)==='transfer'?0:monthRate(kindOf(it));}
+ else{const row=savingsModel(true).rows.find(r=>r.it===it);have=row?(row.monthEnd[NOW]!=null?row.monthEnd[NOW]:(it.balance||0)):(it.balance||0);rate=kindOf(it)==='transfer'?0:monthRate(kindOf(it));}
  const target=g.amount,pct=target?Math.min(100,have/target*100):0;
  let eta=null,months=0,bal=have,k=NOW;
  if(have>=target)eta=NOW;else{for(let n=1;n<=600;n++){k=addMonths(NOW,n);bal=bal*(1+rate)+futureAmt(k);if(bal>=target){eta=k;months=n;break;}}}
@@ -824,7 +840,7 @@ function renderHome(){
 /* ============ BUDSJETT ============ */
 /* Samlet for en konto i valgt måned: fast + ekstra, og hele potten ved utgangen av måneden */
 function subline(it){const ones=data.savings.filter(o=>o.only===mode&&o.target===it.id),fast=it.only?0:amountFor(it,mode),ex=ones.reduce((a,o)=>a+o.amount,0);
- const row=savingsModel().rows.find(r=>r.it===it),pot=row?row.monthEnd[mode]:null,tr=kindOf(it)==='transfer';
+ const row=savingsModel(true).rows.find(r=>r.it===it),pot=row?row.monthEnd[mode]:null,tr=kindOf(it)==='transfer';
  const exTxt=ones.map(o=>`<button type="button" class="linkbtn ex" data-ooedit="${o.id}">+ ekstra ${fmt(o.amount)}</button>`).join(' ');
  const mm=row&&row.month[mode],d1='1. '+mName(mode).toLowerCase().slice(0,3)+'.';
  let txt;
@@ -832,7 +848,7 @@ function subline(it){const ones=data.savings.filter(o=>o.only===mode&&o.target==
  else txt=`Inngående <b>${fmt(mm?mm.start:(it.balance||0))}</b><br>+ ${ex?`${fmt(fast)} fast ${exTxt}`:`${fmt(fast)} inn`}${mm&&mm.ret?` + ${fmt(mm.ret)} avkastning`:''}${mm&&mm.out?` − ${fmt(mm.out)} tatt ut`:''}<br>= Totalt på kontoen <b>${fmt(pot||0)}</b>`;
  return`<span>${txt}</span>${it.only?'':`<button type="button" class="linkbtn" data-extra="${it.id}">+ Ekstra</button>`}`;}
 function refreshSublines(){const list=document.getElementById('list');document.querySelectorAll('#list [data-sub]').forEach(el=>{const it=find(el.dataset.sub);if(it)el.innerHTML=subline(it);});bindSublines(list);
- const box=list.querySelector('.oneoffbox');if(box){const t=document.createElement('div');t.innerHTML=balanceBox();if(t.firstElementChild){box.replaceWith(t.firstElementChild);bindBalance(list);queueClamp();}}}
+}
 function bindSublines(root){root.querySelectorAll('[data-extra]').forEach(b=>b.onclick=()=>openSheet('savings',null,{name:'Ekstra innskudd',icon:'➕',only:mode,target:b.dataset.extra}));
  root.querySelectorAll('[data-ooedit]').forEach(b=>b.onclick=()=>openSheet('savings',b.dataset.ooedit));}
 function balanceBox(){const M=savingsModel();const rows=M.rows.filter(r=>r.monthEnd[mode]>0||(r.ones||[]).some(d=>d.only<mode&&(removeKey(d)===mode)));
@@ -926,12 +942,11 @@ function renderBudget(){queueClamp();
   CATS.forEach(([key,label])=>{const g=items.filter(x=>(x.cat||'Egne utgifter og familieliv')===key);if(!g.length)return;
    html+=groupHead(GROUP_ICON[key],label,g.length,`data-cat="${key}"`,g.reduce((a,x)=>a+amountFor(x,mode),0))+g.map(rowHTML).join('');});
  }else if(tab==='savings'){
-  if(mode!==BASE)html+=balanceBox()+`<div style="margin:4px 2px 0;font-weight:700">Ny sparing i ${mName(mode).toLowerCase()}<div class="muted" style="font-weight:400">Pengene du setter av denne måneden – trekkes fra «Igjen».</div></div>`;
   [['bank','🏦','Sparekonto'],['fond','📈','Fond og aksjer'],['transfer','💛','Overføringer']].forEach(([kd,ico,label])=>{const all=items.filter(x=>kindOf(x)===kd),g=all.filter(x=>!targetOf(x));if(!g.length)return;
    html+=groupHead(ico,label,g.length,`data-kind="${kd}"`,all.reduce((a,x)=>a+amountFor(x,mode),0))+g.map(x=>mode===BASE?rowHTML(x):rowHTML(x).replace('<div class="row">','<div class="row hasSub">')+`<div class="subline" data-sub="${x.id}">${subline(x)}</div>`).join('');});
  }else{const fixed=items.filter(x=>!x.only);
   html=(mode===BASE?'':oneOffBox())+(fixed.length?groupHead('💰','Faste inntekter',fixed.length,'data-inc="1"',fixed.reduce((a,x)=>a+amountFor(x,mode),0))+incomeLine()+fixed.map(rowHTML).join(''):'');}
- if(!items.length&&tab!=='income')html=(tab==='savings'?balanceBox():'')+'<p class="empty">Ingen poster her i '+mName(mode).toLowerCase()+'.</p>';
+ if(!items.length&&tab!=='income')html='<p class="empty">Ingen poster her i '+mName(mode).toLowerCase()+'.</p>';
  if(tab==='savings'){const ch=suggestChips(mode);if(ch)html+=`<div class="suggest" style="margin:14px 0 0">${ch}</div>`;}
  if(tab==='savings'&&mode!==BASE)html+=`<button class="addbtn" type="button" id="add-once">+ Engangsinnskudd i ${mName(mode).toLowerCase()}</button>`;
  html+=`<button class="addbtn" type="button" id="add">+ Ny ${tab==='income'?'fast inntekt':tab==='expenses'?'utgift':'fast sparing'}</button>`;
@@ -1314,7 +1329,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alle beløp 
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='24.10.2026 · basis 9';set('app-version',APP_VERSION);
+const APP_VERSION='24.10.2026 · sparing så langt';set('app-version',APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
