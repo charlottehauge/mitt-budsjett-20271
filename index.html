@@ -122,6 +122,18 @@ details.rates summary{cursor:pointer;color:var(--acc);font-weight:600;font-size:
 .subline .ex{color:var(--acc)}
 .subline .linkbtn{font-size:13px;white-space:nowrap}
 .row.hasSub{border-bottom:0}
+.btn.dangerfill{background:var(--red);border-color:var(--red);color:#fff}
+.delmonth{display:block;width:100%;margin-top:18px;border:0;background:none;color:var(--red);font-weight:600;font-size:14px;padding:10px;text-decoration:underline}
+.basebtn{display:flex;align-items:baseline;gap:10px;width:100%;border:1.5px solid var(--acc);background:var(--paper);color:var(--acc);border-radius:14px;padding:11px 14px;margin:0 0 10px;font-weight:750;font-size:16px;text-align:left}
+.basebtn small{font-weight:500;font-size:13px;color:var(--muted)}
+.basebtn.on{background:var(--acc);color:var(--paper)}.basebtn.on small{color:var(--paper);opacity:.85}
+.usebase{margin:0 0 12px}
+.usebase .basebtn{justify-content:center;margin:0 0 6px}
+.basebtn[disabled]{opacity:.45}
+.tobase{display:block;width:100%;margin-top:14px;border:1.5px solid var(--acc);background:var(--paper);color:var(--acc);border-radius:14px;padding:12px;font-weight:750;font-size:15px}
+.emptymonth{text-align:center;padding:18px 6px}
+.emptymonth h3{margin:0 0 6px}
+.emptymonth .btns{flex-direction:column}
 .clamp{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
 .clamp.open{display:block!important;-webkit-line-clamp:unset;line-clamp:unset;overflow:visible}
 .morebtn{display:inline-flex;align-items:center;gap:4px;border:0;background:none;color:var(--acc);font-weight:700;font-size:13px;padding:4px 0 2px;margin:0 0 4px;cursor:pointer}
@@ -312,9 +324,10 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
 <!-- BUDSJETT -->
 <section class="view" id="v-budget">
   <h2>Budsjett</h2>
-  <p class="lead">Velg måned. Hver måned planlegges for seg – start en ny måned ved å bruke budsjettet fra måneden før.</p>
+  <p class="lead">Velg måned. Hver måned planlegges for seg og starter med basisbudsjettet.</p>
   <div class="monthbar" id="monthbar"></div>
   <div class="modeinfo" id="modeinfo"></div>
+  <div id="usebase"></div>
   <div id="plan-empty"></div>
   <div class="cmpbar" id="cmpbar"><label class="switch"><input type="checkbox" id="cmp-on" aria-label="Sammenlign med andre"><span></span></label>
    <div class="t"><b>Sammenlign med andre</b><div class="profsum" id="cmp-sub"></div></div></div>
@@ -431,6 +444,7 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
   </div>
   <label class="field" id="sh-kind-wrap"><span>Hvor står pengene?</span><select id="sh-kind"><option value="bank">Sparekonto</option><option value="fond">Fond / aksjer</option><option value="transfer">Overføring – ikke sparing</option></select></label>
   <label class="field"><span>Gjelder</span><select id="sh-when"></select></label>
+  <label class="field" id="sh-base-wrap" style="display:flex;gap:12px;align-items:center"><input type="checkbox" id="sh-base" style="width:24px;height:24px;flex:0 0 24px;accent-color:var(--acc)" checked><span style="margin:0;color:var(--ink);font-size:15px">Legg også til i basisbudsjettet</span></label>
   <label class="field" id="sh-later-wrap" style="display:flex;gap:12px;align-items:center"><input type="checkbox" id="sh-later" style="width:24px;height:24px;flex:0 0 24px;accent-color:var(--acc)" checked><span style="margin:0;color:var(--ink);font-size:15px" id="sh-later-lbl"></span></label>
   <div class="btns">
     <button class="btn pri grow" type="button" id="sh-save">Lagre</button>
@@ -464,6 +478,12 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
   <div class="swatches" id="swatches2"></div>
   <div class="btns"><button class="btn pri grow" type="button" id="cl-close">Ferdig</button></div>
 </div></div>
+<div class="sheetbg" id="confbg"><div class="sheet" role="alertdialog" aria-modal="true" aria-labelledby="cf-title" aria-describedby="cf-text">
+  <div class="grab"></div>
+  <h3 id="cf-title" style="font-size:19px;margin:0 0 6px"></h3>
+  <p id="cf-text" style="margin:0;color:var(--muted);font-size:15px;line-height:1.45"></p>
+  <div class="btns"><button class="btn dangerfill grow" type="button" id="cf-yes"></button><button class="btn grow" type="button" id="cf-no">Nei</button></div>
+</div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -473,9 +493,10 @@ const BUDGET_YEAR=2027,TODAY=new Date();
 const pad=n=>String(n).padStart(2,'0');
 const mkey=(y,m)=>y+'-'+pad(m+1);
 const NOW=mkey(TODAY.getFullYear(),TODAY.getMonth());
-const mName=k=>MONTHS[+k.slice(5)-1];
-const mYear=k=>+k.slice(0,4);
-const mLabel=k=>mName(k)+(mYear(k)!==BUDGET_YEAR?' '+mYear(k):'');
+const BASE='base';
+const mName=k=>k===BASE?'Basis':MONTHS[+k.slice(5)-1];
+const mYear=k=>k===BASE?BUDGET_YEAR:+k.slice(0,4);
+const mLabel=k=>k===BASE?'Basisbudsjettet':mName(k)+(mYear(k)!==BUDGET_YEAR?' '+mYear(k):'');
 const YEAR_KEYS=MONTHS.map((_,i)=>mkey(BUDGET_YEAR,i));
 /* Tidslinjen starter i inneværende måned (okt. 2026) og går ut desember 2027 */
 let PERIOD=[],BEFORE=[],YEARS=[];
@@ -572,16 +593,35 @@ function normalize(raw){
  else{const regular=[...inc,...exp,...sav].filter(it=>!it.only);
   const mk=k=>{plan[k]={};regular.forEach(it=>{const o=ov[k];plan[k][it.id]=o&&o[it.id]!=null?Math.max(0,+o[it.id]||0):it.amount;});};
   mk(NOW);Object.keys(ov).forEach(k=>{if(k>NOW&&Object.keys(ov[k]).length)mk(k);});}
+ /* Basisbudsjettet: malen nye måneder starter med (bare faste poster) */
+ let base={};
+ if(d.base&&typeof d.base==='object')Object.entries(d.base).forEach(([id,a])=>{base[id]=Math.max(0,Math.round(+a||0));});
+ else{const ks=Object.keys(plan).sort(),src=ks.filter(k=>k<=NOW).pop()||ks[0];
+  if(src)base=Object.assign({},plan[src]);else[...inc,...exp,...sav].filter(it=>!it.only).forEach(it=>{base[it.id]=it.amount;});}
  sav.filter(o=>o.only&&!o.target).forEach(o=>{const n=o.name.toLowerCase();
   const acc=sav.find(a=>!a.only&&a!==o&&(a.name.toLowerCase()===n||(a.name.length>=3&&n.includes(a.name.toLowerCase()))));if(acc)o.target=acc.id;});
- return{income:inc,expenses:exp,savings:sav,plan,start:Math.max(0,+d.start||0),rates};
+ return{income:inc,expenses:exp,savings:sav,plan,base,start:Math.max(0,+d.start||0),rates};
 }
 function load(){
  try{const s=localStorage.getItem(KEY);if(s){const d=normalize(JSON.parse(s));if(d)return d;}}catch(e){}
  for(const k of OLD_KEYS){try{const s=localStorage.getItem(k);if(s){const d=normalize(JSON.parse(s));if(d)return d;}}catch(e){}}
  return normalize(DEFAULTS);
 }
-let data=load();rebuildPeriod();try{if(!JSON.parse(localStorage.getItem(KEY)||'{}').plan)localStorage.setItem(KEY,JSON.stringify(data));}catch(e){}
+let data=load();
+/* Det opprinnelige budsjettet ligger fortsatt lagret fra den første versjonen av appen */
+function originalData(){for(const k of OLD_KEYS){try{const raw=localStorage.getItem(k);if(raw){const d=JSON.parse(raw),dd=d&&d.data?d.data:d;if(dd&&Array.isArray(dd.income)&&Array.isArray(dd.expenses))return dd;}}catch(e){}}return null;}
+function restoreBase(){const o=originalData();if(!o)return 0;let n=0;const clean=x=>splitIcon(String(x||'')).name.toLowerCase().trim();
+ ['income','expenses','savings'].forEach(t=>(o[t]||[]).forEach(x=>{const arr=Array.isArray(x)?x:[x.name,x.amount,x.cat,x.icon];const sp=splitIcon(arr[0]||'Post'),amt=Math.max(0,Math.round(+arr[1]||0));
+  let it=data[t].find(i=>!i.only&&clean(i.name)===clean(arr[0]));
+  if(!it){it={id:uid(),name:sp.name,amount:amt,icon:sp.icon||arr.slice(2).find(isEmoji)||''};if(t==='expenses'){const c=arr.slice(2).find(v=>CATS.some(([k])=>k===v));it.cat=c||guessCat(sp.name);}data[t].push(it);}
+  data.base[it.id]=amt;n++;}));
+ return n;}
+/* Fjern henvisninger til poster som ikke finnes lenger (f.eks. etter at en måned ble slettet i en tidligere versjon) */
+(()=>{const ids=new Set([...data.income,...data.expenses,...data.savings].map(x=>x.id));data.base=data.base||{};
+ Object.keys(data.base).forEach(id=>{if(!ids.has(id))delete data.base[id];});
+ Object.values(data.plan).forEach(p=>Object.keys(p).forEach(id=>{if(!ids.has(id))delete p[id];}));})();
+if(!Object.keys(data.base||{}).length&&originalData()){restoreBase();try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){}}
+rebuildPeriod();try{if(!JSON.parse(localStorage.getItem(KEY)||'{}').plan)localStorage.setItem(KEY,JSON.stringify(data));}catch(e){}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}}
 function save(msg){persist();renderAll();if(msg)toast(msg);}
 
@@ -589,15 +629,15 @@ function save(msg){persist();renderAll();if(msg)toast(msg);}
 const fmt=n=>new Intl.NumberFormat('nb-NO',{maximumFractionDigits:0}).format(Math.round(+n||0))+' kr';
 const fmtS=n=>(n>0?'+':n<0?'−':'')+fmt(Math.abs(n));
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const isPlanned=k=>!!(k&&data.plan[k]);
-function amountFor(it,m){if(m==null)return 0;if(it.only)return it.only===m?it.amount:0;const p=data.plan[m];return p&&p[it.id]!=null?p[it.id]:0;}
-function inMonth(it,m){return it.only?it.only===m:!!(data.plan[m]&&data.plan[m][it.id]!=null);}
-function prevPlanned(k){const ks=Object.keys(data.plan).filter(x=>x<k).sort();return ks.length?ks[ks.length-1]:null;}
-function nearestPlanned(k){return prevPlanned(k)||Object.keys(data.plan).filter(x=>x>k).sort()[0]||null;}
-const effMonth=k=>isPlanned(k)?k:prevPlanned(k);
-/* Prognose: en måned som ikke er planlagt antas å bli som forrige planlagte måned */
+const isPlanned=k=>k===BASE||!!(k&&data.plan[k]);
+function amountFor(it,m){if(m==null)return 0;if(it.only)return it.only===m?it.amount:0;const p=m===BASE?data.base:data.plan[m];return p&&p[it.id]!=null?p[it.id]:0;}
+function inMonth(it,m){const p=m===BASE?data.base:data.plan[m];return it.only?it.only===m:!!(p&&p[it.id]!=null);}
+function prevPlanned(k){if(k===BASE)return null;const ks=Object.keys(data.plan).filter(x=>x<k).sort();return ks.length?ks[ks.length-1]:null;}
+function nearestPlanned(k){if(k===BASE)return null;return prevPlanned(k)||Object.keys(data.plan).filter(x=>x>k).sort()[0]||null;}
+const effMonth=k=>isPlanned(k)?k:BASE;
+/* Prognose: en måned som ikke er planlagt ennå, regnes som basisbudsjettet */
 function effAmount(it,k){if(it.only)return it.only===k?it.amount:0;const e=effMonth(k);return e?amountFor(it,e):0;}
-function copyMonth(from,to){data.plan[to]=Object.assign({},data.plan[from]||{});}
+function copyMonth(from,to){data.plan[to]=Object.assign({},from===BASE?data.base:(data.plan[from]||{}));}
 const hasOneOff=m=>['income','expenses','savings'].some(t=>data[t].some(it=>it.only===m));
 function tot(m){const s=t=>data[t].reduce((a,it)=>a+amountFor(it,m),0);const i=s('income'),e=s('expenses'),v=s('savings');return{i,e,s:v,left:i-e-v};}
 const monthAdjusted=hasOneOff;
@@ -629,7 +669,7 @@ let savYear=null;
 /* Én felles beregning for alt på sparekortet, så tallene alltid går opp:
    inngående saldo + spart + avkastning = saldo ved årsslutt.
    Avkastningen legges til hver måned på saldoen ved inngangen av måneden; månedens sparing kommer i tillegg.
-   Måneder som ikke er planlagt ennå, regnes som siste planlagte måned. */
+   Måneder som ikke er planlagt ennå, regnes som basisbudsjettet. */
 /* Er et engangsinnskudd fortsatt på kontoen i måned k? */
 function removeKey(d){if(d.removed)return d.removed;if(d.keep===false){const i=PERIOD.indexOf(d.only);return PERIOD[i+1]||null;}return null;}
 const depositActive=(d,k)=>d.only&&k>=d.only&&(!removeKey(d)||k<removeKey(d));
@@ -678,7 +718,7 @@ function renderSavings(){queueClamp();
  const deposits=M.tot[firstY].start+upto.reduce((a,y)=>a+M.tot[y].contrib-M.tot[y].out,0),gain=upto.reduce((a,y)=>a+M.tot[y].ret,0),endT=M.tot[savYear].end;
  set('pj-lbl','Ved utgangen av '+savYear+' (prognose)');set('pj-plain',fmt(deposits));document.getElementById('pj-plain').previousElementSibling.textContent=upto.some(y=>M.tot[y].out)?'Satt inn, minus det som er tatt ut':'Satt inn totalt';set('pj-gain','+'+fmt(gain));set('pj-ret',fmt(endT));
  const r=data.rates;
- document.getElementById('pj-text').innerHTML=`«Satt inn totalt» er det du har fra før pluss det du sparer hver måned ut ${savYear}. «Forventet avkastning» er all avkastning fram til da. Måneder som ikke er planlagt ennå, regnes som siste planlagte måned. «Med forventet avkastning» bruker <b>${String(r.fond).replace('.',',')} %</b> i året på fond og <b>${String(r.bank).replace('.',',')} %</b> på sparekonto (Finans Norges langsiktige forventning, 2026), lagt til hver måned. Fond kan også gå ned. Skatt og kostnader er ikke trukket fra. Totalen er det samme som «Ved årsslutt» i tabellen under.`;
+ document.getElementById('pj-text').innerHTML=`«Satt inn totalt» er det du har fra før pluss det du sparer hver måned ut ${savYear}. «Forventet avkastning» er all avkastning fram til da. Måneder som ikke er planlagt ennå, regnes som basisbudsjettet. «Med forventet avkastning» bruker <b>${String(r.fond).replace('.',',')} %</b> i året på fond og <b>${String(r.bank).replace('.',',')} %</b> på sparekonto (Finans Norges langsiktige forventning, 2026), lagt til hver måned. Fond kan også gå ned. Skatt og kostnader er ikke trukket fra. Totalen er det samme som «Ved årsslutt» i tabellen under.`;
  const rs=document.getElementById('r-start'),rf=document.getElementById('r-fond'),rb=document.getElementById('r-bank');
  if(document.activeElement!==rs)rs.value=data.start||'';if(document.activeElement!==rf)rf.value=r.fond;if(document.activeElement!==rb)rb.value=r.bank;
  rs.labels[0].querySelector('span').textContent='Annen sparing fra før (som ikke står på en egen post)';
@@ -687,7 +727,7 @@ function renderSavings(){queueClamp();
  set('pk-title','Per konto i '+savYear);
  st.querySelectorAll('[data-sy]').forEach(b=>b.onclick=()=>{savYear=+b.dataset.sy;renderSavings();});
  const ks=PERIOD.filter(k=>mYear(k)===savYear),unpl=ks.filter(k=>!isPlanned(k)).length;
- set('sav-note',(ks.length<12?`Gjelder ${mName(ks[0]).toLowerCase()}–desember. `:'')+(unpl?`${unpl} av ${ks.length} måneder er ikke planlagt ennå og er regnet som siste planlagte måned.`:`Alle månedene er planlagt.`));
+ set('sav-note',(ks.length<12?`Gjelder ${mName(ks[0]).toLowerCase()}–desember. `:'')+(unpl?`${unpl} av ${ks.length} måneder er ikke planlagt ennå og er regnet som basisbudsjettet.`:`Alle månedene er planlagt.`));
  const oneNote=rw=>{const os=(rw.ones||[]).filter(o=>o.only&&mYear(o.only)<=savYear&&(!removeKey(o)||mYear(removeKey(o))>=savYear));if(!os.length)return'';
   return`<div class="det" style="margin-top:6px">${os.map(o=>{const rk=removeKey(o);return`<span>${mYear(o.only)===savYear?'Engangsinnskudd':'Videreført'} ${fmt(o.amount)} fra ${mLabel(o.only).toLowerCase()}${rk&&mYear(rk)===savYear?' – tatt ut i '+mName(rk).toLowerCase():' – ligger på kontoen'}</span>`;}).join('')}</div>`;};
  const startLbl='';
@@ -744,23 +784,30 @@ function renderGoals(){queueClamp();const gs=data.savings.filter(x=>!x.only&&x.g
    <div class="togrow" style="grid-column:1/3;margin-top:-4px"><small style="font-size:13px;color:var(--muted)">Motiverende meldinger</small><label class="switch" style="transform:scale(.8);transform-origin:right"><input type="checkbox" data-mot="${it.id}" ${it.goal.motivate?'checked':''} aria-label="Motiverende meldinger for ${esc(it.name)}"><span></span></label></div></div>`;}).join('');
  document.getElementById('goals').insertAdjacentHTML('beforeend',tail);bindSuggest(document.getElementById('goals'),wm);
  document.querySelectorAll('#goals [data-mot]').forEach(c=>c.onchange=()=>{const it=find(c.dataset.mot);if(it){it.goal.motivate=c.checked;save(c.checked?'Meldinger på':'Meldinger av');}});}
-function renderNewMonth(){const el=document.getElementById('newmonth');const prev=prevPlanned(NOW);
- if(!PERIOD.includes(NOW)||isPlanned(NOW)||!prev){el.style.display='none';return;}
- el.style.display='';el.innerHTML=`<h3>${mName(NOW)} har startet</h3><p>${mName(NOW)} er ikke planlagt ennå. Vil du bruke samme budsjett som i ${mLabel(prev).toLowerCase()}? Du kan endre beløpene etterpå.</p>
-  <div class="btns"><button type="button" class="btn pri grow" id="nm-copy">Ja, bruk ${mName(prev).toLowerCase()}-budsjettet</button><button type="button" class="btn" id="nm-adj">Se først</button></div>`;
- document.getElementById('nm-copy').onclick=()=>{copyMonth(prev,NOW);save(mName(NOW)+' er planlagt');};
- document.getElementById('nm-adj').onclick=()=>{mode=NOW;tab='expenses';show('budget');};}
+function renderNewMonth(){const el=document.getElementById('newmonth');const k=homeM;
+ /* Vises når måneden du ser på under Oversikt ikke er planlagt ennå */
+ const emptyPlan=isPlanned(k)&&!['income','expenses','savings'].some(t=>data[t].some(it=>!it.only&&inMonth(it,k)));
+ if(!k||!PERIOD.includes(k)||(isPlanned(k)&&!emptyPlan)){el.style.display='none';return;}
+ const bc=Object.keys(data.base).length,fresh=k===NOW&&TODAY.getDate()<=7,nm=mName(k).toLowerCase();
+ el.style.display='';
+ el.innerHTML=`<h3>${mLabel(k)} ${fresh?'har startet':emptyPlan?'er tom':'er ikke planlagt ennå'}</h3><p>${bc?`Bruk de faste inntektene, utgiftene og sparingen fra basisbudsjettet – eller bygg ${nm} fra bunnen av.`:`Basisbudsjettet er tomt. Bygg ${nm} fra bunnen av.`}</p>
+  <div class="btns">${bc?`<button type="button" class="btn pri grow" id="nm-copy">⭐ Bruk basisbudsjettet for ${nm}</button>`:(originalData()?`<button type="button" class="btn pri grow" id="nm-orig">Hent budsjettet du hadde fra før</button>`:'')}<button type="button" class="btn grow" id="nm-adj">🛠️ Bygg nytt budsjett</button></div>`;
+ const c=document.getElementById('nm-copy');if(c)c.onclick=()=>{copyMonth(BASE,k);save(mName(k)+' bruker nå basisbudsjettet');};
+ const o=document.getElementById('nm-orig');if(o)o.onclick=()=>{const n=restoreBase();if(n)copyMonth(BASE,k);save(n?mName(k)+' er planlagt':'Fant ikke budsjettet fra før');};
+ document.getElementById('nm-adj').onclick=()=>{if(!isPlanned(k))data.plan[k]={};persist();mode=k;tab='income';show('budget');toast('Legg til postene for '+mName(k).toLowerCase());};}
 let homeM=NOW;
 const YEARS_H=()=>{const ys=[...new Set(PERIOD.map(mYear))];return ys.includes(TODAY.getFullYear())?TODAY.getFullYear():BUDGET_YEAR;};
 function renderHome(){
  if(!PERIOD.includes(homeM))homeM=PERIOD.includes(NOW)?NOW:PERIOD[0];
  const hs=document.getElementById('home-m');
  hs.innerHTML=PERIOD.map(k=>`<option value="${k}">${mLabel(k)}${k===NOW?' (nå)':''}${isPlanned(k)?'':' – ikke planlagt'}</option>`).join('');
- hs.value=homeM;hs.onchange=()=>{homeM=hs.value;renderHome();};
+ hs.value=homeM;hs.onchange=()=>{homeM=hs.value;renderHome();renderNewMonth();};
  set('h-lbl','Igjen i '+mLabel(homeM).toLowerCase());
  const t=tot(homeM),planned=isPlanned(homeM);
  set('h-left',planned?fmt(t.left):'Ikke planlagt');
- if(!planned){set('h-hint',`Gå til Budsjett og velg ${mName(homeM).toLowerCase()} for å planlegge måneden.`);}
+ const hasFixedH=['income','expenses','savings'].some(t=>data[t].some(it=>!it.only&&inMonth(it,homeM)));
+ if(!planned){set('h-hint','Velg hvordan du vil starte måneden i kortet over.');}
+ else if(!hasFixedH){set('h-hint','Måneden er tom – bruk basisbudsjettet i kortet over.');}
  else set('h-hint',t.left<0?'Du bruker '+fmt(-t.left)+' mer enn du tjener. Juster utgifter eller sparing.':t.left===0?'Hele inntekten er fordelt. Det er slik et nullbudsjett skal se ut.':fmt(t.left)+' er ikke fordelt ennå – gi dem en jobb, f.eks. ekstra sparing.');
  const pf=v=>planned?fmt(v):'–';set('s-inc',pf(t.i));set('s-exp',pf(t.e));set('s-sav',pf(t.s));
  set('s-rate',planned&&t.i?Math.round(t.s/t.i*100)+' %':'–');
@@ -812,13 +859,26 @@ function suggestChips(m){return SAVE_SUGGEST.map(o=>{const ex=findSaving(o[0]);
 function bindSuggest(root,m,afterOpen){
  root.querySelectorAll('[data-sg]').forEach(b=>b.onclick=()=>{const o=SAVE_SUGGEST.find(x=>x[0]===b.dataset.sg);mode=m;tab='savings';
   openSheet('savings',null,{name:o[0],icon:o[1],kind:o[2],goal:{on:true,type:o[2]==='transfer'?'debt':'save',amount:'',before:'',motivate:true}});});
- root.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{const it=find(b.dataset.back);if(!it)return;data.plan[m]=data.plan[m]||{};data.plan[m][it.id]=it.amount||0;
+ root.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{const it=find(b.dataset.back);if(!it)return;if(m===BASE)data.base[it.id]=it.amount||0;else{data.plan[m]=data.plan[m]||{};data.plan[m][it.id]=it.amount||0;}
   save(it.name+' er lagt tilbake i '+mLabel(m).toLowerCase());});
  root.querySelectorAll('[data-setgoal]').forEach(b=>b.onclick=()=>{mode=m;tab='savings';openSheet('savings',b.dataset.setgoal);
   const on=document.getElementById('g-on');on.checked=true;paintGoal();});}
+/* ---- Slette en måned (én bekreftelse) ---- */
+function deleteMonth(k){
+ const ones=['income','expenses','savings'].flatMap(t=>data[t].filter(it=>it.only===k).map(it=>({t,it})));
+ const bg=document.getElementById('confbg'),yes=document.getElementById('cf-yes'),close=()=>bg.classList.remove('open');
+ document.getElementById('cf-no').onclick=close;bg.onclick=e=>{if(e.target===bg)close();};
+ const step1=()=>{set('cf-title',`Er du sikker på at du vil slette ${mLabel(k).toLowerCase()}?`);
+  set('cf-text',`Alle beløp i ${mLabel(k).toLowerCase()} blir fjernet${ones.length?`, også ${ones.length} engangsbeløp`:''}. Dette kan ikke angres.`);
+  yes.textContent='Ja';yes.onclick=()=>{
+   delete data.plan[k];
+   ['income','expenses','savings'].forEach(t=>{data[t]=data[t].filter(it=>it.only!==k);});
+   data.savings.forEach(d=>{if(d.removed===k)delete d.removed;});
+   rebuildPeriod();close();save(mLabel(k)+' er slettet');};bg.classList.add('open');};
+ step1();}
 function regOneOffs(m){return['income','expenses','savings'].flatMap(t=>data[t].filter(it=>it.only===m).map(it=>({t,it})));}
 function renderBudget(){queueClamp();
- if(!mode||!PERIOD.includes(mode))mode=PERIOD.includes(NOW)?NOW:PERIOD[0];
+ if(!mode||mode===BASE||!PERIOD.includes(mode))mode=PERIOD.includes(NOW)?NOW:PERIOD[0];
  renderCmpBar();
  const mb=document.getElementById('monthbar');
  mb.innerHTML=PERIOD.map((k,i)=>(YEARS.length>1&&(i===0||mYear(k)!==mYear(PERIOD[i-1]))?`<span class="ydiv">${mYear(k)}</span>`:'')+`<button class="chip ${mode===k?'on':''} ${isPlanned(k)?'':'unpl'}" data-m="${k}">${mName(k)}${k===NOW?'<em>nå</em>':''}${isPlanned(k)?'':' +'}</button>`).join('');
@@ -827,17 +887,32 @@ function renderBudget(){queueClamp();
  const planned=isPlanned(mode),prev=prevPlanned(mode),src=nearestPlanned(mode);
  ['cmpbar','tabs','list'].forEach(id=>document.getElementById(id).style.display=planned?'':'none');
  const mi=document.getElementById('modeinfo');mi.style.display=planned?'':'none';
- if(planned)mi.innerHTML=`Du planlegger <b>${mLabel(mode).toLowerCase()}</b>. Endringer gjelder bare denne måneden.${prev?` <button type="button" class="linkbtn" id="recopy">Hent på nytt fra ${mName(prev).toLowerCase()}</button>`:''}`;
+ if(mode===BASE)mi.innerHTML=`⭐ <b>Basisbudsjettet</b> er malen hver ny måned starter med. Endringer her påvirker ikke måneder som allerede er planlagt.${originalData()?' <button type="button" class="linkbtn" id="restorebase">Hent det opprinnelige budsjettet</button>':''}`;
+ else if(planned)mi.innerHTML=`Du planlegger <b>${mLabel(mode).toLowerCase()}</b>. Endringer gjelder bare denne måneden.`;
+ /* ⭐ Bruk basisbudsjettet – øverst i planlagte måneder */
+ const ub=document.getElementById('usebase'),bc=Object.keys(data.base).length;
+ if(planned&&mode!==BASE){
+  ub.innerHTML=`<div class="usebase"><button type="button" class="basebtn" id="ub-btn" ${bc?'':'disabled'}>⭐ Bruk basisbudsjettet</button>
+   <p class="muted" style="margin:0 2px;font-size:13px">${bc?`Klikker du her, får du opp alle de faste inntektene, utgiftene og sparingen fra basisbudsjettet (${bc} poster). Du kan redigere dem fritt etterpå, og engangsbeløp blir liggende. Ønsker du et nytt basisbudsjett? Tilpass måneden og trykk «⭐ Bruk som basisbudsjett» nederst.`:'Basisbudsjettet er tomt. Fyll ut måneden og trykk «⭐ Bruk som basisbudsjett» nederst, så kan du bruke det i de neste månedene.'}</p>
+   ${!bc&&originalData()?'<button type="button" class="linkbtn" id="ub-orig" style="margin:6px 2px 0">Hent budsjettet du hadde fra før</button>':''}</div>`;
+  const ubb=document.getElementById('ub-btn');ubb.onclick=()=>{const has=['income','expenses','savings'].some(t=>data[t].some(it=>!it.only&&inMonth(it,mode)));
+   if(has&&!confirm('Erstatte de faste beløpene i '+mLabel(mode).toLowerCase()+' med basisbudsjettet? Engangsbeløp blir liggende.'))return;copyMonth(BASE,mode);save(mName(mode)+' bruker nå basisbudsjettet');};
+  const uo=document.getElementById('ub-orig');if(uo)uo.onclick=()=>{const n=restoreBase();save(n?n+' poster hentet inn i basisbudsjettet':'Fant ikke budsjettet fra før');};
+ }else ub.innerHTML='';
  const pe=document.getElementById('plan-empty');
  if(!planned){const regs=regOneOffs(mode);
-  pe.innerHTML=`<div class="emptyplan"><h3>${mLabel(mode)} er ikke planlagt</h3><p>Velg hvordan du vil starte måneden.</p>
-   <div class="btns">${src?`<button type="button" class="btn pri" id="ep-copy">Bruk samme budsjett som ${mName(src).toLowerCase()}</button>`:''}<button type="button" class="btn" id="ep-empty">Start med tomt budsjett</button></div>
+  pe.innerHTML=`<div class="emptyplan"><h3>${mLabel(mode)} er ikke planlagt</h3><p>Bruk basisbudsjettet, eller bygg måneden fra bunnen av.</p>
+   <div class="btns">${Object.keys(data.base).length?'<button type="button" class="btn pri" id="ep-base">⭐ Bruk basisbudsjettet</button>':(originalData()?'<button type="button" class="btn pri" id="ep-orig">Hent budsjettet du hadde fra før</button>':'')}<button type="button" class="btn" id="ep-empty">🛠️ Bygg nytt budsjett</button></div>
    ${regs.length?`<div class="reg"><b>Allerede registrert for ${mName(mode).toLowerCase()}:</b>${regs.map(({t,it})=>`<div class="dline"><span>${ic(it,t)}${esc(it.name)}</span><span class="${t==='income'?'pos':'neg'}">${t==='income'?'+':'−'}${fmt(it.amount)}</span></div>`).join('')}</div>`:''}</div>`;
+  const eb=document.getElementById('ep-base');if(eb)eb.onclick=()=>{copyMonth(BASE,mode);save(mName(mode)+' bruker nå basisbudsjettet');};
+  const eo=document.getElementById('ep-orig');if(eo)eo.onclick=()=>{const n=restoreBase();if(n)copyMonth(BASE,mode);save(n?mName(mode)+' bruker nå budsjettet fra før':'Fant ikke budsjettet fra før');};
   const cb=document.getElementById('ep-copy');if(cb)cb.onclick=()=>{copyMonth(src,mode);save(mName(mode)+' bruker nå budsjettet fra '+mName(src).toLowerCase());};
-  document.getElementById('ep-empty').onclick=()=>{data.plan[mode]={};save(mName(mode)+' er startet med tomt budsjett');};
+  document.getElementById('ep-empty').onclick=()=>{data.plan[mode]={};tab='income';save('Legg til postene for '+mName(mode).toLowerCase());};
   return;}
  pe.innerHTML='';
- const rc=document.getElementById('recopy');if(rc)rc.onclick=()=>{if(confirm('Erstatte beløpene i '+mLabel(mode).toLowerCase()+' med budsjettet fra '+mLabel(prev).toLowerCase()+'? Engangsbeløp beholdes.')){copyMonth(prev,mode);save('Hentet på nytt fra '+mName(prev).toLowerCase());}};
+ const rc=document.getElementById('recopy');if(rc)rc.onclick=()=>{if(confirm('Erstatte beløpene i '+mLabel(mode).toLowerCase()+' med basisbudsjettet? Engangsbeløp beholdes.')){copyMonth(BASE,mode);save('Hentet på nytt fra basis');}};
+ const rb=document.getElementById('restorebase');if(rb)rb.onclick=()=>{if(confirm('Erstatte basisbudsjettet med budsjettet du hadde fra før? Planlagte måneder endres ikke.')){data.base={};const n=restoreBase();save(n+' poster hentet inn i basis');}};
+ const tb2=document.getElementById('tobase');if(tb2)tb2.onclick=()=>{if(confirm('Gjøre de faste beløpene i '+mLabel(mode).toLowerCase()+' til nytt basisbudsjett? Måneder som allerede er planlagt, endres ikke.')){data.base=Object.assign({},data.plan[mode]);save('Basisbudsjettet er oppdatert');}};
  const t=tot(mode);
  const tabs=[['income','Inntekter',t.i],['expenses','Utgifter',t.e],['savings','Sparing',t.s]];
  const tb=document.getElementById('tabs');
@@ -849,20 +924,31 @@ function renderBudget(){queueClamp();
   CATS.forEach(([key,label])=>{const g=items.filter(x=>(x.cat||'Egne utgifter og familieliv')===key);if(!g.length)return;
    html+=groupHead(GROUP_ICON[key],label,g.length,`data-cat="${key}"`,g.reduce((a,x)=>a+amountFor(x,mode),0))+g.map(rowHTML).join('');});
  }else if(tab==='savings'){
-  html+=balanceBox()+`<div style="margin:4px 2px 0;font-weight:700">Ny sparing i ${mName(mode).toLowerCase()}<div class="muted" style="font-weight:400">Pengene du setter av denne måneden – trekkes fra «Igjen».</div></div>`;
+  if(mode!==BASE)html+=balanceBox()+`<div style="margin:4px 2px 0;font-weight:700">Ny sparing i ${mName(mode).toLowerCase()}<div class="muted" style="font-weight:400">Pengene du setter av denne måneden – trekkes fra «Igjen».</div></div>`;
   [['bank','🏦','Sparekonto'],['fond','📈','Fond og aksjer'],['transfer','💛','Overføringer']].forEach(([kd,ico,label])=>{const all=items.filter(x=>kindOf(x)===kd),g=all.filter(x=>!targetOf(x));if(!g.length)return;
-   html+=groupHead(ico,label,g.length,`data-kind="${kd}"`,all.reduce((a,x)=>a+amountFor(x,mode),0))+g.map(x=>rowHTML(x).replace('<div class="row">','<div class="row hasSub">')+`<div class="subline" data-sub="${x.id}">${subline(x)}</div>`).join('');});
+   html+=groupHead(ico,label,g.length,`data-kind="${kd}"`,all.reduce((a,x)=>a+amountFor(x,mode),0))+g.map(x=>mode===BASE?rowHTML(x):rowHTML(x).replace('<div class="row">','<div class="row hasSub">')+`<div class="subline" data-sub="${x.id}">${subline(x)}</div>`).join('');});
  }else{const fixed=items.filter(x=>!x.only);
-  html=oneOffBox()+(fixed.length?groupHead('💰','Faste inntekter',fixed.length,'data-inc="1"',fixed.reduce((a,x)=>a+amountFor(x,mode),0))+incomeLine()+fixed.map(rowHTML).join(''):'');}
+  html=(mode===BASE?'':oneOffBox())+(fixed.length?groupHead('💰','Faste inntekter',fixed.length,'data-inc="1"',fixed.reduce((a,x)=>a+amountFor(x,mode),0))+incomeLine()+fixed.map(rowHTML).join(''):'');}
  if(!items.length&&tab!=='income')html=(tab==='savings'?balanceBox():'')+'<p class="empty">Ingen poster her i '+mName(mode).toLowerCase()+'.</p>';
  if(tab==='savings'){const ch=suggestChips(mode);if(ch)html+=`<div class="suggest" style="margin:14px 0 0">${ch}</div>`;}
- if(tab==='savings')html+=`<button class="addbtn" type="button" id="add-once">+ Engangsinnskudd i ${mName(mode).toLowerCase()}</button>`;
+ if(tab==='savings'&&mode!==BASE)html+=`<button class="addbtn" type="button" id="add-once">+ Engangsinnskudd i ${mName(mode).toLowerCase()}</button>`;
  html+=`<button class="addbtn" type="button" id="add">+ Ny ${tab==='income'?'fast inntekt':tab==='expenses'?'utgift':'fast sparing'}</button>`;
+ const hasFixed=['income','expenses','savings'].some(t=>data[t].some(it=>!it.only&&inMonth(it,mode)));
+ if(mode!==BASE&&hasFixed)html+=`<button class="tobase" type="button" id="tobase2">⭐ Bruk som basisbudsjett</button>`;
+ if(mode!==BASE)html+=`<button class="delmonth" type="button" id="delmonth">Slett ${mLabel(mode).toLowerCase()}</button>`;
+ const monthEmpty=mode!==BASE&&!['income','expenses','savings'].some(t=>data[t].some(it=>inMonth(it,mode)));
+ const baseCount=Object.keys(data.base).length;
+ if(monthEmpty)html=`<div class="emptymonth"><h3>${mLabel(mode)} er tom</h3><p class="muted">${baseCount?'Trykk «⭐ Bruk basisbudsjettet» øverst, eller bygg måneden selv med «+ Ny» under.':'Legg til poster selv, eller hent budsjettet du hadde fra før.'}</p></div>`+html.replace(/<p class="empty">[^<]*<\/p>/,'');
+ if(mode===BASE&&!baseCount)html=`<div class="emptymonth"><h3>Basisbudsjettet er tomt</h3><p class="muted">Legg til faste inntekter, utgifter og sparing her${originalData()?', eller hent budsjettet du hadde fra før':''}. Du kan også gå til en utfylt måned og trykke «Bruk som ny basis».</p>
+  ${originalData()?'<div class="btns"><button type="button" class="btn pri" id="em-orig">Hent budsjettet du hadde fra før</button></div>':''}</div>`+html;
  const list=document.getElementById('list');list.innerHTML=html;
+ const emb=list.querySelector('#em-base');if(emb)emb.onclick=()=>{copyMonth(BASE,mode);save(mName(mode)+' bruker nå basisbudsjettet');};
+ const emo=list.querySelector('#em-orig');if(emo)emo.onclick=()=>{const n=restoreBase();if(mode!==BASE)copyMonth(BASE,mode);save(n?n+' poster hentet inn':'Fant ikke budsjettet fra før');};
+ const t2=list.querySelector('#tobase2');if(t2)t2.onclick=()=>{if(confirm('Bruke de faste beløpene i '+mLabel(mode).toLowerCase()+' som nytt basisbudsjett? Engangsbeløp tas ikke med, og måneder som allerede er planlagt, endres ikke.')){data.base=Object.assign({},data.plan[mode]);save('Nytt basisbudsjett er lagret');}};
  list.querySelectorAll('.amt').forEach(inp=>{
   inp.addEventListener('focus',()=>inp.select());
   inp.addEventListener('change',()=>{const it=find(inp.dataset.id);if(!it)return;const v=Math.max(0,Math.round(+inp.value||0));
-   if(it.only)it.amount=v;else{data.plan[mode]=data.plan[mode]||{};data.plan[mode][it.id]=v;it.amount=v;}
+   if(it.only)it.amount=v;else if(mode===BASE){data.base[it.id]=v;it.amount=v;}else{data.plan[mode]=data.plan[mode]||{};data.plan[mode][it.id]=v;it.amount=v;}
    persist();inp.value=amountFor(it,mode);
    const row=inp.closest('.row'),tmp=document.createElement('div');tmp.innerHTML=rowHTML(it);
    row.querySelector('.rname').innerHTML=tmp.querySelector('.rname').innerHTML;
@@ -870,6 +956,7 @@ function renderBudget(){queueClamp();
  });
  list.querySelectorAll('.rname').forEach(b=>b.onclick=()=>openSheet(tab,b.dataset.id));
  document.getElementById('add').onclick=()=>openSheet(tab,null);
+ const dm=document.getElementById('delmonth');if(dm)dm.onclick=()=>deleteMonth(mode);
  bindSuggest(list,mode);
  const ao=document.getElementById('add-once');if(ao)ao.onclick=()=>{const first=data.savings.find(x=>!x.only&&kindOf(x)!=='transfer');openSheet('savings',null,{name:'Engangsinnskudd',icon:'➕',only:mode,target:first?first.id:''});};
  bindOneOff(list);bindBalance(list);bindSublines(list);
@@ -951,15 +1038,15 @@ document.getElementById('cmp-on').onchange=e=>{cmpOn=e.target.checked;if(cmpOn&&
 const GROUP_ICON={'Faste utgifter':'📌','Løpende utgifter':'🔄','Egne utgifter og familieliv':'👨‍👩‍👧'};
 function groupHead(ico,label,n,attr,sum){return`<div class="group"><div><span class="gi" aria-hidden="true">${ico}</span>${label}<small>${n} ${n===1?'post':'poster'}</small></div><span class="sum" ${attr}>${fmt(sum)}</span></div>`;}
 function rowHTML(it){
- let meta='';const pv=prevPlanned(mode);
+ let meta='';
  const tg=targetOf(it);
  if(tab==='savings'&&!it.only&&it.goal&&it.goal.on&&it.goal.amount>0){const st=goalStatus(it);
   return`<div class="row"><button type="button" class="rname" data-id="${it.id}"><span class="n">${ic(it)}${esc(it.name)}</span><span class="m">${Math.floor(st.pct)} % · ${fmt(st.left)} ${it.goal.type==='debt'?'gjenstår':'igjen'}</span><span class="minibar"><i style="width:${st.pct.toFixed(1)}%"></i></span></button><input class="amt" data-id="${it.id}" type="number" inputmode="numeric" min="0" step="50" value="${amountFor(it,mode)}" aria-label="Beløp for ${esc(it.name)}"></div>`;}
  if(it.only&&tab==='savings')meta=`<span class="m edit">Engangsinnskudd${tg?' til '+esc(tg.name):''} – ${it.keep===false?'bare denne måneden':'blir liggende og vises videre'}</span>`;
  else if(it.only&&tg)meta=`<span class="m edit">Engangsinnskudd til ${esc(tg.name)}</span>`;
  else if(it.only)meta=`<span class="m edit">Engangsbeløp – bare i ${mLabel(it.only).toLowerCase()}</span>`;
- else if(pv&&inMonth(it,pv)&&amountFor(it,pv)!==amountFor(it,mode))meta=`<span class="m edit">${mName(pv)}: ${fmt(amountFor(it,pv))}</span>`;
- else if(pv&&!inMonth(it,pv))meta=`<span class="m edit">Ny denne måneden</span>`;
+ else if(mode!==BASE&&!it.only&&data.base[it.id]!=null&&data.base[it.id]!==amountFor(it,mode))meta=`<span class="m edit">Basis: ${fmt(data.base[it.id])}</span>`;
+ else if(mode!==BASE&&!it.only&&data.base[it.id]==null)meta=`<span class="m edit">Ikke i basis</span>`;
  return`<div class="row"><button type="button" class="rname" data-id="${it.id}"><span class="n">${ic(it)}${esc(it.name)}</span>${meta}${tab==='expenses'?cmpSpan(it):''}</button><input class="amt" data-id="${it.id}" type="number" inputmode="numeric" min="0" step="50" value="${amountFor(it,mode)}" aria-label="Beløp for ${esc(it.name)}"></div>`;
 }
 function bindResets(){}
@@ -1026,10 +1113,12 @@ function openSheet(type,id,pre){
  tgs.innerHTML=accts.map(a=>`<option value="${a.id}">${esc(iconOf(a,'savings')+' '+a.name)}</option>`).join('')+'<option value="">Egen post (ny konto)</option>';
  tgs.value=it?(it.target||''):(pre&&pre.target!=null?pre.target:'');
  document.getElementById('sh-keep').checked=it?it.keep!==false:true;
+ document.getElementById('sh-later').checked=mode!==BASE;document.getElementById('sh-base').checked=true;
  const upd=()=>{set('sh-amt-lbl',ws.value===''?'Beløp i '+mLabel(mode).toLowerCase()+' (kr)':'Beløp (kr)');
-  const later=Object.keys(data.plan).filter(x=>x>mode);const lw=document.getElementById('sh-later-wrap');
-  lw.style.display=!it&&ws.value===''&&later.length?'flex':'none';set('sh-later-lbl',`Legg også til i ${later.length===1?mLabel(later[0]).toLowerCase():'de '+later.length+' senere planlagte månedene'}`);
-  ws.closest('.field').style.display=it&&!it.only?'none':'';
+  const later=Object.keys(data.plan).filter(x=>mode===BASE?x>=NOW:x>mode);const lw=document.getElementById('sh-later-wrap');
+  lw.style.display=!it&&ws.value===''&&later.length?'flex':'none';set('sh-later-lbl',`Legg også til i ${later.length===1?mLabel(later[0]).toLowerCase():'de '+later.length+(mode===BASE?' planlagte månedene fra og med nå':' senere planlagte månedene')}`);
+  ws.closest('.field').style.display=(it&&!it.only)||mode===BASE?'none':'';
+  document.getElementById('sh-base-wrap').style.display=!it&&ws.value===''&&mode!==BASE?'flex':'none';
   const once=type==='savings'&&ws.value!=='';document.getElementById('sh-target-wrap').style.display=once?'':'none';document.getElementById('sh-keep-wrap').style.display=once?'flex':'none';
   document.getElementById('sh-goal-wrap').style.display=type==='savings'&&!once?'':'none';
   const linkedT=once&&tgs.value!=='';document.getElementById('sh-kind-wrap').style.display=type==='savings'&&!linkedT?'':'none';document.getElementById('sh-bal-wrap').style.display=type==='savings'&&!once?'':'none';};
@@ -1042,7 +1131,7 @@ function openSheet(type,id,pre){
 function closeSheet(){document.getElementById('sheetbg').classList.remove('open');}
 document.getElementById('sh-cancel').onclick=closeSheet;
 document.getElementById('sheetbg').onclick=e=>{if(e.target.id==='sheetbg')closeSheet();};
-const usedAnywhere=id=>Object.values(data.plan).some(p=>p[id]!=null);
+const usedAnywhere=id=>Object.values(data.plan).some(p=>p[id]!=null)||data.base[id]!=null;
 document.getElementById('sh-save').onclick=()=>{
  const name=document.getElementById('sh-name').value.trim();if(!name||!splitIcon(name).name){document.getElementById('sh-name').focus();return;}
  const amount=Math.max(0,Math.round(+document.getElementById('sh-amt').value||0));
@@ -1059,15 +1148,17 @@ document.getElementById('sh-save').onclick=()=>{
    const gon=document.getElementById('g-on').checked;
    if(gon||it.goal)it.goal={on:gon,type:gState.type,amount:Math.max(0,Math.round(+document.getElementById('g-amt').value||0)),before:Math.max(0,Math.round(+document.getElementById('g-before').value||0)),motivate:document.getElementById('g-mot').checked};}}
  if(only){it.only=only;}
- else{delete it.only;data.plan[mode]=data.plan[mode]||{};data.plan[mode][it.id]=amount;
-  if(!sh.id&&document.getElementById('sh-later').checked)Object.keys(data.plan).filter(k=>k>mode).forEach(k=>{data.plan[k][it.id]=amount;});}
+ else{delete it.only;
+  if(mode===BASE)data.base[it.id]=amount;else{data.plan[mode]=data.plan[mode]||{};data.plan[mode][it.id]=amount;}
+  if(!sh.id&&mode!==BASE&&document.getElementById('sh-base').checked)data.base[it.id]=amount;
+  if(!sh.id&&document.getElementById('sh-later').checked)Object.keys(data.plan).filter(k=>mode===BASE?k>=NOW:k>mode).forEach(k=>{data.plan[k][it.id]=amount;});}
  rebuildPeriod();closeSheet();save(only?'Engangsbeløp lagt inn i '+mLabel(only).toLowerCase():sh.id?'Endret':'Lagt til i '+mLabel(mode).toLowerCase());
 };
 document.getElementById('sh-del').onclick=()=>{
  const it=find(sh.id);if(!it)return;
  if(it.only){if(!confirm('Slette «'+it.name+'»?'))return;data[sh.type]=data[sh.type].filter(x=>x.id!==it.id);closeSheet();save('Slettet');return;}
  if(!confirm('Fjerne «'+it.name+'» fra '+mLabel(mode).toLowerCase()+'?'))return;
- delete (data.plan[mode]||{})[it.id];if(!usedAnywhere(it.id))data[sh.type]=data[sh.type].filter(x=>x.id!==it.id);
+ if(mode===BASE)delete data.base[it.id];else delete (data.plan[mode]||{})[it.id];if(!usedAnywhere(it.id))data[sh.type]=data[sh.type].filter(x=>x.id!==it.id);
  closeSheet();save('Fjernet fra '+mLabel(mode).toLowerCase());
 };
 function move(dir){const arr=data[sh.type];const i=arr.findIndex(x=>x.id===sh.id);const it=arr[i];
@@ -1082,7 +1173,7 @@ function monthRow(t){const k=t.k,adj=monthAdjusted(k);
  if(!t.planned){const regs=regOneOffs(k),src=nearestPlanned(k);
   return`<div class="mrow unpl" data-m="${k}"><div class="mhead" style="cursor:default"><span class="mn">${mName(k)}${k===NOW?'<em>nå</em>':''}</span><span class="ml muted" style="font-weight:600">Ikke planlagt</span><span></span>
    ${regs.length?`<span class="mnums">Registrert: ${regs.map(({t:tp,it})=>esc(it.name)+' '+(tp==='income'?'+':'−')+fmt(it.amount)).join(' · ')}</span>`:''}</div>
-   <div class="btns" style="margin:0 0 12px">${src?`<button type="button" class="btn pri grow" data-copy="${k}" data-src="${src}">Bruk samme som ${mName(src).toLowerCase()}</button>`:''}<button type="button" class="btn" data-adjust="${k}">Planlegg selv</button></div></div>`;}
+   <div class="btns" style="margin:0 0 12px"><button type="button" class="btn pri grow" data-copy="${k}" data-src="base">⭐ Bruk basisbudsjettet</button><button type="button" class="btn grow" data-build="${k}">🛠️ Bygg nytt budsjett</button></div></div>`;}
  const base=Math.max(t.i,t.e+t.s,1),w=v=>(Math.max(0,v)/base*100).toFixed(1)+'%';
  const lft=t.left===0?'Alt fordelt':t.left>0?fmt(t.left)+' til overs':fmt(-t.left)+' for lite';
  const lines=(type,title)=>{const its=data[type].filter(it=>inMonth(it,k)&&amountFor(it,k)>0);if(!its.length)return'';
@@ -1092,7 +1183,7 @@ function monthRow(t){const k=t.k,adj=monthAdjusted(k);
    <span class="mbar"><i style="width:${w(t.e)};background:var(--acc)"></i><i style="width:${w(t.s)};background:#c7aa79"></i><i style="width:${w(t.left)};background:var(--green)"></i></span>
    <span class="mnums">Inn ${fmt(t.i)} · Ut ${fmt(t.e)} · Spart ${fmt(t.s)}</span></button>
   <div class="mdetail">${lines('income','Inntekter')}${lines('expenses','Utgifter')}${lines('savings','Sparing')}
-   <button type="button" class="btn pri" style="width:100%;margin-top:12px" data-adjust="${k}">Endre ${mLabel(k).toLowerCase()}</button></div></div>`;}
+   <button type="button" class="btn pri" style="width:100%;margin-top:12px" data-adjust="${k}">Endre ${mLabel(k).toLowerCase()}</button><button type="button" class="delmonth" data-del="${k}">Slett ${mLabel(k).toLowerCase()}</button></div></div>`;}
 let selYear=YEARS.includes(TODAY.getFullYear())?TODAY.getFullYear():BUDGET_YEAR;
 function renderYear(){queueClamp();
  const keys=PERIOD.filter(k=>mYear(k)===selYear),y=yearTot(keys),partial=keys.length<12;
@@ -1112,7 +1203,9 @@ function renderYear(){queueClamp();
   document.querySelectorAll('.mrow').forEach(r=>{const o=r.dataset.m===openM;r.classList.toggle('open',o);r.querySelector('.mhead').setAttribute('aria-expanded',o);});});
  document.querySelectorAll('[data-goyear]').forEach(b=>b.onclick=()=>{selYear=+b.dataset.goyear;openM=null;renderYear();window.scrollTo({top:0});});
  document.querySelectorAll('#months [data-adjust]').forEach(b=>b.onclick=()=>{mode=b.dataset.adjust;tab='expenses';show('budget');});
- document.querySelectorAll('#months [data-copy]').forEach(b=>b.onclick=()=>{copyMonth(b.dataset.src,b.dataset.copy);save(mName(b.dataset.copy)+' bruker nå budsjettet fra '+mName(b.dataset.src).toLowerCase());});
+ document.querySelectorAll('#months [data-build]').forEach(b=>b.onclick=()=>{const k=b.dataset.build;if(!isPlanned(k))data.plan[k]={};persist();mode=k;tab='income';show('budget');toast('Legg til postene for '+mName(k).toLowerCase());});
+ document.querySelectorAll('#months [data-del]').forEach(b=>b.onclick=()=>deleteMonth(b.dataset.del));
+ document.querySelectorAll('#months [data-copy]').forEach(b=>b.onclick=()=>{copyMonth(b.dataset.src,b.dataset.copy);save(mName(b.dataset.copy)+' bruker nå '+(b.dataset.src==='base'?'basisbudsjettet':'budsjettet fra '+mName(b.dataset.src).toLowerCase()));});
  // Buffer: hvor lavt går kontoen gjennom hele perioden?
  let bal=0,min=0,minK=null;PERIOD.filter(isPlanned).forEach(k=>{bal+=tot(k).left;if(bal<min){min=bal;minK=k;}});
  const bf=document.getElementById('buffer');
@@ -1219,10 +1312,10 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alle beløp 
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='24.10.2026 · inngående';set('app-version',APP_VERSION);
+const APP_VERSION='24.10.2026 · basis 8';set('app-version',APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
-const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .modeinfo, .note';
+const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
 const openTexts=new Set();
 const clampKey=el=>el.id||el.textContent.trim().slice(0,60);
 const chev='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>';
