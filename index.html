@@ -47,6 +47,11 @@ h2{font-size:20px;letter-spacing:-.02em;margin:22px 4px 4px}
 .monthbar::-webkit-scrollbar{display:none}
 .chip{flex:0 0 auto;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:8px 14px;font-size:14px;font-weight:600;color:var(--muted)}
 .chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.ydiv{flex:0 0 auto;align-self:center;font-size:13px;font-weight:800;color:var(--acc);padding:0 2px 0 8px}
+.chip em,.mhead em{font-style:normal;font-size:11px;font-weight:700;background:var(--acc2);color:var(--acc);border-radius:99px;padding:1px 7px;margin-left:6px}
+.chip.on em{background:rgba(255,255,255,.25);color:#fff}
+.ygroup{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px;font-weight:800;color:var(--acc);margin:14px 0 2px;padding:9px 12px;background:var(--acc2);border-radius:12px}
+.ygroup span{font-weight:600;font-size:12px}
 .chip .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-left:6px;vertical-align:2px;opacity:.7}
 .modeinfo{font-size:14px;background:var(--acc2);border-radius:14px;padding:10px 12px;margin:0 0 10px}
 .tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--acc2);border-radius:14px;padding:4px;gap:4px;margin-bottom:6px}
@@ -68,13 +73,22 @@ h2{font-size:20px;letter-spacing:-.02em;margin:22px 4px 4px}
 .addbtn{width:100%;margin-top:12px;border:1.5px dashed var(--line);background:transparent;border-radius:14px;padding:12px;font-weight:600;color:var(--acc)}
 .empty{color:var(--muted);font-size:14px;padding:14px 0}
 /* Året */
-.months{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.mtile{border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:10px;text-align:left;position:relative}
-.mtile .mn{font-size:13px;color:var(--muted);font-weight:600}
-.mtile .ml{font-size:17px;font-weight:750;margin-top:3px;letter-spacing:-.02em}
-.mtile .ms{font-size:11px;color:var(--muted);margin-top:2px}
-.mtile.adj{border-color:var(--acc)}
-.mtile .flag{position:absolute;top:9px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--acc)}
+.mrow{border-bottom:1px solid var(--line)}
+.mrow:last-child{border-bottom:0}
+.mhead{width:100%;border:0;background:none;padding:12px 0 10px;text-align:left;display:grid;grid-template-columns:1fr auto 18px;gap:4px 10px;align-items:baseline}
+.mhead .mn{font-weight:700;font-size:16px}
+.mhead .mn small{font-weight:600;color:var(--acc);font-size:12px;margin-left:6px}
+.mhead .ml{font-weight:700;font-variant-numeric:tabular-nums}
+.mhead .chev{color:var(--muted);transition:transform .2s;justify-self:end}
+.mrow.open .chev{transform:rotate(90deg)}
+.mhead .mbar{grid-column:1/4;height:8px;border-radius:9px;background:var(--acc2);display:flex;overflow:hidden;margin-top:4px}
+.mhead .mbar i{display:block;height:100%}
+.mhead .mnums{grid-column:1/4;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.mdetail{display:none;padding:0 0 14px}
+.mrow.open .mdetail{display:block}
+.mdetail h4{font-size:13px;color:var(--acc);margin:10px 0 2px}
+.dline{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:3px 0}
+.dline .chg{color:var(--acc);font-size:12px}
 .spark{width:100%;height:110px;display:block;margin-top:6px}
 .suggest{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
 .suggest button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-size:13px}
@@ -127,11 +141,12 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
 <div class="app">
 <header>
   <div><h1 id="title">Mitt budsjett</h1><p id="subtitle">Veien mot økonomisk frihet</p></div>
-  <div class="yearpill">2027</div>
+  <div class="yearpill" id="yearpill">2027</div>
 </header>
 
 <!-- OVERSIKT -->
 <section class="view active" id="v-home">
+  <label class="field" style="margin:6px 0 0"><span>Vis måned</span><select id="home-m"></select></label>
   <div class="hero">
     <div class="lbl" id="h-lbl">Igjen i en vanlig måned</div>
     <div class="big" id="h-left">0 kr</div>
@@ -181,8 +196,9 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
   </div>
   <div class="card">
     <h3>Måned for måned</h3>
-    <p class="muted" style="margin:0 0 10px">Beløpet viser hva som er igjen etter utgifter og sparing. Trykk på en måned for å justere den.</p>
-    <div class="months" id="months"></div>
+    <p class="muted" style="margin:0 0 6px">Trykk på en måned for å se alle postene.</p>
+    <div class="legend" style="margin-bottom:4px"><span><b style="background:var(--acc)"></b>Utgifter</span><span><b style="background:#c7aa79"></b>Sparing</span><span><b style="background:var(--green)"></b>Til overs</span></div>
+    <div id="months"></div>
     <div id="buffer" class="modeinfo" style="margin:12px 0 0"></div>
   </div>
   <div class="card">
@@ -276,6 +292,20 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
 <script>
 /* ============ GRUNNDATA ============ */
 const MONTHS=['Januar','Februar','Mars','April','Mai','Juni','Juli','August','September','Oktober','November','Desember'];
+const BUDGET_YEAR=2027,TODAY=new Date();
+const pad=n=>String(n).padStart(2,'0');
+const mkey=(y,m)=>y+'-'+pad(m+1);
+const NOW=mkey(TODAY.getFullYear(),TODAY.getMonth());
+const mName=k=>MONTHS[+k.slice(5)-1];
+const mYear=k=>+k.slice(0,4);
+const mLabel=k=>mName(k)+(mYear(k)!==BUDGET_YEAR?' '+mYear(k):'');
+const YEAR_KEYS=MONTHS.map((_,i)=>mkey(BUDGET_YEAR,i));
+/* Tidslinjen starter i inneværende måned (okt. 2026) og går ut desember 2027 */
+const PERIOD=(()=>{const a=[];if(TODAY.getFullYear()<BUDGET_YEAR)for(let m=TODAY.getMonth();m<12;m++)a.push(mkey(TODAY.getFullYear(),m));return a.concat(YEAR_KEYS);})();
+const BEFORE=PERIOD.filter(k=>mYear(k)<BUDGET_YEAR);
+const DAYS_TO=Math.ceil((new Date(BUDGET_YEAR,0,1)-TODAY)/864e5);
+const nextKey=i=>PERIOD.find(k=>+k.slice(5)-1===i)||mkey(BUDGET_YEAR,i);
+const toKey=v=>(v==null||v==='')?null:(/^\d{4}-\d{2}$/.test(String(v))?String(v):(!isNaN(+v)&&+v>=0&&+v<12?mkey(BUDGET_YEAR,+v):null));
 const CATS=[['Faste utgifter','Faste utgifter'],['Løpende utgifter','Løpende utgifter'],['Egne utgifter og familieliv','Egen bruk og familie']];
 const KEY='personalBudget2027v5',OLD_KEYS=['personalBudget2027v4','personalBudget2027v3'];
 const DEFAULTS={
@@ -319,9 +349,10 @@ function normalize(raw){
   if(Array.isArray(x))return{id:uid(),name:String(x[0]),amount:Math.max(0,+x[1]||0),...(type==='expenses'?{cat:x[2]||guessCat(String(x[0]))}:{})};
   const o={id:x.id||uid(),name:String(x.name||'Post'),amount:Math.max(0,+x.amount||0)};
   if(type==='expenses')o.cat=x.cat||guessCat(o.name);
-  if(x.only!=null&&x.only!==''&&!isNaN(+x.only))o.only=+x.only;
+  const ok=toKey(x.only);if(ok)o.only=ok;
   return o;});
- return{income:conv(d.income,'income'),expenses:conv(d.expenses,'expenses'),savings:conv(d.savings,'savings'),ov:(d.ov&&typeof d.ov==='object')?d.ov:{}};
+ const ov={};if(d.ov&&typeof d.ov==='object')Object.entries(d.ov).forEach(([k,v])=>{const nk=toKey(k);if(nk&&v&&typeof v==='object')ov[nk]=Object.assign(ov[nk]||{},v);});
+ return{income:conv(d.income,'income'),expenses:conv(d.expenses,'expenses'),savings:conv(d.savings,'savings'),ov};
 }
 function load(){
  try{const s=localStorage.getItem(KEY);if(s){const d=normalize(JSON.parse(s));if(d)return d;}}catch(e){}
@@ -343,7 +374,7 @@ function amountFor(it,m){
 function hasOv(it,m){return m!=null&&it.only==null&&data.ov[m]&&data.ov[m][it.id]!=null;}
 function tot(m){const s=t=>data[t].reduce((a,it)=>a+amountFor(it,m),0);const i=s('income'),e=s('expenses'),v=s('savings');return{i,e,s:v,left:i-e-v};}
 function monthAdjusted(m){return['income','expenses','savings'].some(t=>data[t].some(it=>it.only===m||hasOv(it,m)));}
-function yearTot(){const r={i:0,e:0,s:0,left:0,months:[]};for(let m=0;m<12;m++){const t=tot(m);r.months.push(t);r.i+=t.i;r.e+=t.e;r.s+=t.s;r.left+=t.left;}return r;}
+function yearTot(keys=YEAR_KEYS){const r={i:0,e:0,s:0,left:0,months:[]};keys.forEach(k=>{const t=tot(k);t.k=k;r.months.push(t);r.i+=t.i;r.e+=t.e;r.s+=t.s;r.left+=t.left;});return r;}
 
 /* ============ NAVIGASJON ============ */
 let view='home',mode=null,tab='expenses';
@@ -352,9 +383,14 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.
 function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),1800);}
 
 /* ============ OVERSIKT ============ */
+let homeM=PERIOD.includes(NOW)?NOW:null;
 function renderHome(){
- const t=tot(null),y=yearTot();
- const varies=y.months.some(x=>x.left!==t.left);
+ const hs=document.getElementById('home-m');
+ hs.innerHTML='<option value="">En vanlig måned</option>'+PERIOD.map(k=>`<option value="${k}">${mLabel(k)}${k===NOW?' (nå)':''}</option>`).join('');
+ hs.value=homeM||'';hs.onchange=()=>{homeM=hs.value||null;renderHome();};
+ set('h-lbl',homeM==null?'Igjen i en vanlig måned':'Igjen i '+mLabel(homeM).toLowerCase());
+ const t=tot(homeM),y=yearTot();
+ const varies=y.months.some(x=>x.left!==tot(null).left);
  set('h-left',fmt(t.left));
  set('h-hint',t.left<0?'Du bruker '+fmt(-t.left)+' mer enn du tjener. Juster utgifter eller sparing.':t.left===0?'Hele inntekten er fordelt. Det er slik et nullbudsjett skal se ut.':fmt(t.left)+' er ikke fordelt ennå – gi dem en jobb, f.eks. ekstra sparing.');
  set('s-inc',fmt(t.i));set('s-exp',fmt(t.e));set('s-sav',fmt(t.s));
@@ -364,17 +400,17 @@ function renderHome(){
  set('b-left',t.left>0?fmt(t.left)+' ufordelt':t.left<0?fmt(-t.left)+' for mye':'Alt fordelt');
  const ex=data.expenses.filter(x=>x.only==null).slice().sort((a,b)=>b.amount-a.amount).slice(0,5),mx=ex[0]?ex[0].amount:1;
  document.getElementById('top').innerHTML=ex.map(x=>`<div class="toprow"><span>${esc(x.name)}</span><strong>${fmt(x.amount)}</strong><div class="track"><i style="width:${x.amount/mx*100}%"></i></div></div>`).join('')||'<p class="empty">Ingen utgifter lagt inn.</p>';
- set('sav-year','Totalt '+fmt(y.s)+' i løpet av året'+(varies?'. Noen måneder er justert – se Året.':'.'));
+ set('sav-year','Totalt '+fmt(y.s)+' i løpet av 2027'+(varies?'. Noen måneder er justert – se Året.':'.'));
  document.getElementById('sav-list').innerHTML=data.savings.filter(x=>x.only==null).map(x=>`<div class="toprow"><span>${esc(x.name)}</span><strong>${fmt(x.amount*12)}<span class="muted"> / år</span></strong></div>`).join('');
 }
 
 /* ============ BUDSJETT ============ */
 function renderBudget(){
  const mb=document.getElementById('monthbar');
- mb.innerHTML=`<button class="chip ${mode==null?'on':''}" data-m="">Hver måned</button>`+MONTHS.map((n,i)=>`<button class="chip ${mode===i?'on':''}" data-m="${i}">${n}${monthAdjusted(i)?'<span class="dot"></span>':''}</button>`).join('');
- mb.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{mode=c.dataset.m===''?null:+c.dataset.m;renderBudget();renderLeftbar();});
+ mb.innerHTML=`<button class="chip ${mode==null?'on':''}" data-m="">Hver måned</button>`+PERIOD.map((k,i)=>(BEFORE.length&&(i===0||k===YEAR_KEYS[0])?`<span class="ydiv">${mYear(k)}</span>`:'')+`<button class="chip ${mode===k?'on':''}" data-m="${k}">${mName(k)}${k===NOW?'<em>nå</em>':''}${monthAdjusted(k)?'<span class="dot"></span>':''}</button>`).join('');
+ mb.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{mode=c.dataset.m===''?null:c.dataset.m;renderBudget();renderLeftbar();});
  const on=mb.querySelector('.chip.on');if(on&&on.scrollIntoView)on.scrollIntoView({inline:'center',block:'nearest'});
- document.getElementById('modeinfo').innerHTML=mode==null?'Du endrer <b>standardbudsjettet</b> – det gjelder alle måneder som ikke er justert.':`Du justerer <b>bare ${MONTHS[mode].toLowerCase()}</b>. Endrede beløp er markert og kan tilbakestilles.`;
+ document.getElementById('modeinfo').innerHTML=mode==null?'Du endrer <b>standardbudsjettet</b> – det gjelder alle måneder som ikke er justert.':`Du justerer <b>bare ${mLabel(mode).toLowerCase()}</b>. Endrede beløp er markert og kan tilbakestilles.`;
  const t=tot(mode);
  const tabs=[['income','Inntekter',t.i],['expenses','Utgifter',t.e],['savings','Sparing',t.s]];
  const tb=document.getElementById('tabs');
@@ -406,7 +442,7 @@ function renderBudget(){
 }
 function rowHTML(it){
  const ch=hasOv(it,mode);let meta='';
- if(it.only!=null)meta=`<span class="m edit">Bare i ${MONTHS[it.only].toLowerCase()}</span>`;
+ if(it.only!=null)meta=`<span class="m edit">Bare i ${mLabel(it.only).toLowerCase()}</span>`;
  else if(ch)meta=`<span class="m edit">Vanligvis ${fmt(it.amount)} · <span class="reset" role="button" data-id="${it.id}">tilbakestill</span></span>`;
  return`<div class="row"><button type="button" class="rname" data-id="${it.id}"><span class="n">${esc(it.name)}</span>${meta}</button><input class="amt${ch?' changed':''}" data-id="${it.id}" type="number" inputmode="numeric" min="0" step="50" value="${amountFor(it,mode)}" aria-label="Beløp for ${esc(it.name)}"></div>`;
 }
@@ -417,7 +453,7 @@ function updateTotals(){
  document.querySelectorAll('#list .group span[data-cat]').forEach(sp=>{const k=sp.dataset.cat;sp.textContent=fmt(data.expenses.filter(x=>(x.cat||'Egne utgifter og familieliv')===k).reduce((a,x)=>a+amountFor(x,mode),0));});
  renderLeftbar();}
 function renderLeftbar(){const lb=document.getElementById('leftbar');lb.classList.toggle('show',view==='budget');if(view!=='budget')return;
- const t=tot(mode);set('lb-lbl',mode==null?'Igjen hver måned':'Igjen i '+MONTHS[mode].toLowerCase());const el=document.getElementById('lb-val');el.textContent=fmt(t.left);el.className=t.left<0?'neg':t.left>0?'pos':'';}
+ const t=tot(mode);set('lb-lbl',mode==null?'Igjen hver måned':'Igjen i '+mLabel(mode).toLowerCase());const el=document.getElementById('lb-val');el.textContent=fmt(t.left);el.className=t.left<0?'neg':t.left>0?'pos':'';}
 function find(id){for(const t of['income','expenses','savings']){const it=data[t].find(x=>x.id===id);if(it)return it;}return null;}
 
 /* ---- Redigeringsark ---- */
@@ -427,13 +463,14 @@ function openSheet(type,id){
  const word=type==='income'?'inntekt':type==='expenses'?'utgift':'sparepost';
  set('sh-title',it?'Endre '+word:'Ny '+word);
  document.getElementById('sh-name').value=it?it.name:'';
- const when=it?(it.only!=null?String(it.only):''):(mode==null?'':String(mode));
+ const when=it?(it.only||''):(mode||'');
  document.getElementById('sh-amt').value=it?it.amount:'';
  const cw=document.getElementById('sh-cat-wrap');cw.style.display=type==='expenses'?'':'none';
  document.getElementById('sh-cat').innerHTML=CATS.map(([k,l])=>`<option value="${k}">${l}</option>`).join('');
  if(type==='expenses')document.getElementById('sh-cat').value=it?it.cat:(CATS[0][0]);
  const ws=document.getElementById('sh-when');
- ws.innerHTML='<option value="">Hver måned</option>'+MONTHS.map((n,i)=>`<option value="${i}">Bare i ${n.toLowerCase()}</option>`).join('');
+ const opts=PERIOD.slice();if(when&&!opts.includes(when))opts.unshift(when);
+ ws.innerHTML='<option value="">Hver måned</option>'+opts.map(k=>`<option value="${k}">Bare i ${mLabel(k).toLowerCase()}</option>`).join('');
  ws.value=when;
  const upd=()=>set('sh-amt-lbl',ws.value===''?'Beløp per måned (kr)':'Beløp (kr)');ws.onchange=upd;upd();
  document.getElementById('sh-more').style.display=it?'':'none';
@@ -446,7 +483,7 @@ document.getElementById('sheetbg').onclick=e=>{if(e.target.id==='sheetbg')closeS
 document.getElementById('sh-save').onclick=()=>{
  const name=document.getElementById('sh-name').value.trim();if(!name){document.getElementById('sh-name').focus();return;}
  const amount=Math.max(0,Math.round(+document.getElementById('sh-amt').value||0));
- const w=document.getElementById('sh-when').value;const only=w===''?null:+w;
+ const w=document.getElementById('sh-when').value;const only=w===''?null:w;
  let it=sh.id?find(sh.id):null;
  if(!it){it={id:uid(),name,amount};data[sh.type].push(it);}
  it.name=name;it.amount=amount;
@@ -465,48 +502,65 @@ document.getElementById('sh-up').onclick=()=>move(-1);
 document.getElementById('sh-down').onclick=()=>move(1);
 
 /* ============ ÅRET ============ */
-let oType='utgift';
+let oType='utgift',openM=null;
+function monthRow(t){const k=t.k,adj=monthAdjusted(k);
+ const base=Math.max(t.i,t.e+t.s,1),w=v=>(Math.max(0,v)/base*100).toFixed(1)+'%';
+ const lft=t.left===0?'Alt fordelt':t.left>0?fmt(t.left)+' til overs':fmt(-t.left)+' for lite';
+ const lines=(type,title)=>{const its=data[type].filter(it=>amountFor(it,k)>0);if(!its.length)return'';
+  return`<h4>${title}</h4>`+its.map(it=>`<div class="dline"><span>${esc(it.name)}${it.only===k?' <span class="chg">bare denne måneden</span>':hasOv(it,k)?' <span class="chg">justert</span>':''}</span><span>${fmt(amountFor(it,k))}</span></div>`).join('');};
+ return`<div class="mrow${openM===k?' open':''}" data-m="${k}">
+  <button type="button" class="mhead" aria-expanded="${openM===k}"><span class="mn">${mName(k)}${k===NOW?'<em>nå</em>':''}${adj?'<small>justert</small>':''}</span><span class="ml ${t.left<0?'neg':t.left>0?'pos':''}">${lft}</span><span class="chev">›</span>
+   <span class="mbar"><i style="width:${w(t.e)};background:var(--acc)"></i><i style="width:${w(t.s)};background:#c7aa79"></i><i style="width:${w(t.left)};background:var(--green)"></i></span>
+   <span class="mnums">Inn ${fmt(t.i)} · Ut ${fmt(t.e)} · Spart ${fmt(t.s)}</span></button>
+  <div class="mdetail">${lines('income','Inntekter')}${lines('expenses','Utgifter')}${lines('savings','Sparing')}
+   <button type="button" class="btn pri" style="width:100%;margin-top:12px" data-adjust="${k}">Juster ${mLabel(k).toLowerCase()}</button></div></div>`;}
 function renderYear(){
- const y=yearTot(),std=tot(null);
+ const y=yearTot(),pre=yearTot(BEFORE);
  set('y-inc',fmt(y.i));set('y-exp',fmt(y.e));set('y-sav',fmt(y.s));
  const yl=document.getElementById('y-left');yl.textContent=fmt(y.left);yl.className='v '+(y.left<0?'neg':y.left>0?'pos':'');
- const anyAdj=MONTHS.some((_,m)=>monthAdjusted(m));
- set('y-lead',anyAdj?'Året bygger på standardbudsjettet pluss justeringene du har gjort i enkeltmåneder.':'Alle måneder er like nå. Legg inn feriepenger, store regninger og andre engangsbeløp under – da ser du hvordan året faktisk blir.');
- document.getElementById('months').innerHTML=y.months.map((t,m)=>{const adj=monthAdjusted(m);
-  const cls=t.left<0?'neg':t.left>0?'pos':'';const sub=t.left===0?'alt fordelt':t.left>0?'til overs':'mangler';
-  return`<button type="button" class="mtile${adj?' adj':''}" data-m="${m}">${adj?'<span class="flag"></span>':''}<div class="mn">${MONTHS[m]}</div><div class="ml ${cls}">${t.left===0?'0 kr':fmtS(t.left)}</div><div class="ms">${sub} · spart ${fmt(t.s)}</div></button>`;}).join('');
- document.querySelectorAll('.mtile').forEach(b=>b.onclick=()=>{mode=+b.dataset.m;show('budget');});
- // Buffer: hvor lavt går kontoen hvis overskudd/underskudd tas med videre?
- let bal=0,min=0,minM=-1;y.months.forEach((t,m)=>{bal+=t.left;if(bal<min){min=bal;minM=m;}});
+ const anyAdj=PERIOD.some(k=>monthAdjusted(k));
+ set('y-lead',(BEFORE.length?'Tallene øverst gjelder hele 2027. Listen starter med resten av 2026, så du kan planlegge overgangen. ':'')+(anyAdj?'Alle måneder følger standardbudsjettet, pluss justeringene du har gjort.':'Alle månedene er like. Trykk på en måned for å se den, og «Juster» for å endre bare den måneden.'));
+ let html='';
+ if(BEFORE.length){html+=`<div class="ygroup">Resten av ${mYear(BEFORE[0])}<span>Spart ${fmt(pre.s)}</span></div>`+pre.months.map(monthRow).join('');
+  html+=`<div class="ygroup">2027<span>${DAYS_TO>0?'Starter om '+DAYS_TO+' dager':'I gang'}</span></div>`;}
+ html+=y.months.map(monthRow).join('');
+ document.getElementById('months').innerHTML=html;
+ document.querySelectorAll('.mrow .mhead').forEach(b=>b.onclick=()=>{const k=b.parentElement.dataset.m;openM=openM===k?null:k;
+  document.querySelectorAll('.mrow').forEach(r=>{const o=r.dataset.m===openM;r.classList.toggle('open',o);r.querySelector('.mhead').setAttribute('aria-expanded',o);});});
+ document.querySelectorAll('[data-adjust]').forEach(b=>b.onclick=()=>{mode=b.dataset.adjust;tab='expenses';show('budget');});
+ // Buffer: hvor lavt går kontoen gjennom hele perioden?
+ let bal=0,min=0,minK=null;PERIOD.forEach(k=>{bal+=tot(k).left;if(bal<min){min=bal;minK=k;}});
  const bf=document.getElementById('buffer');
- if(min<0){bf.style.display='';bf.innerHTML=`Kontoen går i minus i ${MONTHS[minM].toLowerCase()} hvis du ikke har buffer. Ha minst <b>${fmt(-min)}</b> på brukskontoen 1. januar, eller flytt overskudd fra gode måneder.`;}
- else if(anyAdj){bf.style.display='';bf.innerHTML=`Året går opp uten at du trenger ekstra buffer. ${y.left>0?'Du får '+fmt(y.left)+' til overs – bestem gjerne nå hva de skal brukes til.':''}`;}
+ if(min<0){bf.style.display='';bf.innerHTML=`Kontoen går i minus i ${mLabel(minK).toLowerCase()} hvis du ikke har buffer. Ha minst <b>${fmt(-min)}</b> ekstra på brukskontoen fra ${mLabel(PERIOD[0]).toLowerCase()}, eller flytt overskudd fra gode måneder.`;}
+ else if(anyAdj){bf.style.display='';bf.innerHTML=`Perioden går opp uten at du trenger ekstra buffer. ${bal>0?'Du får '+fmt(bal)+' til overs – bestem gjerne nå hva de skal brukes til.':''}`;}
  else bf.style.display='none';
  // Engangsbeløp
- document.getElementById('o-month').innerHTML=MONTHS.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
- const ones=[];['income','expenses'].forEach(t=>data[t].forEach(it=>{if(it.only!=null)ones.push({t,it});}));
- ones.sort((a,b)=>a.it.only-b.it.only);
- document.getElementById('o-list').innerHTML=ones.map(({t,it})=>`<div class="oneoff"><span><b>${MONTHS[it.only]}</b> · ${esc(it.name)}</span><span><span class="${t==='income'?'pos':'neg'}">${t==='income'?'+':'−'}${fmt(it.amount)}</span><button type="button" class="x" data-id="${it.id}" data-t="${t}" aria-label="Slett ${esc(it.name)}">×</button></span></div>`).join('');
+ const om=document.getElementById('o-month'),cur=om.value;
+ om.innerHTML=[...new Set(PERIOD.map(mYear))].map(yr=>`<optgroup label="${yr}">${PERIOD.filter(k=>mYear(k)===yr).map(k=>`<option value="${k}">${mName(k)}${k===NOW?' (nå)':''}</option>`).join('')}</optgroup>`).join('');
+ if(cur&&PERIOD.includes(cur))om.value=cur;
+ const ones=[];['income','expenses'].forEach(t=>data[t].forEach(it=>{if(it.only)ones.push({t,it});}));
+ ones.sort((a,b)=>a.it.only<b.it.only?-1:1);
+ document.getElementById('o-list').innerHTML=ones.map(({t,it})=>`<div class="oneoff"><span><b>${mLabel(it.only)}</b> · ${esc(it.name)}</span><span><span class="${t==='income'?'pos':'neg'}">${t==='income'?'+':'−'}${fmt(it.amount)}</span><button type="button" class="x" data-id="${it.id}" data-t="${t}" aria-label="Slett ${esc(it.name)}">×</button></span></div>`).join('');
  document.querySelectorAll('#o-list .x').forEach(b=>b.onclick=()=>{data[b.dataset.t]=data[b.dataset.t].filter(x=>x.id!==b.dataset.id);save('Fjernet');});
- // Spart gjennom året
+ // Spart gjennom 2027
  let acc=0;const pts=y.months.map(t=>acc+=t.s);const max=Math.max(1,acc);
  const xy=pts.map((v,i)=>[i/11*296+2,104-v/max*96]);
  const line=xy.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
  document.getElementById('spark').innerHTML=`<path d="${line} L298 106 L2 106 Z" fill="var(--acc2)"/><path d="${line}" fill="none" stroke="var(--acc)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>`;
- set('spark-txt',`${fmt(y.s)} satt av til sparing innen desember – ${fmt(pts[5])} allerede etter juni.`);
+ set('spark-txt',`${fmt(y.s)} satt av til sparing i 2027 – ${fmt(pts[5])} allerede etter juni.`);
 }
 document.querySelectorAll('#o-type button').forEach(b=>b.onclick=()=>{oType=b.dataset.t;document.querySelectorAll('#o-type button').forEach(x=>x.classList.toggle('on',x===b));});
 document.querySelectorAll('[data-sug]').forEach(b=>b.onclick=()=>{const[n,t,m]=b.dataset.sug.split('|');
- document.getElementById('o-name').value=n;document.getElementById('o-month').value=m;
+ document.getElementById('o-name').value=n;document.getElementById('o-month').value=nextKey(+m);
  oType=t;document.querySelectorAll('#o-type button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
  const a=document.getElementById('o-amt');a.value='';a.placeholder=n==='Feriepenger'?'Det du får ekstra':n==='Halv skatt'?'Ekstra utbetalt':'Beløp';a.focus();});
 document.getElementById('o-add').onclick=()=>{
- const name=document.getElementById('o-name').value.trim(),amt=Math.max(0,Math.round(+document.getElementById('o-amt').value||0)),m=+document.getElementById('o-month').value;
+ const name=document.getElementById('o-name').value.trim(),amt=Math.max(0,Math.round(+document.getElementById('o-amt').value||0)),m=document.getElementById('o-month').value;
  if(!name){document.getElementById('o-name').focus();return;}if(!amt){document.getElementById('o-amt').focus();return;}
  if(oType==='inntekt')data.income.push({id:uid(),name,amount:amt,only:m});
  else data.expenses.push({id:uid(),name,amount:amt,cat:'Egne utgifter og familieliv',only:m});
  document.getElementById('o-name').value='';document.getElementById('o-amt').value='';
- save(name+' lagt til i '+MONTHS[m].toLowerCase());
+ save(name+' lagt til i '+mLabel(m).toLowerCase());
 };
 
 /* ============ MER ============ */
@@ -538,16 +592,16 @@ try{sel.value=localStorage.getItem('personalBudget2027ssb')||'alle';}catch(e){}
 sel.onchange=()=>{try{localStorage.setItem('personalBudget2027ssb',sel.value)}catch(e){}renderSSB();};
 function renderSSB(){
  const g=SSB_INCOME.find(x=>x[0]===sel.value)||SSB_INCOME[0],y=yearTot(),P=SSB_SPEND[g[3]];
- const pct=g[2]?Math.round(y.i/g[2]*100):0;
  const mine={};let unmatched=0;
- data.expenses.forEach(it=>{const c=ssbCat(it.name);const v=[...Array(12).keys()].reduce((a,m)=>a+amountFor(it,m),0);if(c)mine[c]=(mine[c]||0)+v;else unmatched+=v;});
+ data.expenses.forEach(it=>{const c=ssbCat(it.name);const v=YEAR_KEYS.reduce((a,k)=>a+amountFor(it,k),0);if(c)mine[c]=(mine[c]||0)+v;else unmatched+=v;});
  const rows=Object.keys(SSB_CAT_NAMES).filter(c=>mine[c]).map(c=>{const d=mine[c]/12,s=P.v[c]/12,diff=d-s;
-  return`<tr><td>${SSB_CAT_NAMES[c]}</td><td class="num">${fmt(d)}</td><td class="num">${fmt(s)}</td><td class="num ${diff>0?'neg':'pos'}">${diff>0?'+':''}${Math.round(diff/s*100)} %</td></tr>`;}).join('');
+  return`<tr><td>${SSB_CAT_NAMES[c]}</td><td class="num ${diff>0?'neg':'pos'}">${Math.abs(Math.round(diff))<50?'På snittet':fmt(Math.abs(diff))+(diff>0?' over':' under')+' snittet'}</td></tr>`;}).join('');
+ const idiff=y.i-g[2];
  document.getElementById('ssb-out').innerHTML=`
-  <p style="margin:6px 0 0">Husholdninger som deres hadde en median inntekt etter skatt på <b>${fmt(g[2])}</b> i året (${fmt(g[2]/12)} i måneden). Budsjettet ditt har <b>${fmt(y.i)}</b> – det er <b>${pct} %</b> av medianen.</p>
-  <p class="muted" style="margin:6px 0 12px">Beløpene i budsjettet regnes som utbetalt etter skatt.</p>
-  <table><thead><tr><th>Per måned</th><th class="num">Deg</th><th class="num">SSB-snitt</th><th class="num">Avvik</th></tr></thead><tbody>${rows||'<tr><td colspan="4" class="muted">Ingen utgifter kunne knyttes til SSB-kategorier.</td></tr>'}</tbody></table>
+  <p style="margin:6px 0 12px">Inntekten din: <b class="${idiff<0?'neg':'pos'}">${fmt(Math.abs(idiff/12))} ${idiff<0?'under':'over'} medianen</b> i måneden.</p>
+  <table><thead><tr><th>Utgifter per måned</th><th class="num">Sammenlignet med andre</th></tr></thead><tbody>${rows||'<tr><td colspan="2" class="muted">Ingen utgifter kunne knyttes til SSB-kategorier.</td></tr>'}</tbody></table>
   ${unmatched?`<p class="muted" style="margin:8px 0 0">${fmt(unmatched/12)} i måneden (f.eks. studielån) er ikke forbruk i SSBs forstand og er holdt utenfor.</p>`:''}
+  <div class="modeinfo" style="margin:12px 0 0">${TODAY>=new Date(2027,0,15)?'<b>SSB har publisert nye tall for inntektsåret 2025.</b> Tallene her er fra 2024 og bør oppdateres.':'Tallene er SSBs nyeste: inntekt fra 2024 (publisert januar 2026). Tall for 2025 kommer 15. januar 2027.'}</div>
   <div class="src">SSB-snittet gjelder ${P.n}${g[3]==='alle'&&g[0]!=='alle'?' – SSB har ikke tilsvarende kategoritall for barnefamilier':''}. Snittet er per husholdning i 2022-kroner, og bolig for selveiere er beregnet husleie, ikke lån. Bruk tallene som pekepinn, ikke fasit.<br>
   Kilder: <a href="https://www.ssb.no/inntekt-og-forbruk/inntekt-og-formue/statistikk/inntekts-og-formuesstatistikk-for-husholdninger" target="_blank" rel="noopener">SSB, Inntekt og formue for husholdninger 2024</a> (tabell 06946/14484) · <a href="https://www.ssb.no/inntekt-og-forbruk/forbruk/statistikk/forbruksundersokelsen" target="_blank" rel="noopener">SSB, Forbruksundersøkelsen 2022</a> (tabell 14100).</div>`;
 }
@@ -558,13 +612,14 @@ document.getElementById('m-share').onclick=async()=>{const t=summary();try{if(na
 document.getElementById('m-export').onclick=()=>{download('budsjett-2027-sikkerhetskopi.json',JSON.stringify({version:5,year:2027,data},null,2),'application/json');toast('Sikkerhetskopi lastet ned');};
 document.getElementById('m-import').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=normalize(JSON.parse(r.result));if(!d)throw 0;data=d;save('Budsjettet er hentet inn');}catch(err){alert('Filen ser ikke ut som en sikkerhetskopi av budsjettet.');}};r.readAsText(f);e.target.value='';};
 document.getElementById('m-csv').onclick=()=>{
- const head=['Type','Kategori','Post',...MONTHS,'Sum år'];const rows=[head];
- [['Inntekt','income'],['Utgift','expenses'],['Sparing','savings']].forEach(([lbl,t])=>data[t].forEach(it=>{const ms=MONTHS.map((_,m)=>amountFor(it,m));rows.push([lbl,it.cat||'',it.name,...ms,ms.reduce((a,b)=>a+b,0)]);}));
+ const head=['Type','Kategori','Post',...PERIOD.map(mLabel),'Sum'];const rows=[head];
+ [['Inntekt','income'],['Utgift','expenses'],['Sparing','savings']].forEach(([lbl,t])=>data[t].forEach(it=>{const ms=PERIOD.map(k=>amountFor(it,k));rows.push([lbl,it.cat||'',it.name,...ms,ms.reduce((a,b)=>a+b,0)]);}));
  download('budsjett-2027.csv','\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n'),'text/csv;charset=utf-8');};
 document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alle beløp og justeringer på denne enheten?'))return;data=normalize(DEFAULTS);mode=null;save('Startet på nytt');};
 
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+set('yearpill',DAYS_TO>0?'2027 om '+DAYS_TO+' dager':'2027');
 function renderAll(){
  renderHome();if(view==='budget')renderBudget();if(view==='year')renderYear();if(view==='more')renderSSB();
  renderLeftbar();
