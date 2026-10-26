@@ -1129,8 +1129,8 @@ function suggestChips(m){return SAVE_SUGGEST.map(o=>{const ex=findSaving(o[0]);
 function bindSuggest(root,m,afterOpen){
  root.querySelectorAll('[data-sg]').forEach(b=>b.onclick=()=>{const o=SAVE_SUGGEST.find(x=>x[0]===b.dataset.sg);mode=m;tab='savings';
   openSheet('savings',null,{name:o[0],icon:o[1],kind:o[2],goal:{on:true,type:o[2]==='transfer'?'debt':'save',amount:'',before:'',motivate:true}});});
- root.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{const it=find(b.dataset.back);if(!it)return;const amt=data.base[it.id]!=null?data.base[it.id]:(it.amount||0);if(m===BASE)data.base[it.id]=amt;else{data.plan[m]=data.plan[m]||{};data.plan[m][it.id]=amt;}
-  save(it.name+' er lagt tilbake i '+mLabel(m).toLowerCase());});
+ root.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{const it=find(b.dataset.back);if(!it)return;const amt=data.base[it.id]!=null?data.base[it.id]:(it.amount||0);if(m===BASE)data.base[it.id]=amt;else{data.plan[m]=data.plan[m]||{};data.plan[m][it.id]=amt;Object.keys(data.plan).filter(k=>k>m&&data.plan[k][it.id]==null).forEach(k=>{data.plan[k][it.id]=amt;});}
+  save(it.name+' er lagt til fra '+mLabel(m).toLowerCase()+' og utover');});
  root.querySelectorAll('[data-setgoal]').forEach(b=>b.onclick=()=>{mode=m;tab='savings';openSheet('savings',b.dataset.setgoal);
   const on=document.getElementById('g-on');on.checked=true;paintGoal();});}
 /* ---- Slette en måned (én bekreftelse) ---- */
@@ -1228,10 +1228,13 @@ function renderBudget(){queueClamp();
  list.querySelectorAll('.amt').forEach(inp=>{
   inp.addEventListener('focus',()=>inp.select());
   inp.addEventListener('change',()=>{const it=find(inp.dataset.id);if(!it)return;const v=Math.max(0,Math.round(+inp.value||0));
-   if(it.only)it.amount=v;else if(mode===BASE){data.base[it.id]=v;it.amount=v;}else{data.plan[mode]=data.plan[mode]||{};data.plan[mode][it.id]=v;it.amount=v;}
+   const old=amountFor(it,mode);let carried=0;
+   if(it.only)it.amount=v;else if(mode===BASE){data.base[it.id]=v;it.amount=v;}else{data.plan[mode]=data.plan[mode]||{};data.plan[mode][it.id]=v;it.amount=v;
+    /* Sparing: det nye beløpet følger med i senere måneder som hadde samme beløp som før */
+    if(tab==='savings'){Object.keys(data.plan).filter(k=>k>mode&&data.plan[k][it.id]===old).forEach(k=>{data.plan[k][it.id]=v;carried++;});if(data.base[it.id]===old||data.base[it.id]==null)data.base[it.id]=v;}}
    persist();inp.value=amountFor(it,mode);if(tab==='savings')bumpQuote();
    const row=inp.closest('.row');if(row){const tmp=document.createElement('div');tmp.innerHTML=rowHTML(it);row.querySelector('.rname').innerHTML=tmp.querySelector('.rname').innerHTML;}
-   updateTotals();toast('Lagret');});
+ updateTotals();toast(carried?'Lagret – også i '+carried+' senere måned'+(carried>1?'er':''):'Lagret');});
  });
  list.querySelectorAll('.rname').forEach(b=>b.onclick=()=>openSheet(tab,b.dataset.id));
  document.getElementById('add').onclick=()=>openSheet(tab,null);
@@ -1414,7 +1417,7 @@ function openSheet(type,id,pre){
  document.getElementById('sh-later').checked=mode!==BASE;document.getElementById('sh-base').checked=true;
  const upd=()=>{set('sh-amt-lbl',ws.value===''?'Beløp i '+mLabel(mode).toLowerCase()+' (kr)':'Beløp (kr)');
   const later=Object.keys(data.plan).filter(x=>mode===BASE?x>=NOW:x>mode);const lw=document.getElementById('sh-later-wrap');
-  lw.style.display=!it&&ws.value===''&&later.length?'flex':'none';set('sh-later-lbl',`Legg også til i ${later.length===1?mLabel(later[0]).toLowerCase():'de '+later.length+(mode===BASE?' planlagte månedene fra og med nå':' senere planlagte månedene')}`);
+  lw.style.display=(!it||!it.only)&&ws.value===''&&later.length?'flex':'none';set('sh-later-lbl',`${it?'Bruk endringen også i':'Legg også til i'} ${later.length===1?mLabel(later[0]).toLowerCase():'de '+later.length+(mode===BASE?' planlagte månedene fra og med nå':' senere planlagte månedene')}`);
   ws.closest('.field').style.display=(it&&!it.only)||mode===BASE?'none':'';
   document.getElementById('sh-base-wrap').style.display=!it&&ws.value===''&&mode!==BASE?'flex':'none';
   const once=type==='savings'&&ws.value!=='';document.getElementById('sh-target-wrap').style.display=once?'':'none';document.getElementById('sh-keep-wrap').style.display=once?'flex':'none';
@@ -1452,7 +1455,7 @@ document.getElementById('sh-save').onclick=()=>{
  else{delete it.only;
   if(mode===BASE)data.base[it.id]=amount;else{data.plan[mode]=data.plan[mode]||{};data.plan[mode][it.id]=amount;}
   if(!sh.id&&mode!==BASE&&document.getElementById('sh-base').checked)data.base[it.id]=amount;
-  if(!sh.id&&document.getElementById('sh-later').checked)Object.keys(data.plan).filter(k=>mode===BASE?k>=NOW:k>mode).forEach(k=>{data.plan[k][it.id]=amount;});}
+  if(document.getElementById('sh-later').checked){Object.keys(data.plan).filter(k=>mode===BASE?k>=NOW:k>mode).forEach(k=>{data.plan[k][it.id]=amount;});if(sh.id&&mode!==BASE)data.base[it.id]=amount;}}
  if(sh.type==='savings')bumpQuote();
  rebuildPeriod();closeSheet();save(only?'Engangsbeløp lagt inn i '+mLabel(only).toLowerCase():sh.id?'Endret':'Lagt til i '+mLabel(mode).toLowerCase());
 };
@@ -1616,7 +1619,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alt og start
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='27.10.2026 · legg tilbake';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
+const APP_VERSION='27.10.2026 · følger med';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
