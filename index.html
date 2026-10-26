@@ -1607,7 +1607,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alt og start
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='26.10.2026 · utforsk 4';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
+const APP_VERSION='26.10.2026 · utforsk 5';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
@@ -1685,9 +1685,10 @@ function bindApply(b){b.onclick=()=>{const it=find(b.dataset.xapply);if(!it)retu
   data.base[it.id]=v;it.amount=v;persist();renderExplore();toast(it.name+': '+fmt(v)+' i basisbudsjettet');};}
 function paintXCA(){const ca=document.getElementById('x-ca'),cards=[...document.querySelectorAll('#x-list [data-xt]')];if(cards.length<2){ca.innerHTML='';return;}
  const anyOpen=cards.some(c=>xOpen[c.dataset.xt]);ca.innerHTML=`<button type="button" class="linkbtn">${anyOpen?'Lukk alle':'Åpne alle'}</button>`;
- ca.firstChild.onclick=()=>{cards.forEach(c=>{const id=c.dataset.xt;if(anyOpen)delete xOpen[id];else xOpen[id]=1;c.setAttribute('aria-expanded',String(!anyOpen));c.nextElementSibling.hidden=anyOpen;});saveXOpen();paintXCA();};}
+ ca.firstChild.onclick=()=>{cards.forEach(c=>{const id=c.dataset.xt;if(anyOpen)delete xOpen[id];else xOpen[id]=1;c.setAttribute('aria-expanded',String(!anyOpen));c.closest('.xcard').querySelector('.xbody').hidden=anyOpen;});saveXOpen();paintXCA();};}
 function bindExplore(){const box=document.getElementById('x-list');
- box.querySelectorAll('[data-xt]').forEach(h=>h.onclick=()=>{const id=h.dataset.xt,o=!xOpen[id];if(o)xOpen[id]=1;else delete xOpen[id];saveXOpen();h.setAttribute('aria-expanded',String(o));h.nextElementSibling.hidden=!o;paintXCA();});
+ box.querySelectorAll('.xcard .xsum').forEach(sm=>{sm.style.cursor='pointer';sm.onclick=()=>sm.closest('.xcard').querySelector('[data-xt]').click();});
+ box.querySelectorAll('[data-xt]').forEach(h=>h.onclick=()=>{const id=h.dataset.xt,o=!xOpen[id];if(o)xOpen[id]=1;else delete xOpen[id];saveXOpen();h.setAttribute('aria-expanded',String(o));h.closest('.xcard').querySelector('.xbody').hidden=!o;paintXCA();});
  paintXCA();
  const upd=id=>{xRefresh(id);};
  box.querySelectorAll('[data-xm]').forEach(el=>el.oninput=()=>{xState[el.dataset.xm].m=+el.value;upd(el.dataset.xm);});
