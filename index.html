@@ -128,7 +128,20 @@ details.rates summary{cursor:pointer;color:var(--acc);font-weight:600;font-size:
 .togrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .togrow b{font-size:15px}
 .togrow small{display:block;font-size:12px;color:var(--muted);font-weight:400}
-.subline{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin:-4px 0 8px;padding:0 0 8px calc(1.5em + 6px);border-bottom:1px solid var(--line)}
+.subline{display:block;font-size:13px;color:var(--muted);margin:-6px 0 8px;padding:0 0 6px calc(1.5em + 6px);border-bottom:1px solid var(--line)}
+.acchead{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;border:0;background:none;padding:4px 0;font-size:13px;color:var(--muted);text-align:left}
+.acchead b{color:var(--ink)}
+.accch{display:inline-flex;color:var(--acc);transition:transform .2s;flex:0 0 auto}
+.acchead[aria-expanded="true"] .accch{transform:rotate(180deg)}
+.accbody{background:var(--acc2);border-radius:12px;padding:8px 12px;margin:4px 0 4px}
+.accbody[hidden]{display:none}
+.accl{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:3px 0;font-size:13px}
+.accl b{color:var(--ink);font-variant-numeric:tabular-nums}
+.accl.tot{border-top:1px solid var(--line);margin-top:3px;padding-top:6px}.accl.tot span,.accl.tot b{font-weight:750;color:var(--ink)}
+.accl.gain b{color:var(--green)}
+.acccar{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line)}
+.accgoal{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);font-size:13px;color:var(--ink);line-height:1.4}
+.accbtns{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
 .subline b{color:var(--ink)}
 .subline .ex{color:var(--acc)}
 .subline .linkbtn{font-size:13px;white-space:nowrap}
@@ -182,6 +195,51 @@ details.rates summary{cursor:pointer;color:var(--acc);font-weight:600;font-size:
 .group.closed .gchev{transform:rotate(-90deg)}
 .group.closed{margin-bottom:2px}
 .gbody[hidden]{display:none}
+.onb{position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.onb[hidden]{display:none}
+.onbin{max-width:520px;margin:0 auto;min-height:100%;box-sizing:border-box;padding:calc(18px + env(safe-area-inset-top)) 22px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:16px}
+.onbtop{display:grid;grid-template-columns:44px 1fr 44px;align-items:center}
+.onbtop span{text-align:center;font-size:13px;font-weight:600;color:var(--muted)}
+.onbback{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--paper);color:var(--acc);font-size:24px;line-height:1;padding:0 0 3px}
+.onbbar{height:6px;border-radius:9px;background:var(--acc2);overflow:hidden}.onbbar i{display:block;height:100%;background:var(--acc)}
+.onb h1{margin:0;font-size:28px;line-height:1.15;letter-spacing:-.02em}
+.onb .sub{margin:0;color:var(--muted);font-size:15px}
+.onb .field{margin:0}
+.onbfeat{display:flex;gap:14px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.onbfeat b{display:block;font-size:15px}.onbfeat span{font-size:14px;color:var(--muted)}
+.onbfeat svg{flex:0 0 24px}
+.onbcard{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.onbopt{display:flex;flex-direction:column;gap:2px;text-align:left;width:100%;border:1px solid var(--line);background:var(--fieldbg);border-radius:14px;padding:12px 14px;font-size:15px}
+.onbopt span{font-size:13px;color:var(--muted)}
+.onbopt.on{border:2px solid var(--acc);padding:11px 13px}
+.onbnote{background:var(--acc2);border-radius:14px;padding:11px 13px;font-size:13px;line-height:1.45}
+.onbgo{margin-top:auto;display:flex;flex-direction:column;gap:6px;padding-top:8px}
+.onbgo .btn{width:100%;padding:15px;font-size:17px;border-radius:14px}
+.onbskip{border:0;background:none;color:var(--acc);font-weight:600;font-size:15px;padding:10px}
+.onbgrp{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:8px 14px}
+.onbgrp h3{display:flex;justify-content:space-between;align-items:baseline;margin:4px 0 4px;font-size:15px}
+.onbgrp h3 small{font-weight:500;font-size:12px;color:var(--muted)}
+.onbchk{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:15px}
+.onbchk input{width:22px;height:22px;flex:0 0 22px;accent-color:var(--acc)}
+.onbchk span{flex:1}.onbchk small{font-size:12px;color:var(--muted)}
+.tipcard{background:var(--ink);color:var(--paper);border-radius:14px;padding:12px 14px;margin:0 0 10px;font-size:14px;line-height:1.4}
+.tipcard[hidden]{display:none}
+.tipcard .row2{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.tipcard small{opacity:.8}
+.tipcard button{border:0;background:var(--paper);color:var(--ink);border-radius:9px;padding:8px 14px;font-weight:700;font-size:13px}
+.xtotal .big{font-size:34px;font-weight:780;letter-spacing:-.03em;margin:2px 0}
+.xrow{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:3px 0}
+.xrow b{font-variant-numeric:tabular-nums}
+.xslider{display:flex;flex-direction:column;gap:2px;margin:10px 0 0}
+.xslider label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.xslider label b{color:var(--ink)}
+.xslider input[type=range]{width:100%;accent-color:var(--acc);height:28px}
+.xcard h3{display:flex;align-items:center;gap:6px}
+.xres{background:var(--acc2);border-radius:14px;padding:12px 14px;margin-top:12px}
+.xres .big{font-size:26px;font-weight:780;letter-spacing:-.02em}
+.xchart{width:100%;height:120px;display:block;margin-top:10px}
+.xboost{font-size:13px;color:var(--green);margin-top:6px}
+.xapply{margin-top:10px;width:100%}
 .clamp{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
 .clamp.open{display:block!important;-webkit-line-clamp:unset;line-clamp:unset;overflow:visible}
 .morebtn{display:inline-flex;align-items:center;gap:4px;border:0;background:none;color:var(--acc);font-weight:700;font-size:13px;padding:4px 0 2px;margin:0 0 4px;cursor:pointer}
@@ -298,7 +356,7 @@ th{font-size:12px;color:var(--muted);font-weight:600}
 .leftbar{display:none;max-width:640px;margin:0 auto;padding:10px 20px 0;justify-content:space-between;align-items:baseline;font-size:15px}
 .leftbar.show{display:flex}
 .leftbar strong{font-size:19px;letter-spacing:-.02em}
-nav{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px}
+nav{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:8px}
 nav button{border:0;background:transparent;border-radius:13px;padding:7px 2px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
 nav button svg{width:22px;height:22px}
 nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
@@ -329,6 +387,7 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
 
 <!-- OVERSIKT -->
 <section class="view active" id="v-home">
+  <div class="tipcard" id="tipcard" hidden></div>
   <div class="backupcard" id="backupcard" hidden></div>
   <label class="field" style="display:none"><span>Vis måned</span><select id="home-m"></select></label>
   <div class="newmonth" id="newmonth" style="display:none"></div>
@@ -394,6 +453,16 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
   <div class="collapseall" id="collapseall"></div>
   <div class="card" id="list"></div>
   <div class="cmpbar mini" id="cmpbar"><div class="t"><b>Sammenlign med andre (SSB)</b><div class="profsum" id="cmp-sub"></div></div><label class="switch"><input type="checkbox" id="cmp-on" aria-label="Sammenlign med andre"><span></span></label></div>
+</section>
+
+<!-- UTFORSK -->
+<section class="view" id="v-explore">
+  <h2>Utforsk</h2>
+  <p class="lead">Hva sparingen kan bli. Regnet fra det som står på kontoene etter måneden du har valgt, med det du sparer hver måned og forventet avkastning.</p>
+  <div class="card xtotal" id="x-total"></div>
+  <div id="x-goals"></div>
+  <div id="x-list"></div>
+  <p class="src">Avkastningen er et anslag, ikke en garanti. Fond kan også gå ned. Skatt og kostnader er ikke trukket fra. Endringer her påvirker ikke budsjettet før du trykker «Bruk i budsjettet».</p>
 </section>
 
 <!-- ÅRET -->
@@ -479,6 +548,7 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
   <nav>
     <button type="button" class="on" data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Oversikt</button>
     <button type="button" data-view="budget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Budsjett</button>
+    <button type="button" data-view="explore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V5M4 19h16M7 15l4-4 3 3 6-7"/></svg>Utforsk</button>
     <button type="button" data-view="year"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Året</button>
     <button type="button" data-view="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></svg>Mer</button>
   </nav>
@@ -497,8 +567,10 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
   <div class="goalbox" id="sh-goal-wrap">
     <div class="togrow"><div><b>Sett et mål</b><small>Vis fremgang, prosent og når du er i mål</small></div><label class="switch"><input type="checkbox" id="g-on" aria-label="Sett et mål"><span></span></label></div>
     <div id="g-fields">
-      <div class="field"><span>Type mål</span><div class="seg3" id="g-type"><button type="button" data-v="save">Spare opp til</button><button type="button" data-v="debt">Betale ned gjeld</button></div></div>
-      <label class="field"><span id="g-amt-lbl">Målbeløp (kr)</span><input id="g-amt" type="number" inputmode="numeric" min="0"></label>
+      <div class="field"><span>Type mål</span><div class="seg3" id="g-type"><button type="button" data-v="amount">Spare til et beløp</button><button type="button" data-v="years">Spare i antall år</button><button type="button" data-v="debt">Betale ned gjeld</button></div></div>
+      <label class="field" id="g-amt-wrap"><span id="g-amt-lbl">Målbeløp (kr)</span><input id="g-amt" type="number" inputmode="numeric" min="0"></label>
+      <label class="field" id="g-by-wrap"><span>Innen (valgfritt)</span><input id="g-by" type="month"></label>
+      <label class="field" id="g-years-wrap"><span>Hvor mange år vil du spare?</span><input id="g-years" type="number" inputmode="numeric" min="1" max="60" placeholder="F.eks. 15"></label>
       <label class="field" id="g-before-wrap"><span>Allerede betalt tilbake før nå (kr)</span><input id="g-before" type="number" inputmode="numeric" min="0" placeholder="0"></label>
       <div class="togrow" style="margin-top:6px"><div><b>Motiverende meldinger</b><small>Små oppmuntringer underveis</small></div><label class="switch"><input type="checkbox" id="g-mot" aria-label="Motiverende meldinger"><span></span></label></div>
     </div>
@@ -561,6 +633,7 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
   <h3 id="mp-title" style="font-size:18px;margin:0 0 6px">Velg måned</h3>
   <div id="mp-list"></div>
 </div></div>
+<div class="onb" id="onb" hidden><div class="onbin" id="onbin"></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -589,9 +662,9 @@ const toKey=v=>(v==null||v==='')?null:(/^\d{4}-\d{2}$/.test(String(v))?String(v)
 const CATS=[['Faste utgifter','Faste utgifter'],['Løpende utgifter','Løpende utgifter'],['Egne utgifter og familieliv','Egen bruk og familie']];
 const KEY='personalBudget2027v5',OLD_KEYS=['personalBudget2027v4','personalBudget2027v3'];
 const DEFAULTS={
- income:[['Lønn',55000],['Barnestøtte NAV',3300]],
- expenses:[['Boliglån',16000,'Faste utgifter'],['Strøm · årssnitt',4000,'Faste utgifter'],['Forsikringer – hus/innbo',800,'Faste utgifter'],['Bilforsikring',2000,'Faste utgifter'],['Studielån',3500,'Faste utgifter'],['Vann/kommunale avgifter',2000,'Faste utgifter'],['Barnehage',850,'Faste utgifter'],['Strømmetjenester',600,'Faste utgifter'],['Mat og husholdning',5000,'Løpende utgifter'],['Bil – service/vedlikehold',550,'Løpende utgifter'],['Parkering/bom/bilvask',1500,'Løpende utgifter'],['Tannlege',250,'Løpende utgifter'],['Klær til barna',1500,'Egne utgifter og familieliv'],['Klær',3000,'Egne utgifter og familieliv'],['Trening',450,'Egne utgifter og familieliv'],['Restaurant/kino',2000,'Egne utgifter og familieliv']],
- savings:[['Elias',1500],['Benjamin',1500],['Langtid / fond',6000],['Buffer',4400],['Mamma',1500]]
+ income:[['Lønn',0]],
+ expenses:[['Boliglån / husleie',0,'Faste utgifter'],['Strøm',0,'Faste utgifter'],['Forsikringer',0,'Faste utgifter'],['Mobil og internett',0,'Faste utgifter'],['Mat og husholdning',0,'Løpende utgifter'],['Helse og tannlege',0,'Løpende utgifter'],['Klær og sko',0,'Egne utgifter og familieliv'],['Trening og fritid',0,'Egne utgifter og familieliv'],['Diverse',0,'Egne utgifter og familieliv']],
+ savings:[['Buffer',0],['Sparemål',0]]
 };
 
 /* SSB-tall – Inntekts- og formuesstatistikk for husholdninger 2024 (publ. 16.01.2026) og Forbruksundersøkelsen 2022 */
@@ -659,7 +732,7 @@ function normalize(raw){
   if(type==='savings'&&x.target)o.target=String(x.target);
   if(x.keep===false)o.keep=false;
   const rk=toKey(x.removed);if(rk)o.removed=rk;
-  if(type==='savings'&&x.goal&&typeof x.goal==='object')o.goal={on:!!x.goal.on,type:x.goal.type==='debt'?'debt':'save',amount:Math.max(0,Math.round(+x.goal.amount||0)),before:Math.max(0,Math.round(+x.goal.before||0)),motivate:x.goal.motivate!==false};
+  if(type==='savings'&&x.goal&&typeof x.goal==='object')o.goal={on:!!x.goal.on,type:x.goal.type==='debt'?'debt':'save',mode:x.goal.mode==='years'?'years':'amount',amount:Math.max(0,Math.round(+x.goal.amount||0)),by:toKey(x.goal.by)||'',years:Math.max(0,Math.min(60,Math.round(+x.goal.years||0))),from:toKey(x.goal.from)||'',before:Math.max(0,Math.round(+x.goal.before||0)),motivate:x.goal.motivate!==false};
   return o;});
  const ov={};if(d.ov&&typeof d.ov==='object')Object.entries(d.ov).forEach(([k,v])=>{const nk=toKey(k);if(nk&&v&&typeof v==='object')ov[nk]=Object.assign(ov[nk]||{},v);});
  const rates=Object.assign({fond:6.5,bank:3},d.rates||{});
@@ -684,6 +757,7 @@ function load(){
  for(const k of OLD_KEYS){try{const s=localStorage.getItem(k);if(s){const d=normalize(JSON.parse(s));if(d)return d;}}catch(e){}}
  return normalize(DEFAULTS);
 }
+const FRESH_USER=(()=>{try{return !localStorage.getItem(KEY)&&!OLD_KEYS.some(k=>localStorage.getItem(k))&&!localStorage.getItem('personalBudget2027onboarded');}catch(e){return false;}})();
 let data=load();
 /* Det opprinnelige budsjettet ligger fortsatt lagret fra den første versjonen av appen */
 function originalData(){for(const k of OLD_KEYS){try{const raw=localStorage.getItem(k);if(raw){const d=JSON.parse(raw),dd=d&&d.data?d.data:d;if(dd&&Array.isArray(dd.income)&&Array.isArray(dd.expenses))return dd;}}catch(e){}}return null;}
@@ -848,10 +922,39 @@ function goalStatus(it,extra=0,at=homeM||NOW){const g=it.goal,last=PERIOD[PERIOD
  let have,rate=0;
  if(g.type==='debt'){have=g.before+PERIOD.filter(k=>k<=at&&isPlanned(k)).reduce((a,k)=>a+contribAt(it,k),0);}
  else{const row=savingsModel(true).rows.find(r=>r.it===it);have=row?(row.monthEnd[at]!=null?row.monthEnd[at]:(it.balance||0)):(it.balance||0);rate=kindOf(it)==='transfer'?0:monthRate(kindOf(it));}
- const target=g.amount,pct=target?Math.min(100,have/target*100):0;
+ let target=g.amount,pct=target?Math.min(100,have/target*100):0;
+ if(g.type!=='debt'&&g.mode==='years'){const from=g.from||NOW,end=addMonths(from,g.years*12),total=g.years*12,left=Math.max(0,monthsBetween(at,end));
+  return{have,target:0,pct:Math.min(100,(total-left)/total*100),left:0,eta:end,months:left,monthly:futureAmt(addMonths(at,1))-extra,at,years:true};}
  let eta=null,months=0,bal=have,k=at;
  if(have>=target)eta=at;else{for(let n=1;n<=600;n++){k=addMonths(at,n);bal=bal*(1+rate)+futureAmt(k);if(bal>=target){eta=k;months=n;break;}}}
  return{have,target,pct,left:Math.max(0,target-have),eta,months,monthly:futureAmt(addMonths(at,1))-extra,at};}
+/* Er målet aktivt? (beløpsmål trenger beløp, årsmål trenger antall år) */
+const goalOn=it=>!!(it&&!it.only&&it.goal&&it.goal.on&&(it.goal.type!=='debt'&&it.goal.mode==='years'?it.goal.years>0:it.goal.amount>0));
+/* Fremtidsverdi: startbeløp + fast beløp hver måned i n måneder, med månedlig avkastning */
+function fvCalc(start,monthly,ratePct,months){const r=Math.pow(1+(+ratePct||0)/100,1/12)-1;let bal=start,paid=start;const pts=[];
+ for(let n=1;n<=months;n++){bal=bal*(1+r)+monthly;paid+=monthly;if(n%12===0||n===months)pts.push({n,bal,paid});}
+ return{total:bal,paid,ret:bal-paid,pts};}
+const rateOf=it=>{const kd=kindOf(it);return kd==='transfer'?0:+data.rates[kd]||0;};
+const monthlyOf=it=>{const b=data.base[it.id];return b!=null?b:effAmount(it,effMonth(NOW)||NOW);};
+const ymLabel=k=>(mName(k)+' '+mYear(k)).toLowerCase();
+/* Detaljer for mål med dato eller antall år */
+function goalPlan(it,st){const g=it.goal;if(g.type==='debt')return null;const r=Math.pow(1+rateOf(it)/100,1/12)-1;
+ if(g.mode==='years'){const from=g.from||NOW,end=addMonths(from,g.years*12),left=Math.max(0,PERIOD.length&&end>st.at?monthsBetween(st.at,end):0);
+  const f=fvCalc(st.have,monthlyOf(it),rateOf(it),left),total=g.years*12,pct=Math.min(100,(total-left)/total*100);
+  return{kind:'years',end,left,fv:f.total,pct};}
+ if(g.by){const left=Math.max(0,monthsBetween(st.at,g.by));if(!left)return{kind:'by',left:0,need:Math.max(0,g.amount-st.have)};
+  /* Med det som er planlagt – også ekstra innskudd – fram til fristen */
+  let bal=st.have;for(let n=1;n<=left;n++){const k=addMonths(st.at,n);bal=bal*(1+r)+(PERIOD.includes(k)?contribAt(it,k):monthlyOf(it));}
+  const grow=Math.pow(1+r,left),short=Math.max(0,g.amount-bal),extra=short?(r?short*r/(grow-1):short/left):0;
+  return{kind:'by',left,proj:bal,short,extra:Math.ceil(extra/50)*50};}
+ return null;}
+const monthsBetween=(a,b)=>(mYear(b)-mYear(a))*12+(+b.slice(5))-(+a.slice(5));
+function goalLine(it,st){const p=goalPlan(it,st),g=it.goal;
+ if(p&&p.kind==='years')return`Om ${monthsText(p.left)} (${ymLabel(p.end)}): forventet ca. <b>${fmt(p.fv)}</b> med ${fmt(monthlyOf(it))} i måneden og ${String(rateOf(it)).replace('.',',')} % avkastning.`;
+ if(p&&p.kind==='by'){if(!p.left)return st.have>=g.amount?'Målet er nådd 🎉':`Fristen er nådd – ${fmt(p.need)} gjenstår.`;
+  return p.short?`Med det du har planlagt har du ca. <b>${fmt(p.proj)}</b> i ${ymLabel(g.by)}. Det mangler ${fmt(p.short)} – spar <b>${fmt(p.extra)} mer i måneden</b> for å nå ${fmt(g.amount)}.`
+   :`Med det du har planlagt har du ca. <b>${fmt(p.proj)}</b> i ${ymLabel(g.by)} – målet på ${fmt(g.amount)} nås ✔`;}
+ return null;}
 const QUOTES={
  ferie:[['Første steg mot sol og saltvann er tatt ☀️','Hver krone her er et lite stykke ferie.'],['Snart har du råd til flybilletter tur-retur ✈️','Kan du kjenne lukta av sjø? 🌊'],['Over halvveis – solkremen kan snart kjøpes 🧴','Du er nærmere stranda enn kontoret nå.'],['Nesten der! Begynn å pakke kofferten i tankene 🧳','Bare litt igjen før ferien er betalt.'],['Ferien er betalt – nyt hvert minutt! 🏖️']],
  gjeld:[['Godt i gang – hver innbetaling teller.','Hver krone her er en krone mindre å tenke på.'],['Du har allerede tatt en god bit av det 💪','Det går fremover, måned for måned.'],['Over halvveis! Det kjennes, gjør det ikke?','Mer betalt enn det som gjenstår nå.'],['Snart gjeldfri – tenk hvordan det kommer til å kjennes 🌿','Innspurten! Bare litt igjen.'],['Ferdig nedbetalt 🎉 Godt jobbet!']],
@@ -865,17 +968,24 @@ function quoteFor(it,st){const n=it.name.toLowerCase();
  return list[(+NOW.slice(5))%list.length];}
 const pctTxt=p=>p>=100?'100 %':p>=10?Math.floor(p)+' %':p>0?(p<0.1?'<0,1':p.toFixed(1).replace('.',','))+' %':'0 %';
 function ringSVG(p){const r=30,c=2*Math.PI*r;return`<svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="${r}" fill="none" stroke="var(--acc2)" stroke-width="8"/><circle cx="36" cy="36" r="${r}" fill="none" stroke="${p>=100?'var(--green)':'var(--acc)'}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(c*Math.min(p,100)/100).toFixed(1)} ${c.toFixed(1)}"/></svg>`;}
-function renderGoals(){queueClamp();const gs=data.savings.filter(x=>!x.only&&x.goal&&x.goal.on&&x.goal.amount>0);
+function renderGoals(){queueClamp();const gs=data.savings.filter(x=>!x.only&&goalOn(x));
  const card=document.getElementById('goals-card');card.style.display='';
- const wm=workMonth(),noGoal=data.savings.filter(x=>!x.only&&!(x.goal&&x.goal.on&&x.goal.amount>0)&&inMonth(x,wm));
+ const wm=workMonth(),noGoal=data.savings.filter(x=>!x.only&&!(goalOn(x))&&inMonth(x,wm));
  const tail=`<div style="margin-top:${gs.length?'12':'4'}px">${gs.length?'':'<p class="muted" style="margin:0 0 4px">Sett et mål for en sparepost – se hvor langt du har kommet, prosent og når du er i mål.</p>'}
   <div class="suggest">${suggestChips(wm)}${noGoal.map(x=>`<button type="button" data-setgoal="${x.id}">🎯 Mål for ${esc(x.name)}</button>`).join('')}</div></div>`;
  document.getElementById('goals').innerHTML=gs.map(it=>{const st=goalStatus(it),debt=it.goal.type==='debt',done=st.pct>=100;
-  const boost=!done&&st.eta?goalStatus(it,500,st.at):null,saved=boost&&boost.eta?st.months-boost.months:0;
+  if(st.years){const p=goalPlan(it,st);
+   return`<div class="goal"><div class="ring">${ringSVG(st.pct)}<span>${pctTxt(st.pct)}</span></div>
+   <div><h4>${ic(it,'savings')}${esc(it.name)}</h4>
+    <div class="gl">Spare i ${it.goal.years} år · <b>${fmt(st.have)}</b> på konto ved utgangen av ${mName(st.at).toLowerCase()}</div>
+    <div class="gl">${goalLine(it,st)}</div></div>
+   <div class="boost" style="color:var(--muted)">Ringen viser hvor mye av spareperioden som har gått.</div></div>`;}
+  const gl2=!debt&&!done?goalLine(it,st):null,boost=!done&&st.eta&&!gl2?goalStatus(it,500,st.at):null,saved=boost&&boost.eta?st.months-boost.months:0;
   return`<div class="goal"><div class="ring">${ringSVG(st.pct)}<span>${pctTxt(st.pct)}</span></div>
    <div><h4>${ic(it,'savings')}${esc(it.name)}</h4>
+    ${gl2?`<div class="gl" style="margin-bottom:2px">${gl2}</div>`:''}
     <div class="gl"><b>${fmt(st.have)}</b> av ${fmt(st.target)} ${debt?'betalt':'spart'} t.o.m. ${mName(st.at).toLowerCase()} · <b>${fmt(st.left)}</b> ${debt?'gjenstår':'igjen'}</div>
-    <div class="gl">${done?(debt?'Ferdig nedbetalt 🎉':'Målet er nådd 🎉'):st.eta?`Med ${fmt(st.monthly)} i måneden er du ${debt?'ferdig':'i mål'} ca. <b>${mLabel(st.eta).toLowerCase().replace(/^(\D+)$/,'$1 '+mYear(st.eta))}</b> (${monthsText(st.months)}).`:'Legg inn et månedlig beløp for å se når du er i mål.'}</div></div>
+    <div class="gl">${gl2?'':done?(debt?'Ferdig nedbetalt 🎉':'Målet er nådd 🎉'):st.eta?`Med ${fmt(st.monthly)} i måneden er du ${debt?'ferdig':'i mål'} ca. <b>${mLabel(st.eta).toLowerCase().replace(/^(\D+)$/,'$1 '+mYear(st.eta))}</b> (${monthsText(st.months)}).`:'Legg inn et månedlig beløp for å se når du er i mål.'}</div></div>
    ${saved>0?`<div class="boost">Med 500 kr mer i måneden blir du ${debt?'ferdig':'i mål'} ${monthsText(saved)} tidligere.</div>`:''}
    ${it.goal.motivate?`<div class="quote">${esc(quoteFor(it,st))}</div>`:''}
    <div class="togrow" style="grid-column:1/3;margin-top:-4px"><small style="font-size:13px;color:var(--muted)">Motiverende meldinger</small><label class="switch" style="transform:scale(.8);transform-origin:right"><input type="checkbox" data-mot="${it.id}" ${it.goal.motivate?'checked':''} aria-label="Motiverende meldinger for ${esc(it.name)}"><span></span></label></div></div>`;}).join('');
@@ -923,19 +1033,44 @@ function renderHome(){
 
 /* ============ BUDSJETT ============ */
 /* Samlet for en konto i valgt måned: fast + ekstra, og hele potten ved utgangen av måneden */
+/* Standardnavn fra tidligere versjoner – disse har ikke fått et eget navn */
+const genericName=n=>/^(engangsinnskudd|ekstra innskudd|ekstra)$/i.test(String(n||'').trim());
+const depLabel=o=>genericName(o.name)?'Ekstra innskudd':esc(o.name);
+/* Kontoer under Sparing kan lukkes og åpnes – valget huskes */
+let openAcc={};try{openAcc=JSON.parse(localStorage.getItem('personalBudget2027openAcc')||'{}')||{};}catch(e){}
+const saveOpenAcc=()=>{try{localStorage.setItem('personalBudget2027openAcc',JSON.stringify(openAcc))}catch(e){}};
+const ACC_CH='<svg viewBox="0 0 12 12" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5l3.5 3.5 3.5-3.5"/></svg>';
 function subline(it){const ones=data.savings.filter(o=>o.only===mode&&o.target===it.id),fast=it.only?0:amountFor(it,mode),ex=ones.reduce((a,o)=>a+o.amount,0);
- const row=savingsModel(true).rows.find(r=>r.it===it),pot=row?row.monthEnd[mode]:null,tr=kindOf(it)==='transfer';
- const exTxt=ones.map(o=>`<button type="button" class="linkbtn ex" data-ooedit="${o.id}">+ ekstra ${fmt(o.amount)}</button>`).join(' ');
- const mm=row&&row.month[mode],d1='1. '+mName(mode).toLowerCase().slice(0,3)+'.';
- let txt;
+ const row=savingsModel(true).rows.find(r=>r.it===it),mm=row&&row.month[mode],tr=kindOf(it)==='transfer',open=!!openAcc[it.id],mn=mName(mode).toLowerCase();
+ const exLines=ones.map(o=>`<div class="accl"><span>+ ${depLabel(o)}${genericName(o.name)?` · <button type="button" class="linkbtn ex" data-ooedit="${o.id}">Gi navn</button>`:` <button type="button" class="linkbtn ex" data-ooedit="${o.id}" aria-label="Endre ${esc(o.name)}">Endre</button>`}</span><b>${fmt(o.amount)}</b></div>`).join('');
+ const st=goalOn(it)?goalStatus(it,0,mode):null,gl=st?(goalLine(it,st)||(st.eta&&st.pct<100?`Med ${fmt(st.monthly)} i måneden er du ${it.goal.type==='debt'?'ferdig':'i mål'} ca. ${ymLabel(st.eta)}.`:'')):'';
+ let head,body;
  if(tr){const sent=PERIOD.filter(k=>k<=mode&&isPlanned(k)).reduce((a,k)=>a+amountFor(it,k)+data.savings.filter(o=>o.only===k&&o.target===it.id).reduce((x,o)=>x+o.amount,0),0);
   const g=it.goal&&it.goal.on&&it.goal.type==='debt'&&it.goal.amount?it.goal:null,paid=sent+(g?g.before:0);
-  txt=(ex?`${fmt(fast)} fast ${exTxt} = <b>${fmt(fast+ex)}</b> denne måneden<br>`:'')+(g?`Betalt t.o.m. ${mName(mode).toLowerCase()}: <b>${fmt(paid)}</b> · gjenstår <b>${fmt(Math.max(0,g.amount-paid))}</b>`:`Overført t.o.m. ${mName(mode).toLowerCase()}: <b>${fmt(sent)}</b>`);}
- else txt=`Inngående <b>${fmt(mm?mm.start:(it.balance||0))}</b><br>+ ${ex?`${fmt(fast)} fast ${exTxt}`:`${fmt(fast)} inn`}${mm&&mm.ret?` + ${fmt(mm.ret)} avkastning`:''}${mm&&mm.out?` − ${fmt(mm.out)} tatt ut`:''}<br>= Totalt på kontoen <b>${fmt(pot||0)}</b>`;
- return`<span>${txt}</span>${it.only?'':`<button type="button" class="linkbtn" data-extra="${it.id}">+ Ekstra</button>`}`;}
-function refreshSublines(){const list=document.getElementById('list');document.querySelectorAll('#list [data-sub]').forEach(el=>{const it=find(el.dataset.sub);if(it)el.innerHTML=subline(it);});bindSublines(list);
+  head=g?`Betalt <b>${fmt(paid)}</b> · gjenstår <b>${fmt(Math.max(0,g.amount-paid))}</b>`:`Overført t.o.m. ${mn}: <b>${fmt(sent)}</b>`;
+  body=`<div class="accl"><span>Fast i ${mn}</span><b>${fmt(fast)}</b></div>${exLines}<div class="accl tot"><span>= Denne måneden</span><b>${fmt(fast+ex)}</b></div>`
+   +(g?`<div class="accl"><span>Betalt totalt t.o.m. ${mn}</span><b>${fmt(paid)}</b></div>`:'');}
+ else{const carried=row?(row.ones||[]).filter(d=>d.only<mode&&(depositActive(d,mode)||removeKey(d)===mode)):[];
+  const exHead=ones.length===1?` · + ${depLabel(ones[0])} ${fmt(ex)}`:ones.length>1?` · + ${ones.length} ekstra innskudd ${fmt(ex)}`:'';
+  head=`På konto <b>${fmt(mm?mm.end:(it.balance||0))}</b>${exHead}${st?` · 🎯 ${pctTxt(st.pct)}`:''}`;
+  body=`<div class="accl"><span>Inngående</span><b>${fmt(mm?mm.start:(it.balance||0))}</b></div>
+   <div class="accl"><span>+ Fast i ${mn}</span><b>${fmt(fast)}</b></div>${exLines}
+   ${mm&&mm.ret?`<div class="accl gain"><span>+ Avkastning</span><b>${fmt(mm.ret)}</b></div>`:''}
+   ${mm&&mm.out?`<div class="accl"><span>− Tatt ut</span><b>${fmt(mm.out)}</b></div>`:''}
+   <div class="accl tot"><span>= På konto etter ${mn}</span><b>${fmt(mm?mm.end:(it.balance||0))}</b></div>
+   ${carried.length?`<div class="acccar"><span class="muted">Inneholder ekstra innskudd:</span>${carried.map(d=>depositActive(d,mode)
+     ?`<div class="accl"><span>${depLabel(d)} · ${ymLabel(d.only)}${genericName(d.name)?` · <button type="button" class="linkbtn ex" data-ooedit="${d.id}">Gi navn</button>`:''}</span><span><b>${fmt(d.amount)}</b> <button type="button" class="linkbtn" data-rm="${d.id}">Ta ut</button></span></div>`
+     :`<div class="accl"><span>${depLabel(d)} · tatt ut i ${mn}</span>${d.removed===mode?`<button type="button" class="linkbtn" data-undo="${d.id}">Angre</button>`:''}</div>`).join('')}</div>`:''}`;}
+ if(gl)body+=`<div class="accgoal">🎯 ${gl}</div>`;
+ body+=`<div class="accbtns">${it.only?'':`<button type="button" class="linkbtn" data-extra="${it.id}">+ Ekstra innskudd</button>`}<button type="button" class="linkbtn" data-goal="${it.id}">${goalOn(it)?'Endre mål':'🎯 Sett mål'}</button></div>`;
+ return`<button type="button" class="acchead" data-acc="${it.id}" aria-expanded="${open}"><span>${head}</span><span class="accch">${ACC_CH}</span></button><div class="accbody"${open?'':' hidden'}>${body}</div>`;}
+function refreshSublines(){const list=document.getElementById('list');document.querySelectorAll('#list [data-sub]').forEach(el=>{const it=find(el.dataset.sub);if(it)el.innerHTML=subline(it);});bindSublines(list);bindBalance(list);
 }
-function bindSublines(root){root.querySelectorAll('[data-extra]').forEach(b=>b.onclick=()=>openSheet('savings',null,{name:'Ekstra innskudd',icon:'➕',only:mode,target:b.dataset.extra}));
+function bindSublines(root){
+ root.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>{const id=b.dataset.acc,o=!openAcc[id];if(o)openAcc[id]=1;else delete openAcc[id];saveOpenAcc();
+  b.setAttribute('aria-expanded',String(o));const bd=b.nextElementSibling;if(bd)bd.hidden=!o;if(typeof paintCA==='function')paintCA();});
+ root.querySelectorAll('[data-goal]').forEach(b=>b.onclick=()=>{openSheet('savings',b.dataset.goal);const on=document.getElementById('g-on');on.checked=true;paintGoal();});
+ root.querySelectorAll('[data-extra]').forEach(b=>b.onclick=()=>openSheet('savings',null,{name:'',icon:'➕',only:mode,target:b.dataset.extra}));
  root.querySelectorAll('[data-ooedit]').forEach(b=>b.onclick=()=>openSheet('savings',b.dataset.ooedit));}
 function bindBalance(root){root.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{const d=find(b.dataset.rm);if(!d)return;
   if(!confirm(`Fjerne ${fmt(d.amount)} (fra ${mLabel(d.only).toLowerCase()}) fra kontoen fra og med ${mLabel(mode).toLowerCase()}? Bruk dette når pengene er tatt ut eller brukt.`))return;d.removed=mode;d.keep=true;save('Fjernet fra '+mName(mode).toLowerCase());});
@@ -1064,11 +1199,15 @@ function renderBudget(){queueClamp();
  const toggleG=h=>{const gk=h.dataset.gk,b=list.querySelector(`[data-gb="${CSS.escape(gk)}"]`);const c=!h.classList.contains('closed');
   h.classList.toggle('closed',c);h.setAttribute('aria-expanded',String(!c));if(b)b.hidden=c;if(c)closedGroups[gk]=1;else delete closedGroups[gk];saveClosed();paintCollapseAll();};
  list.querySelectorAll('.group[data-gk]').forEach(h=>{h.onclick=e=>{if(e.target.closest('button,input'))return;toggleG(h);};h.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleG(h);}};});
- const paintCollapseAll=()=>{const hs=[...list.querySelectorAll('.group[data-gk]')],ca=document.getElementById('collapseall');
+ const paintCollapseAll=()=>{const ca=document.getElementById('collapseall');
+  if(tab==='savings'){const as=[...list.querySelectorAll('[data-acc]')];if(!as.length){ca.innerHTML='';return;}const anyOpen=as.some(a=>openAcc[a.dataset.acc]);
+   ca.innerHTML=`<button type="button" class="linkbtn">${anyOpen?'Lukk alle kontoer':'Åpne alle kontoer'}</button>`;
+   ca.firstChild.onclick=()=>{as.forEach(a=>{const id=a.dataset.acc;if(anyOpen)delete openAcc[id];else openAcc[id]=1;a.setAttribute('aria-expanded',String(!anyOpen));const bd=a.nextElementSibling;if(bd)bd.hidden=anyOpen;});saveOpenAcc();paintCollapseAll();};return;}
+  const hs=[...list.querySelectorAll('.group[data-gk]')];
   if(hs.length<2){ca.innerHTML='';return;}const anyOpen=hs.some(h=>!h.classList.contains('closed'));
   ca.innerHTML=`<button type="button" class="linkbtn">${anyOpen?'Lukk alle':'Åpne alle'}</button>`;
   ca.firstChild.onclick=()=>{hs.forEach(h=>{const gk=h.dataset.gk,b=list.querySelector(`[data-gb="${CSS.escape(gk)}"]`);h.classList.toggle('closed',anyOpen);h.setAttribute('aria-expanded',String(!anyOpen));if(b)b.hidden=anyOpen;if(anyOpen)closedGroups[gk]=1;else delete closedGroups[gk];});saveClosed();paintCollapseAll();};};
- paintCollapseAll();
+ paintCollapseAll();window.paintCA=paintCollapseAll;
 }
 /* ---- Sammenligning (SSB) ---- */
 let cmpOn=true;try{cmpOn=localStorage.getItem('personalBudget2027compare')!=='0';}catch(e){}
@@ -1154,8 +1293,8 @@ const gOpen=gk=>`<div class="gbody" data-gb="${esc(gk)}"${closedGroups[gk]?' hid
 function rowHTML(it){
  let meta='';
  const tg=targetOf(it);
- if(tab==='savings'&&!it.only&&it.goal&&it.goal.on&&it.goal.amount>0){const st=goalStatus(it,0,mode);
-  return`<div class="row"><button type="button" class="rname" data-id="${it.id}"><span class="n">${ic(it)}${esc(it.name)}</span><span class="m">${pctTxt(st.pct)} ${it.goal.type==='debt'?'av gjelden er betalt':'av målet'}</span><span class="minibar"><i style="width:${st.pct.toFixed(1)}%"></i></span></button><input class="amt" data-id="${it.id}" type="number" inputmode="numeric" min="0" step="50" value="${amountFor(it,mode)}" aria-label="Beløp for ${esc(it.name)}"></div>`;}
+ if(tab==='savings'&&goalOn(it)){const st=goalStatus(it,0,mode);
+  return`<div class="row"><button type="button" class="rname" data-id="${it.id}"><span class="n">${ic(it)}${esc(it.name)}</span><span class="m">${st.years?`Spare i ${it.goal.years} år · ${pctTxt(st.pct)} av tiden`:`${pctTxt(st.pct)} ${it.goal.type==='debt'?'av gjelden er betalt':'av målet'}`}</span><span class="minibar"><i style="width:${st.pct.toFixed(1)}%"></i></span></button><input class="amt" data-id="${it.id}" type="number" inputmode="numeric" min="0" step="50" value="${amountFor(it,mode)}" aria-label="Beløp for ${esc(it.name)}"></div>`;}
  if(it.only&&tab==='savings')meta=`<span class="m edit">Engangsinnskudd${tg?' til '+esc(tg.name):''} – ${it.keep===false?'bare denne måneden':'blir liggende og vises videre'}</span>`;
  else if(it.only&&tg)meta=`<span class="m edit">Engangsinnskudd til ${esc(tg.name)}</span>`;
  else if(it.only)meta=`<span class="m edit">Engangsbeløp – bare i ${mLabel(it.only).toLowerCase()}</span>`;
@@ -1195,17 +1334,18 @@ function bindOneOff(root){root.querySelectorAll('[data-oo]').forEach(b=>b.onclic
   openSheet('income',null,{name:o[0]==='Annet engangsbeløp'?'':o[0],icon:o[1],only:mode});});
  root.querySelectorAll('[data-ooid]').forEach(r=>r.onclick=()=>openSheet('income',r.dataset.ooid));}
 let gState={type:'save'};
-function paintGoal(){const on=document.getElementById('g-on').checked,debt=gState.type==='debt';
+function paintGoal(){const on=document.getElementById('g-on').checked,debt=gState.type==='debt',yrs=!debt&&gState.mode==='years',sel=debt?'debt':yrs?'years':'amount';
  document.getElementById('g-fields').style.display=on?'':'none';
- document.querySelectorAll('#g-type button').forEach(b=>b.classList.toggle('on',b.dataset.v===gState.type));
- set('g-amt-lbl',debt?'Gjeld totalt (kr)':'Målbeløp (kr)');document.getElementById('g-before-wrap').style.display=debt?'':'none';}
+ document.querySelectorAll('#g-type button').forEach(b=>b.classList.toggle('on',b.dataset.v===sel));
+ set('g-amt-lbl',debt?'Gjeld totalt (kr)':'Målbeløp (kr)');document.getElementById('g-before-wrap').style.display=debt?'':'none';
+ document.getElementById('g-amt-wrap').style.display=yrs?'none':'';document.getElementById('g-by-wrap').style.display=debt||yrs?'none':'';document.getElementById('g-years-wrap').style.display=yrs?'':'none';}
 document.getElementById('g-on').onchange=paintGoal;
-document.querySelectorAll('#g-type button').forEach(b=>b.onclick=()=>{gState.type=b.dataset.v;paintGoal();});
+document.querySelectorAll('#g-type button').forEach(b=>b.onclick=()=>{const v=b.dataset.v;gState.type=v==='debt'?'debt':'save';gState.mode=v==='years'?'years':'amount';paintGoal();});
 function openSheet(type,id,pre){
  sh={type,id};const it=id?find(id):null;
  const word=type==='income'?'inntekt':type==='expenses'?'utgift':'sparepost';
  set('sh-title',it?(it.only?'Endre engangsbeløp':'Endre '+word):pre?'Nytt engangsbeløp':'Ny '+word);
- document.getElementById('sh-name').value=it?it.name:(pre&&pre.name)||'';
+ document.getElementById('sh-name').value=it?(it.only&&type==='savings'&&genericName(it.name)?'':it.name):(pre&&pre.name)||'';
  shIcon=it?iconOf(it,type):(pre&&pre.icon)||'';renderIcons();
  const onceKey=(it&&it.only)||mode;
  const when=it?(it.only||''):pre?pre.only:'';
@@ -1216,8 +1356,8 @@ function openSheet(type,id,pre){
  document.getElementById('sh-bal-wrap').style.display=type==='savings'?'':'none';
  document.getElementById('sh-bal').value=it&&it.balance?it.balance:'';
  const g=(it&&it.goal)||(pre&&pre.goal)||{on:false,type:(it?kindOf(it):'bank')==='transfer'?'debt':'save',amount:'',before:'',motivate:true};
- gState={type:g.type};document.getElementById('g-on').checked=!!g.on;document.getElementById('g-mot').checked=g.motivate!==false;
- document.getElementById('g-amt').value=g.amount||'';document.getElementById('g-before').value=g.before||'';paintGoal();
+ gState={type:g.type,mode:g.mode||'amount',from:g.from||''};document.getElementById('g-on').checked=!!g.on;document.getElementById('g-mot').checked=g.motivate!==false;
+ document.getElementById('g-amt').value=g.amount||'';document.getElementById('g-before').value=g.before||'';document.getElementById('g-by').value=g.by||'';document.getElementById('g-years').value=g.years||'';paintGoal();
  document.getElementById('sh-cat').innerHTML=CATS.map(([k,l])=>`<option value="${k}">${l}</option>`).join('');
  if(type==='expenses')document.getElementById('sh-cat').value=it?it.cat:(CATS[0][0]);
  const ws=document.getElementById('sh-when');
@@ -1237,6 +1377,7 @@ function openSheet(type,id,pre){
   document.getElementById('sh-goal-wrap').style.display=type==='savings'&&!once?'':'none';
   const linkedT=once&&tgs.value!=='';document.getElementById('sh-kind-wrap').style.display=type==='savings'&&!linkedT?'':'none';document.getElementById('sh-bal-wrap').style.display=type==='savings'&&!once?'':'none';};
  ws.onchange=upd;tgs.onchange=upd;upd();
+ {const nl=document.getElementById('sh-name').previousElementSibling,ns=document.getElementById('sh-name'),once=type==='savings'&&ws.value!=='';nl.textContent=once?'Hva var det?':'Navn';ns.placeholder=once?'F.eks. Skattepenger, gave, feriepenger':'';}
  document.getElementById('sh-more').style.display=it?'':'none';
  set('sh-del',it&&!it.only?'Fjern fra '+mLabel(mode).toLowerCase():'Slett');
  document.getElementById('sheetbg').classList.add('open');
@@ -1245,9 +1386,10 @@ function openSheet(type,id,pre){
 function closeSheet(){document.getElementById('sheetbg').classList.remove('open');}
 document.getElementById('sh-cancel').onclick=closeSheet;
 document.getElementById('sheetbg').onclick=e=>{if(e.target.id==='sheetbg')closeSheet();};
+const isOnceSav=()=>sh.type==='savings'&&document.getElementById('sh-when').value!=='';
 const usedAnywhere=id=>Object.values(data.plan).some(p=>p[id]!=null)||data.base[id]!=null;
 document.getElementById('sh-save').onclick=()=>{
- const name=document.getElementById('sh-name').value.trim();if(!name||!splitIcon(name).name){document.getElementById('sh-name').focus();return;}
+ let name=document.getElementById('sh-name').value.trim();if(!name&&isOnceSav())name='Ekstra innskudd';if(!name||!splitIcon(name).name){document.getElementById('sh-name').focus();return;}
  const amount=Math.max(0,Math.round(+document.getElementById('sh-amt').value||0));
  const w=document.getElementById('sh-when').value;const only=w===''?null:w;
  let it=sh.id?find(sh.id):null;
@@ -1260,7 +1402,8 @@ document.getElementById('sh-save').onclick=()=>{
   if(only){const tg=document.getElementById('sh-target').value;if(tg)it.target=tg;else delete it.target;delete it.balance;it.keep=document.getElementById('sh-keep').checked;}
   else{delete it.target;it.balance=Math.max(0,Math.round(+document.getElementById('sh-bal').value||0));
    const gon=document.getElementById('g-on').checked;
-   if(gon||it.goal)it.goal={on:gon,type:gState.type,amount:Math.max(0,Math.round(+document.getElementById('g-amt').value||0)),before:Math.max(0,Math.round(+document.getElementById('g-before').value||0)),motivate:document.getElementById('g-mot').checked};}}
+   if(gon||it.goal){const yrsV=Math.max(0,Math.min(60,Math.round(+document.getElementById('g-years').value||0))),old=it.goal||{};
+    it.goal={on:gon,type:gState.type,mode:gState.type==='debt'?'amount':gState.mode,amount:Math.max(0,Math.round(+document.getElementById('g-amt').value||0)),by:toKey(document.getElementById('g-by').value)||'',years:yrsV,from:(old.mode==='years'&&old.years===yrsV&&old.from)?old.from:NOW,before:Math.max(0,Math.round(+document.getElementById('g-before').value||0)),motivate:document.getElementById('g-mot').checked};}}}
  if(only){it.only=only;}
  else{delete it.only;
   if(mode===BASE)data.base[it.id]=amount;else{data.plan[mode]=data.plan[mode]||{};data.plan[mode][it.id]=amount;}
@@ -1416,17 +1559,19 @@ function summary(){const t=tot(effMonth(NOW)||NOW),y=yearTot();return`Budsjett 2
 function download(name,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
 document.getElementById('m-share').onclick=async()=>{const t=summary();try{if(navigator.share)await navigator.share({title:'Budsjett 2027',text:t});else{await navigator.clipboard.writeText(t);toast('Kopiert');}}catch(e){if(e.name!=='AbortError')download('budsjett-2027.txt',t,'text/plain');}};
 document.getElementById('m-export').onclick=()=>{const d=new Date();download('budsjett-sikkerhetskopi-'+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'.json',JSON.stringify({version:5,year:2027,data},null,2),'application/json');try{localStorage.setItem('personalBudget2027backup',String(Date.now()))}catch(e){}toast('Sikkerhetskopi lastet ned');renderBackupCard();};
-document.getElementById('m-import').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=normalize(JSON.parse(r.result));if(!d)throw 0;data=d;rebuildPeriod();setMonth(startMonth());save('Budsjettet er hentet inn');}catch(err){alert('Filen ser ikke ut som en sikkerhetskopi av budsjettet.');}};r.readAsText(f);e.target.value='';};
+document.getElementById('m-import').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=normalize(JSON.parse(r.result));if(!d)throw 0;data=d;rebuildPeriod();setMonth(startMonth());try{localStorage.setItem('personalBudget2027onboarded','1')}catch(e){}document.getElementById('onb').hidden=true;view='home';show('home');save('Budsjettet er hentet inn');}catch(err){alert('Filen ser ikke ut som en sikkerhetskopi av budsjettet.');}};r.readAsText(f);e.target.value='';};
 document.getElementById('m-csv').onclick=()=>{
  const head=['Type','Kategori','Post',...PERIOD.map(mLabel),'Sum'];const rows=[head];
  [['Inntekt','income'],['Utgift','expenses'],['Sparing','savings']].forEach(([lbl,t])=>data[t].forEach(it=>{const ms=PERIOD.map(k=>amountFor(it,k));rows.push([lbl,it.cat||'',it.name,...ms,ms.reduce((a,b)=>a+b,0)]);}));
  download('budsjett-2027.csv','\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n'),'text/csv;charset=utf-8');};
-document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alle beløp og justeringer på denne enheten?'))return;data=normalize(DEFAULTS);rebuildPeriod();mode=NOW;save('Startet på nytt');};
+document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alt og starte på nytt? Ta gjerne en sikkerhetskopi først.'))return;
+ try{[KEY,...OLD_KEYS,'personalBudget2027profile','personalBudget2027dashboard','personalBudget2027closed'].forEach(k=>localStorage.removeItem(k));}catch(e){}
+ data=normalize(DEFAULTS);rebuildPeriod();setMonth(NOW);persist();applyPrefs();openOnboarding();};
 
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='25.10.2026 · app 3';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
+const APP_VERSION='26.10.2026 · navn på ekstra 2';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
@@ -1451,6 +1596,195 @@ function applyClamp(){
 let clampQueued=false;
 function queueClamp(){if(clampQueued)return;clampQueued=true;requestAnimationFrame(()=>{clampQueued=false;applyClamp();});}
 window.addEventListener('resize',queueClamp);
+/* ============ UTFORSK ============ */
+let xState={},xYears=null;
+const xFrom=()=>homeM&&homeM!==BASE&&PERIOD.includes(homeM)?homeM:NOW;
+function xRows(){const R=savingsModel(true),k=xFrom();return R.rows.filter(rw=>rw.it&&!rw.it.only&&kindOf(rw.it)!=='transfer').map(rw=>{
+ const now=rw.monthEnd[k]!=null?rw.monthEnd[k]:(rw.it.balance||0);return{it:rw.it,rw,now};});}
+function xDefaults(o){const it=o.it,g=it.goal;if(!xState[it.id])xState[it.id]={m:monthlyOf(it),y:goalOn(it)&&g.mode==='years'?g.years:(xYears||15),r:rateOf(it)};return xState[it.id];}
+function xChart(pts){if(!pts.length)return'';const W=300,H=110,max=Math.max(1,...pts.map(p=>p.bal)),n=pts.length,X=i=>n===1?W:(i/(n-1))*W,Y=v=>H-4-v/max*(H-12);
+ const line=(f)=>pts.map((p,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(f(p)).toFixed(1)).join(' ');
+ return`<svg class="xchart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${line(p=>p.bal)} L${W} ${H} L0 ${H} Z" fill="var(--acc2)"/><path d="${line(p=>p.paid)} L${W} ${H} L0 ${H} Z" fill="#c7aa79" opacity=".55"/><path d="${line(p=>p.bal)}" fill="none" stroke="var(--acc)" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg>`;}
+function xCardHTML(o){const st=xDefaults(o),it=o.it,f=fvCalc(o.now,st.m,st.r,st.y*12),fb=fvCalc(o.now,st.m+500,st.r,st.y*12),endK=addMonths(xFrom(),st.y*12),changed=st.m!==monthlyOf(it);
+ return`<div class="card xcard" data-x="${it.id}"><h3>${ic(it,'savings')}${esc(it.name)} <span class="muted" style="font-weight:500">· ${KIND_NAMES[kindOf(it)]}</span></h3>
+  <div class="xrow"><span class="muted">På konto etter ${ymLabel(xFrom())}</span><b>${fmt(o.now)}</b></div>
+  <div class="xslider"><label for="xm-${it.id}">Per måned <b>${fmt(st.m)}</b></label><input type="range" id="xm-${it.id}" data-xm="${it.id}" min="0" max="${Math.max(20000,st.m)}" step="100" value="${st.m}"></div>
+  <div class="xslider"><label for="xy-${it.id}">Antall år <b>${st.y} år</b></label><input type="range" id="xy-${it.id}" data-xy="${it.id}" min="1" max="40" step="1" value="${st.y}"></div>
+  <div class="xslider"><label for="xr-${it.id}">Avkastning per år <b>${String(st.r).replace('.',',')} %</b></label><input type="range" id="xr-${it.id}" data-xr="${it.id}" min="0" max="12" step="0.5" value="${st.r}"></div>
+  <div class="xres"><div class="muted" style="font-size:13px">Om ${st.y} år (${ymLabel(endK)})</div><div class="big">ca. ${fmt(f.total)}</div>
+   <div class="xrow"><span>Satt inn</span><b>${fmt(f.paid)}</b></div><div class="xrow"><span>Avkastning</span><b class="pos">${fmt(f.ret)}</b></div>
+   ${xChart(f.pts)}<div class="legend" style="margin-top:4px"><span><b style="background:#c7aa79"></b>Satt inn</span><span><b style="background:var(--acc)"></b>Med avkastning</span></div>
+   <div class="xboost">Sparer du 500 kr mer i måneden: ca. ${fmt(fb.total)} (+${fmt(fb.total-f.total)})</div></div>
+  ${changed?`<button type="button" class="btn pri xapply" data-xapply="${it.id}">Bruk ${fmt(st.m)} i måneden i basisbudsjettet</button>`:''}</div>`;}
+function xTotals(){const rows=xRows(),tot=rows.reduce((a,o)=>{const st=xDefaults(o),f=fvCalc(o.now,st.m,st.r,xYears*12);a.t+=f.total;a.p+=f.paid;a.n+=o.now;return a;},{t:0,p:0,n:0});
+ document.getElementById('x-totnums').innerHTML=`<div class="muted">All sparing om ${xYears} år (${ymLabel(addMonths(xFrom(),xYears*12))})</div><div class="big">ca. ${fmt(tot.t)}</div>
+  <div class="xrow"><span>På kontoene etter ${ymLabel(xFrom())}</span><b>${fmt(tot.n)}</b></div><div class="xrow"><span>Satt inn i perioden</span><b>${fmt(tot.p-tot.n)}</b></div><div class="xrow"><span>Avkastning</span><b class="pos">${fmt(tot.t-tot.p)}</b></div>`;
+ set('x-ylbl',xYears+' år');}
+function renderExplore(){queueClamp();const rows=xRows();if(xYears==null)xYears=15;
+ const xt=document.getElementById('x-total');
+ if(!document.getElementById('x-years'))xt.innerHTML=`<div id="x-totnums"></div><div class="xslider"><label for="x-years">Antall år for alle <b id="x-ylbl"></b></label><input type="range" id="x-years" min="1" max="40" step="1" value="${xYears}"></div>
+  <p class="muted" style="margin:6px 0 0;font-size:12px">Hver konto under bruker sitt eget antall år og beløp.</p>`;
+ xTotals();
+ const gs=data.savings.filter(goalOn);
+ document.getElementById('x-goals').innerHTML=gs.length?`<div class="card"><h3>Mål</h3>${gs.map(it=>{const st=goalStatus(it,0,xFrom()),done=st.pct>=100&&!st.years;
+  const pl=it.goal.type!=='debt'&&it.goal.by&&!st.years?goalPlan(it,st):null;
+  const txt=st.years?`Spare i ${it.goal.years} år · ${monthsText(st.months)} igjen`:done?'Målet er nådd 🎉':pl&&pl.left?(pl.short?`Mangler ${fmt(pl.short)} til ${ymLabel(it.goal.by)}`:`Nås innen ${ymLabel(it.goal.by)} ✔`):st.eta?`I mål ${ymLabel(st.eta)} · ${monthsText(st.months)} igjen`:'Legg inn et månedlig beløp';
+  return`<div class="toprow"><span>${ic(it,'savings')}${esc(it.name)}</span><strong style="font-size:13px">${txt}</strong><div class="track"><i style="width:${st.pct.toFixed(1)}%"></i></div></div>`;}).join('')}</div>`:'';
+ document.getElementById('x-list').innerHTML=rows.map(xCardHTML).join('')||'<p class="empty">Legg til en sparekonto under Budsjett for å se hva den kan bli.</p>';
+ const ty=document.getElementById('x-years');ty.oninput=()=>{xYears=+ty.value;Object.keys(xState).forEach(id=>{const it=find(id);if(!(it&&goalOn(it)&&it.goal.mode==='years'))xState[id].y=xYears;});
+  xTotals();document.querySelectorAll('#x-list [data-x]').forEach(c=>xRefresh(c.dataset.x));};
+ bindExplore();}
+function xRefresh(id){const box=document.getElementById('x-list'),o=xRows().find(x=>x.it.id===id),card=box.querySelector(`[data-x="${id}"]`);if(!o||!card)return;
+ const tmp=document.createElement('div');tmp.innerHTML=xCardHTML(o);const nc=tmp.firstElementChild;
+ card.querySelector('.xres').innerHTML=nc.querySelector('.xres').innerHTML;
+ const lb=card.querySelectorAll('.xslider label b'),nb=nc.querySelectorAll('.xslider label b');lb.forEach((b,i)=>{b.textContent=nb[i].textContent;});
+ card.querySelectorAll('input[type=range]').forEach((r,i)=>{const nr=nc.querySelectorAll('input[type=range]')[i];if(document.activeElement!==r)r.value=nr.value;r.max=nr.max;});
+ const ob=card.querySelector('.xapply'),nbtn=nc.querySelector('.xapply');if(ob)ob.remove();if(nbtn){card.appendChild(nbtn);bindApply(nbtn);}}
+function bindApply(b){b.onclick=()=>{const it=find(b.dataset.xapply);if(!it)return;const v=xState[it.id].m;
+  if(!confirm(`Sette ${it.name} til ${fmt(v)} i måneden i basisbudsjettet? Måneder du allerede har planlagt, endres ikke.`))return;
+  data.base[it.id]=v;it.amount=v;persist();renderExplore();toast(it.name+': '+fmt(v)+' i basisbudsjettet');};}
+function bindExplore(){const box=document.getElementById('x-list');
+ const upd=id=>{xRefresh(id);xTotals();};
+ box.querySelectorAll('[data-xm]').forEach(el=>el.oninput=()=>{xState[el.dataset.xm].m=+el.value;upd(el.dataset.xm);});
+ box.querySelectorAll('[data-xy]').forEach(el=>el.oninput=()=>{xState[el.dataset.xy].y=+el.value;upd(el.dataset.xy);});
+ box.querySelectorAll('[data-xr]').forEach(el=>el.oninput=()=>{xState[el.dataset.xr].r=+el.value;upd(el.dataset.xr);});
+ box.querySelectorAll('[data-xapply]').forEach(bindApply);}
+
+/* ============ FØRSTEGANGSOPPSETT ============ */
+const CY=TODAY.getFullYear();
+let ob={step:0,name:'',by:'',who:'single',pby:'',kids:[],lonn:'',plonn:'',btr:'',bb:'none',bbAmt:'',mode:'split',fk:'',home:'eier',homeAmt:'',felles:'',trans:{bil:true,koll:false,sykkel:false},sel:{}};
+const num=v=>Math.max(0,Math.round(+String(v||'').replace(/[^\d]/g,'')||0));
+const kidAges=()=>ob.kids.map(y=>y?CY-(+y):null).filter(a=>a!=null&&a>=0&&a<40);
+const hasKids=()=>ob.kids.length>0;
+const youngest=()=>{const a=kidAges();return a.length?Math.min(...a):null;};
+/* Postkatalogen: [id, navn, type, kategori, slått på?, hvorfor, beløp] */
+function catalog(){const kids=hasKids(),y=youngest(),bil=ob.trans.bil,eier=ob.home==='eier',leier=ob.home==='leier',couple=ob.who==='couple',split=couple&&ob.mode==='split',all=couple&&ob.mode==='all',single=!couple;
+ const shared=!split; // i «felleskonto + egne» betales fellesregningene fra felleskontoen
+ const c=[];const A=(id,name,type,cat,on,why,amt,kind)=>c.push({id,name,type,cat,on:!!on,why:why||'',amt:amt||0,kind});
+ // Inntekter
+ if(all){A('lonn','Lønn – '+(ob.name||'meg'),'income','',true,'',num(ob.lonn));A('plonn','Lønn – partner','income','',true,'',num(ob.plonn));}
+ else A('lonn','Lønn','income','',true,'',num(ob.lonn));
+ if(kids&&(single||all))A('btr','Barnetrygd','income','',true,'barn',num(ob.btr));
+ if(single&&kids&&ob.bb==='get')A('bb','Barnebidrag','income','',true,'du mottar',num(ob.bbAmt));
+ A('annet','Andre faste inntekter','income','',false,'',0);
+ // Faste utgifter
+ if(split)A('fk','Overføring til felleskonto','expenses','Faste utgifter',true,'felleskonto',num(ob.fk));
+ if(single&&kids&&ob.bb==='pay')A('bbpay','Barnebidrag','expenses','Faste utgifter',true,'du betaler',num(ob.bbAmt));
+ if(eier)A('bolig','Boliglån','expenses','Faste utgifter',shared,'eier',num(ob.homeAmt));
+ if(leier)A('bolig','Husleie','expenses','Faste utgifter',shared,'leier',num(ob.homeAmt));
+ if(eier||leier)A('felles','Felleskostnader','expenses','Faste utgifter',shared&&num(ob.felles)>0,'',num(ob.felles));
+ A('strom','Strøm','expenses','Faste utgifter',shared&&ob.home!=='hjemme','',0);
+ if(eier)A('kommunal','Kommunale avgifter','expenses','Faste utgifter',shared,'eier',0);
+ A('fors','Forsikringer','expenses','Faste utgifter',true,'',0);
+ A('mobil','Mobil og internett','expenses','Faste utgifter',true,'',0);
+ A('stream','Strømmetjenester','expenses','Faste utgifter',true,'',0);
+ A('studie','Studielån','expenses','Faste utgifter',false,'',0);
+ if(kids)A('bhg','Barnehage / SFO','expenses','Faste utgifter',shared&&y!=null&&y<=9,y!=null?'yngste født '+(CY-y):'barn',0);
+ if(bil)A('billan','Billån','expenses','Faste utgifter',false,'bil',0);
+ // Løpende
+ A('mat','Mat og husholdning','expenses','Løpende utgifter',shared,'',0);
+ if(bil)A('drivstoff','Drivstoff, bom og parkering','expenses','Løpende utgifter',true,'bil',0);
+ if(bil)A('bilservice','Bil – service og dekk','expenses','Løpende utgifter',true,'bil',0);
+ if(ob.trans.koll)A('koll','Kollektivtransport','expenses','Løpende utgifter',true,'kollektivt',0);
+ A('helse','Helse og tannlege','expenses','Løpende utgifter',true,'',0);
+ if(kids)A('barn','Barn – klær og aktiviteter','expenses','Løpende utgifter',shared,'barn',0);
+ if(eier)A('hjem','Hjem og vedlikehold','expenses','Løpende utgifter',false,'eier',0);
+ // Egen bruk
+ A('klaer','Klær og sko','expenses','Egne utgifter og familieliv',true,'',0);
+ A('trening','Trening og fritid','expenses','Egne utgifter og familieliv',true,'',0);
+ A('rest','Restaurant og kafé','expenses','Egne utgifter og familieliv',true,'',0);
+ A('gaver','Gaver og høytider','expenses','Egne utgifter og familieliv',true,'',0);
+ A('frisor','Frisør og pleie','expenses','Egne utgifter og familieliv',false,'',0);
+ A('div','Diverse','expenses','Egne utgifter og familieliv',true,'',0);
+ // Sparing
+ A('buffer','Buffer','savings','',true,'anbefalt',0,'bank');
+ A('maal','Sparemål (f.eks. ferie)','savings','',true,'',0,'bank');
+ A('fond','Langsiktig / fond','savings','',false,'',0,'fond');
+ if(kids)A('barnspar','Barnas sparing','savings','',true,'barn',0,'bank');
+ c.forEach(x=>{if(ob.sel[x.id]!=null)x.on=ob.sel[x.id];});
+ return c;}
+const ONB_STEPS=4;
+function onbHead(n,back){return`<div class="onbtop"><button type="button" class="onbback" data-ob="back" aria-label="Tilbake">‹</button><span>Steg ${n} av ${ONB_STEPS}</span><span></span></div><div class="onbbar"><i style="width:${n/ONB_STEPS*100}%"></i></div>`;}
+const segBtns=(key,opts)=>`<div class="seg3">${opts.map(([v,l])=>`<button type="button" class="${ob[key]===v?'on':''}" data-set="${key}" data-v="${v}">${l}</button>`).join('')}</div>`;
+const fld=(key,label,ph,type='text')=>`<label class="field"><span>${label}</span><input data-in="${key}" type="${type}" inputmode="numeric" value="${esc(ob[key]||'')}" placeholder="${ph||''}"></label>`;
+function renderOnb(){const el=document.getElementById('onbin'),st=ob.step;let h='';
+ const ico=d=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="1.8" aria-hidden="true"><path d="${d}"/></svg>`;
+ if(st===0){h=`<div style="width:72px;height:72px;border-radius:18px;background:var(--acc);display:flex;align-items:center;justify-content:center;margin-top:24px"><div style="width:46px;height:46px;border-radius:50%;background:var(--paper);color:var(--acc);font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center">kr</div></div>
+  <h1 style="font-size:34px">Velkommen til ditt budsjett</h1><p class="sub">Vi setter det opp sammen på et par minutter. Du kan endre alt senere.</p>
+  <div class="onbfeat">${ico('M3 5h18v16H3zM3 10h18M8 3v4M16 3v4')}<div><b>Planlegg måned for måned</b><span>Ett basisbudsjett som mal – juster hver måned for seg.</span></div></div>
+  <div class="onbfeat">${ico('M4 19V5M4 19h16M8 15l4-4 3 3 5-6')}<div><b>Se hvor pengene går</b><span>Sparing, mål og hva som er igjen – med sammenligning mot SSB.</span></div></div>
+  <div class="onbfeat">${ico('M5 11h14v10H5zM8 11V8a4 4 0 0 1 8 0v3')}<div><b>Bare på din telefon</b><span>Ingen konto og ingen deling. Ta sikkerhetskopi under Mer.</span></div></div>
+  <div class="onbgo"><button type="button" class="btn pri" data-ob="next">Kom i gang</button><button type="button" class="btn" data-ob="restore">Jeg har en sikkerhetskopi – hent den</button><button type="button" class="onbskip" data-ob="skip">Hopp over – jeg setter det opp selv</button></div>`;}
+ else if(st===1){h=onbHead(1)+`<h1>Om deg</h1><p class="sub">Svarene bestemmer hvilke poster du får foreslått.</p>
+  <label class="field"><span>Fornavn (blir overskriften i appen)</span><input data-in="name" type="text" value="${esc(ob.name)}" placeholder="F.eks. Ingrid" autocomplete="given-name"></label>
+  ${fld('by','Ditt fødselsår','F.eks. 1989','number')}
+  <div class="field"><span>Hvem er budsjettet for?</span>${segBtns('who',[['single','Bare meg'],['couple','Meg og partner']])}</div>
+  ${ob.who==='couple'?fld('pby','Partners fødselsår (valgfritt)','F.eks. 1987','number'):''}
+  <div class="field"><span>Barn som bor hos deg</span><div class="stepper"><button type="button" data-ob="kid-" aria-label="Færre barn">−</button><output>${ob.kids.length}</output><button type="button" data-ob="kid+" aria-label="Flere barn">+</button></div></div>
+  ${ob.kids.length?`<div class="kids">${ob.kids.map((y,i)=>`<label class="field" style="margin:0"><span>Barn ${i+1}, fødselsår</span><input type="number" inputmode="numeric" data-kid="${i}" value="${esc(y||'')}" placeholder="F.eks. 2018"></label>`).join('')}</div>
+   <p class="sub" style="font-size:13px">Fødselsår gjør at alderen alltid stemmer – også neste år. Det yngste barnet avgjør om barnehage eller SFO foreslås.</p>`:''}
+  <div class="onbgo"><button type="button" class="btn pri" data-ob="next">Neste</button></div>`;}
+ else if(st===2){const couple=ob.who==='couple';
+  if(!couple){h=onbHead(2)+`<h1>Hva kommer inn hver måned?</h1><p class="sub">Det som faktisk kommer inn på konto, etter skatt.</p>
+   ${fld('lonn','Lønn etter skatt','Beløp per måned')}
+   ${hasKids()?fld('btr','Barnetrygd ('+ob.kids.length+(ob.kids.length===1?' barn)':' barn)'),'Beløp per måned'):''}
+   ${hasKids()?`<div class="onbcard"><b>Barnebidrag</b>${segBtns('bb',[['get','Jeg mottar'],['pay','Jeg betaler'],['none','Ingen']])}
+    ${ob.bb!=='none'?fld('bbAmt',ob.bb==='get'?'Mottar per måned':'Betaler per måned','Beløp'):''}
+    <span class="muted">Mottar du, havner det under Inntekter. Betaler du, havner det under faste utgifter.</span></div>`:''}`;}
+  else{h=onbHead(2)+`<h1>Hvordan har dere økonomien?</h1><p class="sub">Dette avgjør hva som blir med i ditt budsjett.</p>
+   ${[['split','Felleskonto + egne kontoer','Begge overfører til felles regninger. Budsjettet viser din del.'],['all','Alt felles','Ett budsjett for hele husstanden.'],['mine','Bare min del','Budsjettet gjelder bare det jeg betaler.']].map(([v,t,d])=>`<button type="button" class="onbopt ${ob.mode===v?'on':''}" data-set="mode" data-v="${v}"><b>${t}</b><span>${d}</span></button>`).join('')}
+   ${fld('lonn','Din lønn etter skatt','Beløp per måned')}
+   ${ob.mode==='all'?fld('plonn','Partners lønn etter skatt','Valgfritt'):''}
+   ${ob.mode==='split'?fld('fk','Din overføring til felleskonto per måned','Beløp'):''}
+   ${ob.mode==='all'&&hasKids()?fld('btr','Barnetrygd','Beløp per måned'):''}
+   <div class="onbnote">${ob.mode==='split'?'Regninger som betales fra felleskontoen (bolig, strøm, mat) blir ikke huket av – overføringen dekker dem. Du kan legge dem til i neste steg.':ob.mode==='all'?'Begge lønningene og alle husstandens utgifter blir med.':'Bare dine inntekter og det du betaler selv blir med.'}</div>`;}
+  h+=`<div class="onbgo"><button type="button" class="btn pri" data-ob="next">Neste</button></div>`;}
+ else if(st===3){h=onbHead(3)+`<h1>Bolig og transport</h1><p class="sub">De største faste utgiftene. Resten fyller du inn etterpå.</p>
+  <div class="field"><span>Bolig</span>${segBtns('home',[['eier','Eier'],['leier','Leier'],['hjemme','Bor hjemme']])}</div>
+  ${ob.home==='eier'?fld('homeAmt','Boliglån per måned (renter og avdrag)','Beløp'):ob.home==='leier'?fld('homeAmt','Husleie per måned','Beløp'):''}
+  ${ob.home!=='hjemme'?fld('felles','Felleskostnader (hvis borettslag eller sameie)','0'):''}
+  <div class="field"><span>Hvordan kommer du deg rundt? Velg alt som passer.</span><div class="seg3">${[['bil','Bil'],['koll','Kollektivt'],['sykkel','Sykkel / gange']].map(([k,l])=>`<button type="button" class="${ob.trans[k]?'on':''}" data-tr="${k}">${l}</button>`).join('')}</div></div>
+  <div class="onbgo"><button type="button" class="btn pri" data-ob="next">Neste</button></div>`;}
+ else if(st===4){const c=catalog(),G=[['Inntekter',c.filter(x=>x.type==='income')],['Faste utgifter',c.filter(x=>x.cat==='Faste utgifter')],['Løpende utgifter',c.filter(x=>x.cat==='Løpende utgifter')],['Egen bruk',c.filter(x=>x.cat==='Egne utgifter og familieliv')],['Sparing',c.filter(x=>x.type==='savings')]];
+  h=onbHead(4)+`<h1>Velg postene dine</h1><p class="sub">Foreslått ut fra svarene dine. Beløp kan du fylle inn i budsjettet etterpå.</p>
+  ${G.map(([t,list])=>`<div class="onbgrp"><h3>${t}<small>${list.filter(x=>x.on).length} av ${list.length} valgt</small></h3>${list.map(x=>`<label class="onbchk"><input type="checkbox" data-sel="${x.id}" ${x.on?'checked':''}><span>${esc(x.name)}${x.amt?` <small>· ${fmt(x.amt)}</small>`:''}</span><small>${esc(x.why)}</small></label>`).join('')}</div>`).join('')}
+  <div class="onbgo"><button type="button" class="btn pri" data-ob="finish">Lag budsjettet</button></div>`;}
+ el.innerHTML=h;document.getElementById('onb').scrollTop=0;
+ el.querySelectorAll('[data-in]').forEach(i=>i.oninput=()=>{ob[i.dataset.in]=i.value;});
+ el.querySelectorAll('[data-kid]').forEach(i=>i.oninput=()=>{ob.kids[+i.dataset.kid]=i.value;});
+ el.querySelectorAll('[data-set]').forEach(b=>b.onclick=()=>{ob[b.dataset.set]=b.dataset.v;renderOnb();});
+ el.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>{ob.trans[b.dataset.tr]=!ob.trans[b.dataset.tr];renderOnb();});
+ el.querySelectorAll('[data-sel]').forEach(i=>i.onchange=()=>{ob.sel[i.dataset.sel]=i.checked;renderOnb();});
+ el.querySelectorAll('[data-ob]').forEach(b=>b.onclick=()=>{const a=b.dataset.ob;
+  if(a==='next'){if(st===1&&!ob.name.trim()){toast('Skriv inn fornavnet ditt');return;}ob.step++;renderOnb();}
+  else if(a==='back'){ob.step=Math.max(0,ob.step-1);renderOnb();}
+  else if(a==='kid+'){ob.kids.push('');renderOnb();}
+  else if(a==='kid-'){ob.kids.pop();renderOnb();}
+  else if(a==='restore')document.getElementById('m-import').click();
+  else if(a==='skip')finishOnb(true);
+  else if(a==='finish')finishOnb(false);});}
+function finishOnb(skip){
+ try{localStorage.setItem('personalBudget2027onboarded','1');localStorage.setItem('personalBudget2027tips','0');}catch(e){}
+ if(!skip){
+  const c=catalog().filter(x=>x.on),d={income:[],expenses:[],savings:[],plan:{},base:{},start:0,rates:{fond:6.5,bank:3}};
+  c.forEach(x=>{const it={id:uid(),name:x.name,amount:x.amt,icon:guessIcon(x.name,x.type)};if(x.type==='expenses')it.cat=x.cat;if(x.kind)it.kind=x.kind;
+   if(x.id==='barnspar'||x.id==='fk')it.icon=x.id==='fk'?'🏦':'🧒';
+   d[x.type].push(it);d.base[it.id]=x.amt;});
+  d.plan[NOW]=Object.assign({},d.base);
+  data=normalize(d);rebuildPeriod();
+  try{const p=prefs();p.title='Budsjett '+ob.name.trim();localStorage.setItem('personalBudget2027dashboard',JSON.stringify(p));
+   const ages=kidAges();localStorage.setItem('personalBudget2027profile',JSON.stringify({gender:'',birthYear:num(ob.by)||'',partnerBirthYear:num(ob.pby)||'',household:ob.who==='couple'?'couple':'single',children:ages.length?'yes':'no',count:ages.length,ages,kidsBirthYears:ob.kids.map(num).filter(Boolean)}));}catch(e){}
+  applyPrefs();}
+ persist();document.getElementById('onb').hidden=true;setMonth(NOW);view='home';show('home');
+ toast(skip?'Fyll inn beløpene under Budsjett':'Budsjettet ditt er klart');}
+/* Tre korte tips etter oppsettet */
+const TIPS=[['Bytt måned her','Trykk på pilene øverst, eller sveip til siden. Trykk på månedsnavnet for å se alle.'],['Fyll inn beløpene','Gå til Budsjett nederst og skriv inn beløpet ved hver post. Trykk på en kategori for å lukke den.'],['Ta sikkerhetskopi','Budsjettet ligger bare på denne telefonen. Under Mer kan du laste ned en sikkerhetskopi.']];
+function renderTips(){const el=document.getElementById('tipcard');let n=null;try{n=localStorage.getItem('personalBudget2027tips');}catch(e){}
+ if(n==null||+n>=TIPS.length||view!=='home'){el.hidden=true;return;}const i=+n,[t,x]=TIPS[i];
+ el.hidden=false;el.innerHTML=`<b style="display:block;margin-bottom:2px">${t}</b>${x}<div class="row2"><small>Tips ${i+1} av ${TIPS.length}</small><button type="button" id="tip-next">${i<TIPS.length-1?'Neste tips':'Ferdig'}</button></div>`;
+ document.getElementById('tip-next').onclick=()=>{try{localStorage.setItem('personalBudget2027tips',String(i+1))}catch(e){}renderTips();};}
+function openOnboarding(){ob.step=0;document.getElementById('onb').hidden=false;renderOnb();}
+
 /* ============ FELLES MÅNEDSVELGER ============ */
 function monthStatus(k){if(!isPlanned(k))return['Ikke planlagt','unpl'];const has=['income','expenses','savings'].some(t=>data[t].some(it=>!it.only&&inMonth(it,k)));
  if(!has)return['Tom','unpl'];return k===NOW?['Pågår nå','now']:k<NOW?['Ferdig','']:['Planlagt',''];}
@@ -1485,17 +1819,18 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdat
 if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 function renderBackupCard(){const el=document.getElementById('backupcard');let last=0,snooze=0;
  try{last=+localStorage.getItem('personalBudget2027backup')||0;snooze=+localStorage.getItem('personalBudget2027backupSnooze')||0;}catch(e){}
- const now=Date.now(),hasData=Object.keys(data.plan).length>0,due=hasData&&now-last>30*864e5&&now>snooze;
+ const now=Date.now(),hasData=Object.keys(data.plan).length>0&&localStorage.getItem('personalBudget2027tips')!=='0',due=hasData&&now-last>30*864e5&&now>snooze;
  el.hidden=!due;if(!due)return;
  el.innerHTML=`<b>Ta en sikkerhetskopi</b><div class="muted" style="font-size:13px">${last?'Det er over en måned siden sist.':'Du har ikke tatt sikkerhetskopi ennå.'} Budsjettet ligger bare på denne telefonen.</div>
   <div class="btns"><button type="button" class="btn pri grow" id="bk-now">Last ned nå</button><button type="button" class="btn" id="bk-later">Om en uke</button></div>`;
  document.getElementById('bk-now').onclick=()=>document.getElementById('m-export').click();
  document.getElementById('bk-later').onclick=()=>{try{localStorage.setItem('personalBudget2027backupSnooze',String(now+7*864e5))}catch(e){}renderBackupCard();};}
 function renderAll(){queueClamp();
- renderHome();if(view==='budget')renderBudget();if(view==='year')renderYear();if(view==='more')renderSSB();
- renderLeftbar();renderMonthNav();renderBackupCard();
+ renderHome();if(view==='budget')renderBudget();if(view==='year')renderYear();if(view==='more')renderSSB();if(view==='explore')renderExplore();
+ renderLeftbar();renderMonthNav();renderBackupCard();renderTips();
 }
 renderAll();
+if(FRESH_USER)openOnboarding();
 setTimeout(checkUpdate,1500);
 </script>
 </body>
