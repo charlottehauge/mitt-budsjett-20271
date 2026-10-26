@@ -234,12 +234,35 @@ details.rates summary{cursor:pointer;color:var(--acc);font-weight:600;font-size:
 .xslider label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
 .xslider label b{color:var(--ink)}
 .xslider input[type=range]{width:100%;accent-color:var(--acc);height:28px}
-.xcard h3{display:flex;align-items:center;gap:6px}
+.xhead{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;border:0;background:none;padding:0;text-align:left;font-size:16px;font-weight:700;color:var(--ink)}
+.xht{display:flex;flex-direction:column;gap:2px}
+.xsum{font-size:13px;font-weight:500;color:var(--muted)}.xsum b{color:var(--ink)}
+.xhead[aria-expanded="true"] .accch{transform:rotate(180deg)}
+.xcard .sstats{margin-top:10px}
+.xbody{margin-top:10px}.xbody[hidden]{display:none}
 .xres{background:var(--acc2);border-radius:14px;padding:12px 14px;margin-top:12px}
 .xres .big{font-size:26px;font-weight:780;letter-spacing:-.02em}
 .xchart{width:100%;height:120px;display:block;margin-top:10px}
 .xboost{font-size:13px;color:var(--green);margin-top:6px}
 .xapply{margin-top:10px;width:100%}
+.scard{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:14px 14px 6px;margin:12px 0;box-shadow:0 2px 10px rgba(60,45,30,.04)}
+.scrow{display:flex;align-items:center;gap:10px}
+.scrow .rname{flex:1;min-width:0;padding:2px 0}
+.scrow .rname .n{font-size:17px;font-weight:700}
+.smon{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:12px;color:var(--muted)}
+.smon .amt{width:110px;flex:none;padding:8px 10px}
+.sstats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.sstat{background:var(--acc2);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.sstat span{font-size:13px;color:var(--muted)}
+.sstat b{font-size:20px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--ink)}
+.sstat.goal{background:transparent;border:1.5px solid var(--acc2)}
+.sstat:only-child{grid-column:1/3}
+.sbar{height:6px;border-radius:9px;background:var(--acc2);overflow:hidden;margin:12px 0 4px}.sbar i{display:block;height:100%;background:var(--acc)}
+.sbarl{font-size:13px;color:var(--muted)}
+.smot{font-size:14px;font-style:italic;color:var(--ink);margin-top:10px}
+.sdet{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;border-top:1px solid var(--line);background:none;margin-top:12px;padding:10px 0 8px;color:var(--acc);font-weight:700;font-size:14px}
+.sdet[aria-expanded="true"] .accch{transform:rotate(180deg)}
+.sbody .accbody{margin:0 0 8px}
 .clamp{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
 .clamp.open{display:block!important;-webkit-line-clamp:unset;line-clamp:unset;overflow:visible}
 .morebtn{display:inline-flex;align-items:center;gap:4px;border:0;background:none;color:var(--acc);font-weight:700;font-size:13px;padding:4px 0 2px;margin:0 0 4px;cursor:pointer}
@@ -458,9 +481,9 @@ nav button.on{background:var(--acc2);color:var(--acc);font-weight:700}
 <!-- UTFORSK -->
 <section class="view" id="v-explore">
   <h2>Utforsk</h2>
-  <p class="lead">Hva sparingen kan bli. Regnet fra det som står på kontoene etter måneden du har valgt, med det du sparer hver måned og forventet avkastning.</p>
-  <div class="card xtotal" id="x-total"></div>
+  <p class="lead">Hva sparingen kan bli. Trykk på en konto for å se detaljer og prøve andre beløp.</p>
   <div id="x-goals"></div>
+  <div class="collapseall" id="x-ca" style="margin:0 4px 6px"></div>
   <div id="x-list"></div>
   <p class="src">Avkastningen er et anslag, ikke en garanti. Fond kan også gå ned. Skatt og kostnader er ikke trukket fra. Endringer her påvirker ikke budsjettet før du trykker «Bruk i budsjettet».</p>
 </section>
@@ -778,6 +801,7 @@ function save(msg){persist();renderAll();if(msg)toast(msg);}
 
 /* ============ REGNING ============ */
 const fmt=n=>new Intl.NumberFormat('nb-NO',{maximumFractionDigits:0}).format(Math.round(+n||0))+' kr';
+const fmtM=n=>Math.abs(n)>=1e6?(Math.round(n/1e4)/100).toFixed(2).replace('.',',')+' mill. kr':fmt(n);
 const fmtS=n=>(n>0?'+':n<0?'−':'')+fmt(Math.abs(n));
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isPlanned=k=>k===BASE||!!(k&&data.plan[k]);
@@ -955,17 +979,15 @@ function goalLine(it,st){const p=goalPlan(it,st),g=it.goal;
   return p.short?`Med det du har planlagt har du ca. <b>${fmt(p.proj)}</b> i ${ymLabel(g.by)}. Det mangler ${fmt(p.short)} – spar <b>${fmt(p.extra)} mer i måneden</b> for å nå ${fmt(g.amount)}.`
    :`Med det du har planlagt har du ca. <b>${fmt(p.proj)}</b> i ${ymLabel(g.by)} – målet på ${fmt(g.amount)} nås ✔`;}
  return null;}
-const QUOTES={
- ferie:[['Første steg mot sol og saltvann er tatt ☀️','Hver krone her er et lite stykke ferie.'],['Snart har du råd til flybilletter tur-retur ✈️','Kan du kjenne lukta av sjø? 🌊'],['Over halvveis – solkremen kan snart kjøpes 🧴','Du er nærmere stranda enn kontoret nå.'],['Nesten der! Begynn å pakke kofferten i tankene 🧳','Bare litt igjen før ferien er betalt.'],['Ferien er betalt – nyt hvert minutt! 🏖️']],
- gjeld:[['Godt i gang – hver innbetaling teller.','Hver krone her er en krone mindre å tenke på.'],['Du har allerede tatt en god bit av det 💪','Det går fremover, måned for måned.'],['Over halvveis! Det kjennes, gjør det ikke?','Mer betalt enn det som gjenstår nå.'],['Snart gjeldfri – tenk hvordan det kommer til å kjennes 🌿','Innspurten! Bare litt igjen.'],['Ferdig nedbetalt 🎉 Godt jobbet!']],
- bil:[['Motoren er i gang 🚗','Hver krone bringer deg nærmere nøkkelen.'],['Du har allerede råd til et par gode dekk 🛞','Fint driv – fortsett sånn.'],['Over halvveis til ny bil!','Kan du se den i oppkjørselen?'],['Nesten der – snart kan du ta en prøvetur 🔑'],['Målet er nådd – god tur! 🚗']],
- buffer:[['En god start på trygghetsbufferen 🛟','Litt i reserve gjør hverdagen lettere.'],['Bufferen vokser – det gir ro i magen.'],['Over halvveis til en solid buffer 💪'],['Nesten full buffer – godt planlagt!'],['Bufferen er på plass 🛟 Godt å ha!']],
- barn:[['En fin start for framtiden 🌱','Litt hver måned blir mye over tid.'],['Sparingen vokser sammen med barnet 🌱'],['Over halvveis – for et godt utgangspunkt!'],['Nesten i mål – dette blir et fint grunnlag.'],['Målet er nådd 🎉 For en gave!']],
- annet:[['Godt i gang – hver krone teller.','Det første steget er alltid det viktigste.'],['Du er på god vei 💪','Fint driv – fortsett sånn.'],['Over halvveis!','Mer spart enn det som gjenstår.'],['Nesten der – bare litt igjen!','Innspurten er i gang.'],['Målet er nådd 🎉']]};
+const QUOTES={"langtid":[["Hver måned teller – tiden gjør jobben for deg 🌱","Rolig og jevnt slår det meste.","Små beløp i dag, store muligheter senere.","Du planter trær du skal sitte i skyggen av.","Det viktigste steget er å fortsette."],["Renters rente har begynt å virke 📈","Du er godt i gang – hold kursen.","Fremtidens deg sier tusen takk.","Hver innbetaling er en stemme for frihet.","Jevn sparing slår perfekt timing."],["Halvveis i spareperioden – godt jobbet!","Nå begynner avkastningen å synes.","Det du gjør nå, takker du deg selv for senere.","Tålmodighet er din beste investering.","Du har bygget en vane som varer."],["Innspurten – tålmodigheten lønner seg 💪","Snart kan du høste.","Du har holdt ut lenge – det merkes.","Nesten i mål. Fortsett som før.","Renters rente jobber hardest nå."],["Spareperioden er fullført 🎉","Du klarte det – år etter år.","For en innsats! Nyt friheten du har bygget."]],"ferie":[["Første steg mot sol og saltvann er tatt ☀️","Hver krone her er et lite stykke ferie.","Ferien har begynt – i alle fall på konto.","Drømmen får et budsjett. Bra!","Litt hver måned blir lange dager i sola."],["Snart har du råd til flybilletter tur-retur ✈️","Kan du kjenne lukta av sjø? 🌊","Kofferten kan snart hentes fram.","Du sparer deg til gode minner.","Fint driv – ferien kommer nærmere."],["Over halvveis – solkremen kan snart kjøpes 🧴","Du er nærmere stranda enn kontoret nå.","Mer spart enn det som gjenstår!","Begynn gjerne å se på overnatting.","Ferien er mer enn halvveis betalt."],["Nesten der! Begynn å pakke kofferten i tankene 🧳","Bare litt igjen før ferien er betalt.","Snart kan du booke med god samvittighet.","Innspurt mot sommer og sol!","Du har nesten hele ferien i boks."],["Ferien er betalt – nyt hvert minutt! 🏖️","Alt betalt på forhånd – den beste følelsen.","God tur! Du har fortjent den."]],"gjeld":[["Godt i gang – hver innbetaling teller.","Hver krone her er en krone mindre å tenke på.","Det første steget er det tyngste – det er tatt.","Litt lettere for hver måned.","Du tar kontroll – det er sterkt."],["Du har allerede tatt en god bit av det 💪","Det går fremover, måned for måned.","En fjerdedel er unnagjort!","Hold tempoet – det virker.","Du er på riktig vei."],["Over halvveis! Det kjennes, gjør det ikke?","Mer betalt enn det som gjenstår nå.","Halvveis – resten går raskere enn du tror.","Godt jobbet, du holder løftet.","Gjelden krymper for hver måned."],["Snart gjeldfri – tenk hvordan det kommer til å kjennes 🌿","Innspurten! Bare litt igjen.","Målstreken er i sikte.","Snart kan pengene gå til noe nytt.","Nesten ferdig – stå på!"],["Ferdig nedbetalt 🎉 Godt jobbet!","Gjeldfri! For en lettelse.","Du gjorde det. Nå kan pengene jobbe for deg."]],"bil":[["Motoren er i gang 🚗","Hver krone bringer deg nærmere nøkkelen.","God start på bilkontoen.","Litt hver måned blir fire hjul.","Du kjører i riktig retning."],["Du har allerede råd til et par gode dekk 🛞","Fint driv – fortsett sånn.","En fjerdedel er på plass.","Bilen nærmer seg.","Jevnt og trutt – som en god diesel."],["Over halvveis til ny bil!","Kan du se den i oppkjørselen?","Mer spart enn det som gjenstår.","Begynn gjerne å se på modeller.","Halvveis – godt jobbet!"],["Nesten der – snart kan du ta en prøvetur 🔑","Bare litt igjen før bilen er din.","Innspurt – snart kan du handle.","Målstreken er rett rundt svingen.","Nesten i mål!"],["Målet er nådd – god tur! 🚗","Bilen er spart opp. Gratulerer!","Kjør trygt – du har fortjent den."]],"buffer":[["En god start på trygghetsbufferen 🛟","Litt i reserve gjør hverdagen lettere.","Hver krone her gir litt mer ro.","Du bygger en trygg grunnmur.","Godt å ha – også når du ikke trenger den."],["Bufferen vokser – det gir ro i magen.","En fjerdedel på plass – bra!","Uforutsette ting blir mindre skumle nå.","Du står stødigere for hver måned.","Trygghet, krone for krone."],["Over halvveis til en solid buffer 💪","Mer i reserve enn det som gjenstår.","Du kan sove godt om natta.","Halvveis – fortsett sånn.","Bufferen begynner å bli solid."],["Nesten full buffer – godt planlagt!","Snart har du en skikkelig trygghet.","Innspurt mot full buffer.","Bare litt igjen – stå på!","Du er nesten helt forberedt."],["Bufferen er på plass 🛟 Godt å ha!","Full buffer – for en trygghet.","Nå kan ekstra sparing gå til drømmene."]],"barn":[["En fin start for framtiden 🌱","Litt hver måned blir mye over tid.","Den beste gaven er tid og tålmodighet.","Sparingen vokser sammen med barnet.","Et lite frø i dag – et stort tre senere."],["Sparingen vokser sammen med barnet 🌱","Godt i gang – dette blir fint.","En fjerdedel er på plass.","Hver måned er en investering i framtiden.","Fint driv!"],["Over halvveis – for et godt utgangspunkt!","Mer spart enn det som gjenstår.","Dette blir et godt grunnlag.","Halvveis – fortsett sånn.","Framtiden ser lys ut."],["Nesten i mål – dette blir et fint grunnlag.","Bare litt igjen!","Innspurt for framtiden.","Snart har du nådd målet.","For en fin start du gir."],["Målet er nådd 🎉 For en gave!","Godt jobbet – en flott start på livet.","Målet er nådd. For en innsats!"]],"annet":[["Godt i gang – hver krone teller.","Det første steget er alltid det viktigste.","Du er på vei!","Litt hver måned blir mye.","Fin start!"],["Du er på god vei 💪","Fint driv – fortsett sånn.","En fjerdedel er unnagjort.","Det går fremover.","Hold kursen!"],["Over halvveis!","Mer spart enn det som gjenstår.","Halvveis – godt jobbet.","Nå går det fort.","Du er nærmere enn du tror."],["Nesten der – bare litt igjen!","Innspurten er i gang.","Målstreken er i sikte.","Snart i mål!","Stå på – du er nesten der."],["Målet er nådd 🎉","Godt jobbet!","Du klarte det!"]]};
 function quoteFor(it,st){const n=it.name.toLowerCase();
- const theme=it.goal.type==='debt'?'gjeld':/ferie|reise|tur|sol|syden|hytte/.test(n)?'ferie':/bil/.test(n)?'bil':/buffer/.test(n)?'buffer':isPersonName(it.name)||/barn/.test(n)?'barn':'annet';
+ const theme=it.goal.type==='debt'?'gjeld':it.goal.mode==='years'?'langtid':/ferie|reise|tur|sol|syden|hytte/.test(n)?'ferie':/bil/.test(n)?'bil':/buffer/.test(n)?'buffer':isPersonName(it.name)||/barn/.test(n)?'barn':'annet';
  const step=st.pct>=100?4:st.pct>=75?3:st.pct>=50?2:st.pct>=25?1:0,list=QUOTES[theme][step];
- return list[(+NOW.slice(5))%list.length];}
+ let h=0;for(const ch of String(it.id))h=(h*31+ch.charCodeAt(0))>>>0;
+ return list[(h+QSEED)%list.length];}
+/* Teller som øker hver gang appen åpnes og når du setter inn mer – da byttes den motiverende teksten */
+let QSEED=0;try{QSEED=(+localStorage.getItem('personalBudget2027q')||0)+1;localStorage.setItem('personalBudget2027q',String(QSEED));}catch(e){QSEED=Math.floor(Math.random()*100);}
+function bumpQuote(){QSEED++;try{localStorage.setItem('personalBudget2027q',String(QSEED))}catch(e){}}
 const pctTxt=p=>p>=100?'100 %':p>=10?Math.floor(p)+' %':p>0?(p<0.1?'<0,1':p.toFixed(1).replace('.',','))+' %':'0 %';
 function ringSVG(p){const r=30,c=2*Math.PI*r;return`<svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="${r}" fill="none" stroke="var(--acc2)" stroke-width="8"/><circle cx="36" cy="36" r="${r}" fill="none" stroke="${p>=100?'var(--green)':'var(--acc)'}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(c*Math.min(p,100)/100).toFixed(1)} ${c.toFixed(1)}"/></svg>`;}
 function renderGoals(){queueClamp();const gs=data.savings.filter(x=>!x.only&&goalOn(x));
@@ -1063,12 +1085,26 @@ function subline(it){const ones=data.savings.filter(o=>o.only===mode&&o.target==
      :`<div class="accl"><span>${depLabel(d)} · tatt ut i ${mn}</span>${d.removed===mode?`<button type="button" class="linkbtn" data-undo="${d.id}">Angre</button>`:''}</div>`).join('')}</div>`:''}`;}
  if(gl)body+=`<div class="accgoal">🎯 ${gl}</div>`;
  body+=`<div class="accbtns">${it.only?'':`<button type="button" class="linkbtn" data-extra="${it.id}">+ Ekstra innskudd</button>`}<button type="button" class="linkbtn" data-goal="${it.id}">${goalOn(it)?'Endre mål':'🎯 Sett mål'}</button></div>`;
- return`<button type="button" class="acchead" data-acc="${it.id}" aria-expanded="${open}"><span>${head}</span><span class="accch">${ACC_CH}</span></button><div class="accbody"${open?'':' hidden'}>${body}</div>`;}
+ /* Tallboksene øverst: «På konto», og forventet/mål hvis det er satt et mål */
+ const bal=mm?mm.end:(it.balance||0);let stats='';
+ if(tr){const g=it.goal&&it.goal.on&&it.goal.type==='debt'&&it.goal.amount?it.goal:null;
+  const sent=PERIOD.filter(k=>k<=mode&&isPlanned(k)).reduce((a,k)=>a+amountFor(it,k)+data.savings.filter(o=>o.only===k&&o.target===it.id).reduce((x,o)=>x+o.amount,0),0),paid=sent+(g?g.before:0);
+  stats=g?`<div class="sstat"><span>Betalt</span><b>${fmt(paid)}</b></div><div class="sstat"><span>Gjenstår</span><b>${fmt(Math.max(0,g.amount-paid))}</b></div>`
+   :`<div class="sstat"><span>Overført t.o.m. ${mn}</span><b>${fmt(sent)}</b></div>`;}
+ else{stats=`<div class="sstat"><span>På konto</span><b>${fmt(bal)}</b></div>`;
+  if(st){const g=it.goal,pl=goalPlan(it,st);
+   if(g.mode==='years'&&pl)stats+=`<div class="sstat goal"><span>Forventet om ${Math.max(1,Math.round(pl.left/12))} år</span><b>ca. ${fmtM(pl.fv)}</b></div>`;
+   else if(g.by&&pl&&pl.left)stats+=`<div class="sstat goal"><span>Forventet ${ymLabel(g.by)}</span><b>ca. ${fmtM(pl.proj)}</b></div>`;
+   else stats+=`<div class="sstat goal"><span>Mål</span><b>${fmt(g.amount)}</b></div>`;}}
+ const bar=st&&!st.years&&it.goal.amount?`<div class="sbar"><i style="width:${st.pct.toFixed(1)}%"></i></div><div class="sbarl">${pctTxt(st.pct)} ${it.goal.type==='debt'?'av gjelden er betalt':'av målet'}${it.goal.by&&it.goal.type!=='debt'?' · innen '+ymLabel(it.goal.by):''}</div>`:'';
+ const mot=st&&it.goal.motivate!==false?`<div class="smot">${esc(quoteFor(it,st))}</div>`:'';
+ return`<div class="sstats">${stats}</div>${bar}${mot}<button type="button" class="sdet" data-acc="${it.id}" aria-expanded="${open}"><span class="sdl">${open?'Skjul detaljer':'Vis detaljer'}</span><span class="accch">${ACC_CH}</span></button><div class="accbody"${open?'':' hidden'}>${body}</div>`;}
+function savCard(x){return`<div class="scard"><div class="scrow"><button type="button" class="rname" data-id="${x.id}"><span class="n">${ic(x)}${esc(x.name)}</span></button><label class="smon"><span>Per måned</span><input class="amt" data-id="${x.id}" type="number" inputmode="numeric" min="0" step="50" value="${amountFor(x,mode)}" aria-label="Beløp per måned for ${esc(x.name)}"></label></div><div class="sbody" data-sub="${x.id}">${subline(x)}</div></div>`;}
 function refreshSublines(){const list=document.getElementById('list');document.querySelectorAll('#list [data-sub]').forEach(el=>{const it=find(el.dataset.sub);if(it)el.innerHTML=subline(it);});bindSublines(list);bindBalance(list);
 }
 function bindSublines(root){
  root.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>{const id=b.dataset.acc,o=!openAcc[id];if(o)openAcc[id]=1;else delete openAcc[id];saveOpenAcc();
-  b.setAttribute('aria-expanded',String(o));const bd=b.nextElementSibling;if(bd)bd.hidden=!o;if(typeof paintCA==='function')paintCA();});
+  b.setAttribute('aria-expanded',String(o));const bd=b.nextElementSibling;if(bd)bd.hidden=!o;const l=b.querySelector('.sdl');if(l)l.textContent=o?'Skjul detaljer':'Vis detaljer';if(typeof paintCA==='function')paintCA();});
  root.querySelectorAll('[data-goal]').forEach(b=>b.onclick=()=>{openSheet('savings',b.dataset.goal);const on=document.getElementById('g-on');on.checked=true;paintGoal();});
  root.querySelectorAll('[data-extra]').forEach(b=>b.onclick=()=>openSheet('savings',null,{name:'',icon:'➕',only:mode,target:b.dataset.extra}));
  root.querySelectorAll('[data-ooedit]').forEach(b=>b.onclick=()=>openSheet('savings',b.dataset.ooedit));}
@@ -1161,7 +1197,7 @@ function renderBudget(){queueClamp();
    html+=groupHead(GROUP_ICON[key],label,g.length,`data-cat="${key}"`,g.reduce((a,x)=>a+amountFor(x,mode),0))+gOpen(tab+':'+label)+g.map(rowHTML).join('')+'</div>';});
  }else if(tab==='savings'){
   [['bank','🏦','Sparekonto'],['fond','📈','Fond og aksjer'],['transfer','💛','Overføringer']].forEach(([kd,ico,label])=>{const all=items.filter(x=>kindOf(x)===kd),g=all.filter(x=>!targetOf(x));if(!g.length)return;
-   html+=groupHead(ico,label,g.length,`data-kind="${kd}"`,all.reduce((a,x)=>a+amountFor(x,mode),0))+gOpen(tab+':'+label)+g.map(x=>mode===BASE?rowHTML(x):rowHTML(x).replace('<div class="row">','<div class="row hasSub">')+`<div class="subline" data-sub="${x.id}">${subline(x)}</div>`).join('')+'</div>';});
+   html+=groupHead(ico,label,g.length,`data-kind="${kd}"`,all.reduce((a,x)=>a+amountFor(x,mode),0))+gOpen(tab+':'+label)+g.map(x=>mode===BASE?rowHTML(x):savCard(x)).join('')+'</div>';});
  }else{const fixed=items.filter(x=>!x.only);
   html=(mode===BASE?'':oneOffBox())+(fixed.length?groupHead('💰','Faste inntekter',fixed.length,'data-inc="1"',fixed.reduce((a,x)=>a+amountFor(x,mode),0))+gOpen(tab+':Faste inntekter')+incomeLine()+fixed.map(rowHTML).join('')+'</div>':'');}
  if(!items.length&&tab!=='income')html='<p class="empty">Ingen poster her i '+mName(mode).toLowerCase()+'.</p>';
@@ -1184,9 +1220,8 @@ function renderBudget(){queueClamp();
   inp.addEventListener('focus',()=>inp.select());
   inp.addEventListener('change',()=>{const it=find(inp.dataset.id);if(!it)return;const v=Math.max(0,Math.round(+inp.value||0));
    if(it.only)it.amount=v;else if(mode===BASE){data.base[it.id]=v;it.amount=v;}else{data.plan[mode]=data.plan[mode]||{};data.plan[mode][it.id]=v;it.amount=v;}
-   persist();inp.value=amountFor(it,mode);
-   const row=inp.closest('.row'),tmp=document.createElement('div');tmp.innerHTML=rowHTML(it);
-   row.querySelector('.rname').innerHTML=tmp.querySelector('.rname').innerHTML;
+   persist();inp.value=amountFor(it,mode);if(tab==='savings')bumpQuote();
+   const row=inp.closest('.row');if(row){const tmp=document.createElement('div');tmp.innerHTML=rowHTML(it);row.querySelector('.rname').innerHTML=tmp.querySelector('.rname').innerHTML;}
    updateTotals();toast('Lagret');});
  });
  list.querySelectorAll('.rname').forEach(b=>b.onclick=()=>openSheet(tab,b.dataset.id));
@@ -1202,7 +1237,7 @@ function renderBudget(){queueClamp();
  const paintCollapseAll=()=>{const ca=document.getElementById('collapseall');
   if(tab==='savings'){const as=[...list.querySelectorAll('[data-acc]')];if(!as.length){ca.innerHTML='';return;}const anyOpen=as.some(a=>openAcc[a.dataset.acc]);
    ca.innerHTML=`<button type="button" class="linkbtn">${anyOpen?'Lukk alle kontoer':'Åpne alle kontoer'}</button>`;
-   ca.firstChild.onclick=()=>{as.forEach(a=>{const id=a.dataset.acc;if(anyOpen)delete openAcc[id];else openAcc[id]=1;a.setAttribute('aria-expanded',String(!anyOpen));const bd=a.nextElementSibling;if(bd)bd.hidden=anyOpen;});saveOpenAcc();paintCollapseAll();};return;}
+   ca.firstChild.onclick=()=>{as.forEach(a=>{const id=a.dataset.acc;if(anyOpen)delete openAcc[id];else openAcc[id]=1;a.setAttribute('aria-expanded',String(!anyOpen));const bd=a.nextElementSibling;if(bd)bd.hidden=anyOpen;const l=a.querySelector('.sdl');if(l)l.textContent=anyOpen?'Vis detaljer':'Skjul detaljer';});saveOpenAcc();paintCollapseAll();};return;}
   const hs=[...list.querySelectorAll('.group[data-gk]')];
   if(hs.length<2){ca.innerHTML='';return;}const anyOpen=hs.some(h=>!h.classList.contains('closed'));
   ca.innerHTML=`<button type="button" class="linkbtn">${anyOpen?'Lukk alle':'Åpne alle'}</button>`;
@@ -1409,6 +1444,7 @@ document.getElementById('sh-save').onclick=()=>{
   if(mode===BASE)data.base[it.id]=amount;else{data.plan[mode]=data.plan[mode]||{};data.plan[mode][it.id]=amount;}
   if(!sh.id&&mode!==BASE&&document.getElementById('sh-base').checked)data.base[it.id]=amount;
   if(!sh.id&&document.getElementById('sh-later').checked)Object.keys(data.plan).filter(k=>mode===BASE?k>=NOW:k>mode).forEach(k=>{data.plan[k][it.id]=amount;});}
+ if(sh.type==='savings')bumpQuote();
  rebuildPeriod();closeSheet();save(only?'Engangsbeløp lagt inn i '+mLabel(only).toLowerCase():sh.id?'Endret':'Lagt til i '+mLabel(mode).toLowerCase());
 };
 document.getElementById('sh-del').onclick=()=>{
@@ -1571,7 +1607,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alt og start
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='26.10.2026 · navn på ekstra 2';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
+const APP_VERSION='26.10.2026 · utforsk 4';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
@@ -1597,7 +1633,8 @@ let clampQueued=false;
 function queueClamp(){if(clampQueued)return;clampQueued=true;requestAnimationFrame(()=>{clampQueued=false;applyClamp();});}
 window.addEventListener('resize',queueClamp);
 /* ============ UTFORSK ============ */
-let xState={},xYears=null;
+let xState={},xYears=null,xOpen={};try{xOpen=JSON.parse(localStorage.getItem('personalBudget2027xopen')||'{}')||{};}catch(e){}
+const saveXOpen=()=>{try{localStorage.setItem('personalBudget2027xopen',JSON.stringify(xOpen))}catch(e){}};
 const xFrom=()=>homeM&&homeM!==BASE&&PERIOD.includes(homeM)?homeM:NOW;
 function xRows(){const R=savingsModel(true),k=xFrom();return R.rows.filter(rw=>rw.it&&!rw.it.only&&kindOf(rw.it)!=='transfer').map(rw=>{
  const now=rw.monthEnd[k]!=null?rw.monthEnd[k]:(rw.it.balance||0);return{it:rw.it,rw,now};});}
@@ -1605,9 +1642,16 @@ function xDefaults(o){const it=o.it,g=it.goal;if(!xState[it.id])xState[it.id]={m
 function xChart(pts){if(!pts.length)return'';const W=300,H=110,max=Math.max(1,...pts.map(p=>p.bal)),n=pts.length,X=i=>n===1?W:(i/(n-1))*W,Y=v=>H-4-v/max*(H-12);
  const line=(f)=>pts.map((p,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(f(p)).toFixed(1)).join(' ');
  return`<svg class="xchart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${line(p=>p.bal)} L${W} ${H} L0 ${H} Z" fill="var(--acc2)"/><path d="${line(p=>p.paid)} L${W} ${H} L0 ${H} Z" fill="#c7aa79" opacity=".55"/><path d="${line(p=>p.bal)}" fill="none" stroke="var(--acc)" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg>`;}
+/* Øverst på kortet: «På konto», og forventet sum hvis det er satt et mål eller det er en fondskonto */
+function xStats(o,st,f){const it=o.it,g=goalOn(it)?it.goal:null;let h=`<div class="sstat"><span>På konto</span><b>${fmt(o.now)}</b></div>`;
+ if(g&&g.type!=='debt'&&g.mode!=='years'&&g.by){const gs=goalStatus(it,0,xFrom()),pl=goalPlan(it,gs);if(pl&&pl.left)h+=`<div class="sstat goal"><span>Forventet ${ymLabel(g.by)}</span><b>ca. ${fmtM(pl.proj)}</b></div>`;}
+ else if((g&&g.mode==='years')||kindOf(it)==='fond')h+=`<div class="sstat goal"><span>Forventet om ${st.y} år</span><b>ca. ${fmtM(f.total)}</b></div>`;
+ return h;}
 function xCardHTML(o){const st=xDefaults(o),it=o.it,f=fvCalc(o.now,st.m,st.r,st.y*12),fb=fvCalc(o.now,st.m+500,st.r,st.y*12),endK=addMonths(xFrom(),st.y*12),changed=st.m!==monthlyOf(it);
- return`<div class="card xcard" data-x="${it.id}"><h3>${ic(it,'savings')}${esc(it.name)} <span class="muted" style="font-weight:500">· ${KIND_NAMES[kindOf(it)]}</span></h3>
-  <div class="xrow"><span class="muted">På konto etter ${ymLabel(xFrom())}</span><b>${fmt(o.now)}</b></div>
+ const open=!!xOpen[it.id];
+ return`<div class="card xcard" data-x="${it.id}"><button type="button" class="xhead" data-xt="${it.id}" aria-expanded="${open}"><span class="xht"><span>${ic(it,'savings')}${esc(it.name)} <span class="muted" style="font-weight:500">· ${KIND_NAMES[kindOf(it)]}</span></span></span><span class="accch">${ACC_CH}</span></button>
+  <div class="sstats xsum">${xStats(o,st,f)}</div>
+  <div class="xbody"${open?'':' hidden'}><div class="xrow"><span class="muted">På konto etter ${ymLabel(xFrom())}</span><b>${fmt(o.now)}</b></div>
   <div class="xslider"><label for="xm-${it.id}">Per måned <b>${fmt(st.m)}</b></label><input type="range" id="xm-${it.id}" data-xm="${it.id}" min="0" max="${Math.max(20000,st.m)}" step="100" value="${st.m}"></div>
   <div class="xslider"><label for="xy-${it.id}">Antall år <b>${st.y} år</b></label><input type="range" id="xy-${it.id}" data-xy="${it.id}" min="1" max="40" step="1" value="${st.y}"></div>
   <div class="xslider"><label for="xr-${it.id}">Avkastning per år <b>${String(st.r).replace('.',',')} %</b></label><input type="range" id="xr-${it.id}" data-xr="${it.id}" min="0" max="12" step="0.5" value="${st.r}"></div>
@@ -1615,36 +1659,37 @@ function xCardHTML(o){const st=xDefaults(o),it=o.it,f=fvCalc(o.now,st.m,st.r,st.
    <div class="xrow"><span>Satt inn</span><b>${fmt(f.paid)}</b></div><div class="xrow"><span>Avkastning</span><b class="pos">${fmt(f.ret)}</b></div>
    ${xChart(f.pts)}<div class="legend" style="margin-top:4px"><span><b style="background:#c7aa79"></b>Satt inn</span><span><b style="background:var(--acc)"></b>Med avkastning</span></div>
    <div class="xboost">Sparer du 500 kr mer i måneden: ca. ${fmt(fb.total)} (+${fmt(fb.total-f.total)})</div></div>
-  ${changed?`<button type="button" class="btn pri xapply" data-xapply="${it.id}">Bruk ${fmt(st.m)} i måneden i basisbudsjettet</button>`:''}</div>`;}
+  ${changed?`<button type="button" class="btn pri xapply" data-xapply="${it.id}">Bruk ${fmt(st.m)} i måneden i basisbudsjettet</button>`:''}</div></div>`;}
 function xTotals(){const rows=xRows(),tot=rows.reduce((a,o)=>{const st=xDefaults(o),f=fvCalc(o.now,st.m,st.r,xYears*12);a.t+=f.total;a.p+=f.paid;a.n+=o.now;return a;},{t:0,p:0,n:0});
  document.getElementById('x-totnums').innerHTML=`<div class="muted">All sparing om ${xYears} år (${ymLabel(addMonths(xFrom(),xYears*12))})</div><div class="big">ca. ${fmt(tot.t)}</div>
   <div class="xrow"><span>På kontoene etter ${ymLabel(xFrom())}</span><b>${fmt(tot.n)}</b></div><div class="xrow"><span>Satt inn i perioden</span><b>${fmt(tot.p-tot.n)}</b></div><div class="xrow"><span>Avkastning</span><b class="pos">${fmt(tot.t-tot.p)}</b></div>`;
  set('x-ylbl',xYears+' år');}
 function renderExplore(){queueClamp();const rows=xRows();if(xYears==null)xYears=15;
- const xt=document.getElementById('x-total');
- if(!document.getElementById('x-years'))xt.innerHTML=`<div id="x-totnums"></div><div class="xslider"><label for="x-years">Antall år for alle <b id="x-ylbl"></b></label><input type="range" id="x-years" min="1" max="40" step="1" value="${xYears}"></div>
-  <p class="muted" style="margin:6px 0 0;font-size:12px">Hver konto under bruker sitt eget antall år og beløp.</p>`;
- xTotals();
+
  const gs=data.savings.filter(goalOn);
  document.getElementById('x-goals').innerHTML=gs.length?`<div class="card"><h3>Mål</h3>${gs.map(it=>{const st=goalStatus(it,0,xFrom()),done=st.pct>=100&&!st.years;
   const pl=it.goal.type!=='debt'&&it.goal.by&&!st.years?goalPlan(it,st):null;
   const txt=st.years?`Spare i ${it.goal.years} år · ${monthsText(st.months)} igjen`:done?'Målet er nådd 🎉':pl&&pl.left?(pl.short?`Mangler ${fmt(pl.short)} til ${ymLabel(it.goal.by)}`:`Nås innen ${ymLabel(it.goal.by)} ✔`):st.eta?`I mål ${ymLabel(st.eta)} · ${monthsText(st.months)} igjen`:'Legg inn et månedlig beløp';
   return`<div class="toprow"><span>${ic(it,'savings')}${esc(it.name)}</span><strong style="font-size:13px">${txt}</strong><div class="track"><i style="width:${st.pct.toFixed(1)}%"></i></div></div>`;}).join('')}</div>`:'';
  document.getElementById('x-list').innerHTML=rows.map(xCardHTML).join('')||'<p class="empty">Legg til en sparekonto under Budsjett for å se hva den kan bli.</p>';
- const ty=document.getElementById('x-years');ty.oninput=()=>{xYears=+ty.value;Object.keys(xState).forEach(id=>{const it=find(id);if(!(it&&goalOn(it)&&it.goal.mode==='years'))xState[id].y=xYears;});
-  xTotals();document.querySelectorAll('#x-list [data-x]').forEach(c=>xRefresh(c.dataset.x));};
+
  bindExplore();}
 function xRefresh(id){const box=document.getElementById('x-list'),o=xRows().find(x=>x.it.id===id),card=box.querySelector(`[data-x="${id}"]`);if(!o||!card)return;
  const tmp=document.createElement('div');tmp.innerHTML=xCardHTML(o);const nc=tmp.firstElementChild;
- card.querySelector('.xres').innerHTML=nc.querySelector('.xres').innerHTML;
+ card.querySelector('.xres').innerHTML=nc.querySelector('.xres').innerHTML;card.querySelector('.xsum').innerHTML=nc.querySelector('.xsum').innerHTML;
  const lb=card.querySelectorAll('.xslider label b'),nb=nc.querySelectorAll('.xslider label b');lb.forEach((b,i)=>{b.textContent=nb[i].textContent;});
  card.querySelectorAll('input[type=range]').forEach((r,i)=>{const nr=nc.querySelectorAll('input[type=range]')[i];if(document.activeElement!==r)r.value=nr.value;r.max=nr.max;});
- const ob=card.querySelector('.xapply'),nbtn=nc.querySelector('.xapply');if(ob)ob.remove();if(nbtn){card.appendChild(nbtn);bindApply(nbtn);}}
+ const ob=card.querySelector('.xapply'),nbtn=nc.querySelector('.xapply');if(ob)ob.remove();if(nbtn){card.querySelector('.xbody').appendChild(nbtn);bindApply(nbtn);}}
 function bindApply(b){b.onclick=()=>{const it=find(b.dataset.xapply);if(!it)return;const v=xState[it.id].m;
   if(!confirm(`Sette ${it.name} til ${fmt(v)} i måneden i basisbudsjettet? Måneder du allerede har planlagt, endres ikke.`))return;
   data.base[it.id]=v;it.amount=v;persist();renderExplore();toast(it.name+': '+fmt(v)+' i basisbudsjettet');};}
+function paintXCA(){const ca=document.getElementById('x-ca'),cards=[...document.querySelectorAll('#x-list [data-xt]')];if(cards.length<2){ca.innerHTML='';return;}
+ const anyOpen=cards.some(c=>xOpen[c.dataset.xt]);ca.innerHTML=`<button type="button" class="linkbtn">${anyOpen?'Lukk alle':'Åpne alle'}</button>`;
+ ca.firstChild.onclick=()=>{cards.forEach(c=>{const id=c.dataset.xt;if(anyOpen)delete xOpen[id];else xOpen[id]=1;c.setAttribute('aria-expanded',String(!anyOpen));c.nextElementSibling.hidden=anyOpen;});saveXOpen();paintXCA();};}
 function bindExplore(){const box=document.getElementById('x-list');
- const upd=id=>{xRefresh(id);xTotals();};
+ box.querySelectorAll('[data-xt]').forEach(h=>h.onclick=()=>{const id=h.dataset.xt,o=!xOpen[id];if(o)xOpen[id]=1;else delete xOpen[id];saveXOpen();h.setAttribute('aria-expanded',String(o));h.nextElementSibling.hidden=!o;paintXCA();});
+ paintXCA();
+ const upd=id=>{xRefresh(id);};
  box.querySelectorAll('[data-xm]').forEach(el=>el.oninput=()=>{xState[el.dataset.xm].m=+el.value;upd(el.dataset.xm);});
  box.querySelectorAll('[data-xy]').forEach(el=>el.oninput=()=>{xState[el.dataset.xy].y=+el.value;upd(el.dataset.xy);});
  box.querySelectorAll('[data-xr]').forEach(el=>el.oninput=()=>{xState[el.dataset.xr].r=+el.value;upd(el.dataset.xr);});
