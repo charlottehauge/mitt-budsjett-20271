@@ -1211,7 +1211,7 @@ function renderBudget(){queueClamp();
  if(tab==='savings'&&mode!==BASE){const back=data.savings.filter(x=>!x.only&&!inMonth(x,mode)&&usedAnywhere(x.id));
   if(back.length)html+=`<div class="oneoffbox" style="margin:14px -6px 0"><div class="obh">Ikke med i ${mName(mode).toLowerCase()}<small>Trykk for å legge kontoen til denne måneden.</small></div><div class="suggest">${back.map(x=>`<button type="button" data-back="${x.id}">↩ ${iconOf(x,'savings')} ${esc(x.name)}</button>`).join('')}</div></div>`;}
  if(tab==='savings'){const ch=suggestChips(mode);if(ch)html+=`<div class="suggest" style="margin:14px 0 0">${ch}</div>`;}
- if(tab==='savings'&&mode!==BASE)html+=`<button class="addbtn" type="button" id="add-once">+ Engangsinnskudd i ${mName(mode).toLowerCase()}</button>`;
+ if(tab==='savings'&&mode!==BASE)html+=`<button class="addbtn" type="button" id="add-once">+ Ekstra innskudd i ${mName(mode).toLowerCase()}</button>`;
  html+=`<button class="addbtn" type="button" id="add">+ Ny ${tab==='income'?'fast inntekt':tab==='expenses'?'utgift':'fast sparing'}</button>`;
  const hasFixed=['income','expenses','savings'].some(t=>data[t].some(it=>!it.only&&inMonth(it,mode)));
  if(mode!==BASE&&hasFixed)html+=`<button class="tobase" type="button" id="tobase2">⭐ Bruk som basisbudsjett</button>`;
@@ -1240,7 +1240,7 @@ function renderBudget(){queueClamp();
  document.getElementById('add').onclick=()=>openSheet(tab,null);
  const dm=document.getElementById('delmonth');if(dm)dm.onclick=()=>deleteMonth(mode);
  bindSuggest(list,mode);
- const ao=document.getElementById('add-once');if(ao)ao.onclick=()=>{const first=data.savings.find(x=>!x.only&&kindOf(x)!=='transfer');openSheet('savings',null,{name:'Engangsinnskudd',icon:'➕',only:mode,target:first?first.id:''});};
+ const ao=document.getElementById('add-once');if(ao)ao.onclick=()=>{const first=data.savings.find(x=>!x.only&&kindOf(x)!=='transfer');openSheet('savings',null,{name:'',icon:'➕',only:mode,target:first?first.id:''});};
  bindOneOff(list);bindBalance(list);bindSublines(list);
  /* lukk/åpne kategori */
  const toggleG=h=>{const gk=h.dataset.gk,b=list.querySelector(`[data-gb="${CSS.escape(gk)}"]`);const c=!h.classList.contains('closed');
@@ -1408,10 +1408,10 @@ function openSheet(type,id,pre){
  document.getElementById('sh-cat').innerHTML=CATS.map(([k,l])=>`<option value="${k}">${l}</option>`).join('');
  if(type==='expenses')document.getElementById('sh-cat').value=it?it.cat:(CATS[0][0]);
  const ws=document.getElementById('sh-when');
- ws.innerHTML=`<option value="">Fast – blir med når du kopierer til neste måned</option><option value="${onceKey}">Engangsbeløp – bare i ${mLabel(onceKey).toLowerCase()}</option>`;
+ ws.innerHTML=type==='savings'?`<option value="">Fast sparing – hver måned</option><option value="${onceKey}">Ekstra innskudd på en konto – bare i ${mLabel(onceKey).toLowerCase()}</option>`:`<option value="">Fast – hver måned</option><option value="${onceKey}">Engangsbeløp – bare i ${mLabel(onceKey).toLowerCase()}</option>`;
  ws.value=when;
  const tgs=document.getElementById('sh-target'),accts=data.savings.filter(x=>!x.only&&x!==it);
- tgs.innerHTML=accts.map(a=>`<option value="${a.id}">${esc(iconOf(a,'savings')+' '+a.name)}</option>`).join('')+'<option value="">Egen post (ny konto)</option>';
+ tgs.innerHTML=accts.map(a=>`<option value="${a.id}">${esc(iconOf(a,'savings')+' '+a.name)}</option>`).join('')+(accts.length&&!(it&&it.only&&!it.target)?'':'<option value="">Egen post</option>');
  tgs.value=it?(it.target||''):(pre&&pre.target!=null?pre.target:'');
  document.getElementById('sh-keep').checked=it?it.keep!==false:true;
  document.getElementById('sh-later').checked=mode!==BASE;document.getElementById('sh-base').checked=true;
@@ -1619,7 +1619,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alt og start
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='27.10.2026 · følger med';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
+const APP_VERSION='27.10.2026 · ny konto';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
