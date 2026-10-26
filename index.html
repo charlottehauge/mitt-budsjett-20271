@@ -1081,7 +1081,7 @@ function subline(it){const ones=data.savings.filter(o=>o.only===mode&&o.target==
    ${mm&&mm.out?`<div class="accl"><span>− Tatt ut</span><b>${fmt(mm.out)}</b></div>`:''}
    <div class="accl tot"><span>= På konto etter ${mn}</span><b>${fmt(mm?mm.end:(it.balance||0))}</b></div>
    ${carried.length?`<div class="acccar"><span class="muted">Inneholder ekstra innskudd:</span>${carried.map(d=>depositActive(d,mode)
-     ?`<div class="accl"><span>${depLabel(d)} · ${ymLabel(d.only)}${genericName(d.name)?` · <button type="button" class="linkbtn ex" data-ooedit="${d.id}">Gi navn</button>`:''}</span><span><b>${fmt(d.amount)}</b> <button type="button" class="linkbtn" data-rm="${d.id}">Ta ut</button></span></div>`
+     ?`<div class="accl"><span><button type="button" class="linkbtn ex" data-ooedit="${d.id}" title="Endre eller slett">${depLabel(d)}</button> · ${ymLabel(d.only)}</span><span><b>${fmt(d.amount)}</b> <button type="button" class="linkbtn" data-rm="${d.id}">Ta ut</button></span></div>`
      :`<div class="accl"><span>${depLabel(d)} · tatt ut i ${mn}</span>${d.removed===mode?`<button type="button" class="linkbtn" data-undo="${d.id}">Angre</button>`:''}</div>`).join('')}</div>`:''}`;}
  if(gl)body+=`<div class="accgoal">🎯 ${gl}</div>`;
  body+=`<div class="accbtns">${it.only?'':`<button type="button" class="linkbtn" data-extra="${it.id}">+ Ekstra innskudd</button>`}<button type="button" class="linkbtn" data-goal="${it.id}">${goalOn(it)?'Endre mål':'🎯 Sett mål'}</button><button type="button" class="linkbtn" style="color:var(--red)" data-rmacc="${it.id}">${it.only?'Slett innskuddet':'Fjern fra '+mName(mode).toLowerCase()}</button></div>`;
@@ -1107,8 +1107,10 @@ function bindSublines(root){
   b.setAttribute('aria-expanded',String(o));const bd=b.nextElementSibling;if(bd)bd.hidden=!o;const l=b.querySelector('.sdl');if(l)l.textContent=o?'Skjul detaljer':'Vis detaljer';if(typeof paintCA==='function')paintCA();});
  root.querySelectorAll('[data-rmacc]').forEach(b=>b.onclick=()=>{const it=find(b.dataset.rmacc);if(!it)return;
   if(it.only){if(!confirm('Slette «'+it.name+'» ('+fmt(it.amount)+')?'))return;data.savings=data.savings.filter(x=>x!==it);}
-  else{if(!confirm('Fjerne «'+it.name+'» fra '+mLabel(mode).toLowerCase()+'?'+(Object.keys(data.plan).filter(k=>k!==mode&&data.plan[k][it.id]!=null).length?' Den blir liggende i andre måneder.':'')))return;
-   delete (data.plan[mode]||{})[it.id];if(!usedAnywhere(it.id))data.savings=data.savings.filter(x=>x!==it&&x.target!==it.id);}
+  else{const ex=data.savings.filter(o=>o.only===mode&&o.target===it.id),others=Object.keys(data.plan).filter(k=>k!==mode&&data.plan[k][it.id]!=null).length;
+   if(!confirm('Fjerne «'+it.name+'» fra '+mLabel(mode).toLowerCase()+'?'+(ex.length?' Ekstra innskudd i '+mName(mode).toLowerCase()+' blir også fjernet: '+ex.map(o=>(genericName(o.name)?'Ekstra innskudd':o.name)+' '+fmt(o.amount)).join(', ')+'.':'')+(others?' Kontoen blir liggende i andre måneder.':'')))return;
+   delete (data.plan[mode]||{})[it.id];data.savings=data.savings.filter(o=>!ex.includes(o));
+   if(!usedAnywhere(it.id))data.savings=data.savings.filter(x=>x!==it&&x.target!==it.id);}
   rebuildPeriod();save('Fjernet');});
  root.querySelectorAll('[data-goal]').forEach(b=>b.onclick=()=>{openSheet('savings',b.dataset.goal);const on=document.getElementById('g-on');on.checked=true;paintGoal();});
  root.querySelectorAll('[data-extra]').forEach(b=>b.onclick=()=>openSheet('savings',null,{name:'',icon:'➕',only:mode,target:b.dataset.extra}));
@@ -1127,7 +1129,7 @@ function suggestChips(m){return SAVE_SUGGEST.map(o=>{const ex=findSaving(o[0]);
 function bindSuggest(root,m,afterOpen){
  root.querySelectorAll('[data-sg]').forEach(b=>b.onclick=()=>{const o=SAVE_SUGGEST.find(x=>x[0]===b.dataset.sg);mode=m;tab='savings';
   openSheet('savings',null,{name:o[0],icon:o[1],kind:o[2],goal:{on:true,type:o[2]==='transfer'?'debt':'save',amount:'',before:'',motivate:true}});});
- root.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{const it=find(b.dataset.back);if(!it)return;if(m===BASE)data.base[it.id]=it.amount||0;else{data.plan[m]=data.plan[m]||{};data.plan[m][it.id]=it.amount||0;}
+ root.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{const it=find(b.dataset.back);if(!it)return;const amt=data.base[it.id]!=null?data.base[it.id]:(it.amount||0);if(m===BASE)data.base[it.id]=amt;else{data.plan[m]=data.plan[m]||{};data.plan[m][it.id]=amt;}
   save(it.name+' er lagt tilbake i '+mLabel(m).toLowerCase());});
  root.querySelectorAll('[data-setgoal]').forEach(b=>b.onclick=()=>{mode=m;tab='savings';openSheet('savings',b.dataset.setgoal);
   const on=document.getElementById('g-on');on.checked=true;paintGoal();});}
@@ -1206,6 +1208,8 @@ function renderBudget(){queueClamp();
  }else{const fixed=items.filter(x=>!x.only);
   html=(mode===BASE?'':oneOffBox())+(fixed.length?groupHead('💰','Faste inntekter',fixed.length,'data-inc="1"',fixed.reduce((a,x)=>a+amountFor(x,mode),0))+gOpen(tab+':Faste inntekter')+incomeLine()+fixed.map(rowHTML).join('')+'</div>':'');}
  if(!items.length&&tab!=='income')html='<p class="empty">Ingen poster her i '+mName(mode).toLowerCase()+'.</p>';
+ if(tab==='savings'&&mode!==BASE){const back=data.savings.filter(x=>!x.only&&!inMonth(x,mode)&&usedAnywhere(x.id));
+  if(back.length)html+=`<div class="oneoffbox" style="margin:14px -6px 0"><div class="obh">Ikke med i ${mName(mode).toLowerCase()}<small>Trykk for å legge kontoen til denne måneden.</small></div><div class="suggest">${back.map(x=>`<button type="button" data-back="${x.id}">↩ ${iconOf(x,'savings')} ${esc(x.name)}</button>`).join('')}</div></div>`;}
  if(tab==='savings'){const ch=suggestChips(mode);if(ch)html+=`<div class="suggest" style="margin:14px 0 0">${ch}</div>`;}
  if(tab==='savings'&&mode!==BASE)html+=`<button class="addbtn" type="button" id="add-once">+ Engangsinnskudd i ${mName(mode).toLowerCase()}</button>`;
  html+=`<button class="addbtn" type="button" id="add">+ Ny ${tab==='income'?'fast inntekt':tab==='expenses'?'utgift':'fast sparing'}</button>`;
@@ -1612,7 +1616,7 @@ document.getElementById('m-reset').onclick=()=>{if(!confirm('Slette alt og start
 /* ============ FELLES ============ */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 set('yearpill',(TODAY.getFullYear()+1)+' om '+daysTo(TODAY.getFullYear()+1)+' dager');
-const APP_VERSION='27.10.2026 · fjern konto';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
+const APP_VERSION='27.10.2026 · legg tilbake';set('app-version',APP_VERSION);set('app-version2','Versjon '+APP_VERSION);
 /* ============ LES MER / VIS MINDRE ============
    Små forklaringstekster som går over mer enn to linjer, kortes ned med en «Les mer»-knapp. */
 const CLAMP_SEL='.lead, .explain, p.muted, div.muted, .obh small, .src, .emptyplan p, .gl, #pj-text, #sav-start, #sav-note, .note';
